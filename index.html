@@ -50,6 +50,9 @@
   .drop-hot{outline:3px dashed #7c3aed;outline-offset:2px}
   .bell{width:min(70vw,260px);height:min(70vw,260px);border-radius:999px;background:radial-gradient(circle at 35% 30%,#fde68a,#f59e0b 55%,#b45309);color:#fff;font-size:5rem;box-shadow:0 18px 40px rgba(245,158,11,.45);animation:ring 1s infinite}
   @keyframes ring{0%,100%{transform:rotate(0)}20%{transform:rotate(-8deg)}40%{transform:rotate(8deg)}60%{transform:rotate(-5deg)}80%{transform:rotate(5deg)}}
+  .phone .sm\:grid-cols-2,.phone .sm\:grid-cols-3,.phone .lg\:grid-cols-\[1fr_280px\]{grid-template-columns:repeat(1,minmax(0,1fr))!important}
+  .phone .sm\:grid-cols-4{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .phone .sm\:text-2xl{font-size:1.25rem!important}.phone .sm\:p-7,.phone .sm\:p-12{padding:1.25rem!important}
   .pulse-soft{animation:ps 1.4s infinite}@keyframes ps{50%{opacity:.45}}
   .pop{animation:pop .35s ease-out}@keyframes pop{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
   .tabular-nums{font-variant-numeric:tabular-nums}
@@ -1053,10 +1056,12 @@ function renderHost() {
           <span class="hidden md:inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-lg border ${Net.mode !== 'local' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-800 border-amber-200'}"><i class="fa-solid ${Net.mode !== 'local' ? 'fa-wifi' : 'fa-laptop'}"></i>${Net.mode === 'local' ? 'Chế độ 1 máy (nhiều tab)' : 'Online nhiều máy'}</span>
           ${H.phase === 'setup' ? '' : `<button onclick="h_backSetup()" class="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-xs border border-purple-200 flex items-center gap-1.5 transition shadow-sm"><i class="fa-solid fa-users-gear text-purple-600"></i><span class="hidden sm:inline">Chia lại đội</span></button>`}
           <button onclick="h_fullscreen()" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 hidden sm:flex items-center justify-center text-xs transition" title="Chiếu máy chiếu"><i class="fa-solid fa-expand"></i></button>
+          <span class="hidden lg:inline-flex items-center gap-1.5 text-[11px] font-black px-2.5 py-1 rounded-lg bg-slate-900 text-white"><i class="fa-solid fa-user-shield text-amber-300"></i>${esc(authUser())}</span>
           <a href="index.html" class="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs flex items-center gap-1.5 transition shadow-sm"><i class="fa-solid fa-arrow-left"></i><span class="hidden sm:inline">Thoát trò chơi</span></a>
         </div>
       </header>
       <main class="flex-1 px-4 sm:px-6 lg:px-8 py-5 w-full max-w-[1550px] mx-auto">${body}</main>
+      ${UI.preview ? previewHTML() : ''}
       <footer class="mt-auto border-t border-slate-200 bg-white py-4 px-6 text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2">
         <div>© 2026 <strong>EDU GAME</strong> - Tương thích máy chiếu & TV thông minh</div>
         <div class="flex items-center gap-3"><span>Hỗ trợ file Word .docx & Excel .xlsx</span><span>•</span><span>Mã PIN riêng từng đội</span></div>
@@ -1096,6 +1101,7 @@ function sidebarHTML() {
           ${link('fa-users-gear', 'purple', 'Danh sách & Chia đội', ph === 'setup' ? '' : 'h_backSetup()', ph === 'setup', `${H.students.length} HS • ${H.teams.length} đội`)}
           ${link('fa-door-open', 'emerald', 'Phòng chờ & Mã PIN', '', ph === 'lobby', ph === 'setup' ? 'Chưa mở phòng' : `${joined}/${H.teams.length} đội đã vào`, ph === 'setup')}
           ${link('fa-users-viewfinder', 'indigo', 'Màn hình các đội (BGK)', ph === 'game' ? 'h_tab(0)' : '', ph === 'game' && UI.tab !== 'main', 'Xem y hệt máy từng đội', ph !== 'game')}
+          ${link('fa-eye', 'pink', 'Xem trước giao diện', "h_preview('lobby')", !!UI.preview, 'Màn hình đội & GV từng vòng')}
           ${link('fa-trophy', 'amber', 'Bảng điểm', ph === 'game' ? "h_tab('main')" : '', ph === 'end' || (ph === 'game' && UI.tab === 'main'), H.teams.map(t => t.score).join(' • '), ph === 'setup' || ph === 'lobby')}
         </div>
       </div>
@@ -1109,7 +1115,8 @@ function sidebarHTML() {
       </div>
     </div>
     <div class="p-3 border-t border-slate-100 bg-slate-50/60 flex items-center justify-between">
-      <button onclick="h_resetAll()" class="flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-purple-600"><i class="fa-solid fa-rotate text-purple-500"></i><span>Làm mới</span></button>
+      <div class="flex items-center gap-3"><button onclick="h_logout()" class="flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-rose-600" title="Đăng xuất"><i class="fa-solid fa-right-from-bracket text-rose-500"></i><span>Đăng xuất</span></button>
+      <button onclick="h_resetAll()" class="flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-purple-600" title="Xóa dữ liệu, làm lại"><i class="fa-solid fa-rotate text-purple-500"></i><span>Làm mới</span></button></div>
       <button onclick="h_fullscreen()" class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-purple-600 flex items-center justify-center text-xs shadow-sm" title="Toàn màn hình"><i class="fa-solid fa-expand"></i></button>
     </div>
   </aside>`;
@@ -1185,6 +1192,7 @@ Câu không nằm dưới mục nào sẽ được tự chia vào vòng còn thi
     ${step(3, 'Bộ câu hỏi 4 vòng thi', 'fa-list-check', bank)}
     <div class="card p-5 flex flex-wrap items-center justify-between gap-3 bg-gradient-to-r from-rose-50 to-violet-50">
       <div class="text-sm font-semibold text-slate-600">Bước tiếp theo: hệ thống cấp <b>mã PIN riêng cho từng đội</b>. Mỗi mã chỉ vào được <b>1 thiết bị</b>.</div>
+      <button class="btn btn-soft py-3.5 px-5 text-base" onclick="h_preview('lobby')"><i class="fa-solid fa-eye text-purple-600"></i> Xem trước giao diện</button>
       <button class="btn btn-pri py-3.5 px-6 text-base" onclick="h_openLobby()" ${ready ? '' : 'disabled'}><i class="fa-solid fa-key"></i> Tạo mã PIN & mở phòng chờ</button></div></div>`;
 }
 
@@ -1198,20 +1206,33 @@ function lobbyHTML() {
         ${Net.mode === 'local' ? `<div class="text-xs font-bold text-amber-700 mt-2"><i class="fa-solid fa-circle-info"></i> Chưa tải được thư viện kết nối (kiểm tra Internet) – hiện chỉ chơi được bằng nhiều tab trên máy này.</div>`
           : `<div class="text-xs font-bold text-emerald-700 mt-2"><i class="fa-solid fa-wifi"></i> Học sinh dùng điện thoại/máy bất kỳ có Internet, mở đường dẫn trên và nhập mã PIN. <span class="text-rose-600">Giữ trang này mở suốt buổi thi.</span></div>`}</div>
       <div class="flex gap-2"><button class="btn btn-soft" onclick="h_regenPins()"><i class="fa-solid fa-key"></i> Tạo PIN mới</button></div></div>
-    <div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">${H.teams.map((t, i) => `
-      <div class="card p-5 border-t-8" style="border-top-color:${t.color}">
-        <div class="flex items-center justify-between"><div class="font-black text-lg">${esc(t.name)}</div>
-          ${t.dev ? `<span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-black"><i class="fa-solid fa-circle-check"></i> Sẵn sàng</span>` : `<span class="px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-black pulse-soft"><i class="fa-solid fa-hourglass-half"></i> Đang chờ</span>`}</div>
-        <div class="mt-4 rounded-2xl bg-slate-900 text-white text-center py-4 cursor-pointer select-all" onclick="UI.showPin[${i}]=!UI.showPin[${i}];renderHost()" title="Bấm để ẩn/hiện">
-          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Mã PIN</div>
-          <div class="text-4xl font-black tracking-[.25em] tabular-nums">${UI.showPin[i] ? t.pin : '••••••'}</div></div>
-        ${Net.mode === 'p2p' ? (() => { const st = Net.peerOk[t.pin]; return `<div class="mt-2 text-[11px] font-bold ${st === 'ok' ? 'text-emerald-600' : st === 'error' ? 'text-rose-600' : 'text-amber-600'}"><i class="fa-solid ${st === 'ok' ? 'fa-plug-circle-check' : st === 'error' ? 'fa-triangle-exclamation' : 'fa-spinner fa-spin'}"></i> ${st === 'ok' ? 'Cổng kết nối đã mở' : st === 'error' ? 'Lỗi mạng – đang thử lại' : 'Đang mở cổng kết nối…'}</div>`; })() : ''}
-        <div class="mt-3 text-xs text-slate-500 line-clamp-2"><b>${t.members.length} HS:</b> ${esc(t.members.join(', '))}</div>
-        <div class="mt-3 flex gap-2">${t.dev ? `<button class="btn btn-soft flex-1" onclick="h_unlock(${i})"><i class="fa-solid fa-lock-open"></i> Mở khóa</button>` : `<a class="btn btn-soft flex-1" href="${esc(link)}?team" target="_blank"><i class="fa-solid fa-up-right-from-square"></i> Mở tab đội</a>`}</div>
-      </div>`).join('')}</div>
+    <div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">${H.teams.map((t, i) => {
+      const st = Net.mode === 'p2p' ? Net.peerOk[t.pin] : 'ok';
+      const port = Net.mode === 'p2p' ? `<div class="text-[11px] font-bold ${st === 'ok' ? 'text-emerald-600' : st === 'error' ? 'text-rose-600' : 'text-amber-600'}"><i class="fa-solid ${st === 'ok' ? 'fa-plug-circle-check' : st === 'error' ? 'fa-triangle-exclamation' : 'fa-spinner fa-spin'}"></i> ${st === 'ok' ? 'Cổng kết nối đã mở' : st === 'error' ? 'Lỗi mạng – đang thử lại' : 'Đang mở cổng kết nối…'}</div>` : '';
+      const pinSmall = `<button class="flex items-center gap-2 rounded-xl bg-slate-100 hover:bg-slate-200 px-3 py-2 text-left" onclick="UI.showPin[${i}]=!UI.showPin[${i}];renderHost()" title="Bấm để ẩn/hiện"><i class="fa-solid fa-key text-slate-400 text-xs"></i><span class="text-[10px] font-black uppercase text-slate-400">PIN</span><span class="font-black tracking-[.2em] tabular-nums text-slate-700">${UI.showPin[i] ? t.pin : '••••••'}</span></button>`;
+      return `
+      <div class="relative overflow-hidden rounded-3xl border-2 bg-white shadow-sm p-4 flex flex-col min-h-[300px] transition" style="border-color:${t.dev ? '#10b981' : t.color + '55'}">
+        <div class="flex items-center justify-between gap-2">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-white text-sm font-black shadow-sm" style="background:${t.color}">${esc(t.name)}</span>
+          <span class="text-[11px] font-black text-slate-400"><i class="fa-solid fa-users"></i> ${t.members.length} HS</span></div>
+        <div class="text-[11px] text-slate-500 mt-2 line-clamp-2 min-h-[30px]">${esc(t.members.join(', '))}</div>
+        ${t.dev ? `
+        <div class="flex-1 mt-3 rounded-2xl text-white grid place-items-center text-center pop shadow-lg min-h-[150px]" style="background:radial-gradient(circle at 80% 0%,rgba(255,255,255,.35),transparent 50%),linear-gradient(135deg,#10b981,#047857)">
+          <div><div class="w-14 h-14 mx-auto rounded-full bg-white/25 grid place-items-center text-3xl mb-2"><i class="fa-solid fa-check"></i></div>
+            <div class="text-3xl xl:text-4xl font-black tracking-wider">SẴN SÀNG</div><div class="text-xs font-bold opacity-90 mt-1">Đội đã vào phòng thi</div></div></div>
+        <div class="mt-3 flex items-center gap-2">${pinSmall}<button class="btn btn-soft flex-1 !px-2" onclick="h_unlock(${i})" title="Cho đội nhập lại PIN trên máy khác"><i class="fa-solid fa-lock-open"></i> Mở khóa</button></div>`
+        : `
+        <div class="mt-3 flex items-center justify-between"><span class="px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-black pulse-soft"><i class="fa-solid fa-hourglass-half"></i> Đang chờ đội vào…</span></div>
+        <div class="flex-1 mt-3 rounded-2xl bg-slate-900 text-white text-center grid place-items-center py-5 cursor-pointer" onclick="UI.showPin[${i}]=!UI.showPin[${i}];renderHost()" title="Bấm để ẩn/hiện">
+          <div><div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Mã PIN</div>
+          <div class="text-4xl font-black tracking-[.25em] tabular-nums mt-1">${UI.showPin[i] ? t.pin : '••••••'}</div>
+          <div class="text-[10px] text-slate-500 mt-1">${UI.showPin[i] ? 'Bấm để ẩn' : 'Bấm để hiện mã'}</div></div></div>
+        <div class="mt-3 flex items-center justify-between gap-2">${port}<a class="btn btn-soft !py-1.5 !px-2.5 !text-xs" href="${esc(link)}?team" target="_blank" title="Mở thử màn hình đội trong tab mới"><i class="fa-solid fa-up-right-from-square"></i> Mở tab</a></div>`}
+      </div>`; }).join('')}</div>
     <div class="card p-6 text-center">
       <div class="font-bold text-slate-500 mb-3">${all ? 'Tất cả các đội đã sẵn sàng!' : `Đang chờ ${H.teams.length - n} đội vào phòng…`}</div>
-      <button class="btn btn-pri text-xl py-5 px-14" onclick="h_start()" ${all ? '' : 'disabled'}><i class="fa-solid fa-play"></i> BẮT ĐẦU</button>
+      <div class="flex flex-wrap justify-center gap-3"><button class="btn btn-soft text-base py-5 px-6" onclick="h_preview('lobby')"><i class="fa-solid fa-eye text-purple-600"></i> Xem trước giao diện</button>
+      <button class="btn btn-pri text-xl py-5 px-14" onclick="h_start()" ${all ? '' : 'disabled'}><i class="fa-solid fa-play"></i> BẮT ĐẦU</button></div>
       <div class="text-xs text-slate-400 mt-3">Bấm vào ô PIN để hiện mã. Nên phát mã riêng cho từng đội, không chiếu cả 4 mã lên máy chiếu.</div></div></div>`;
 }
 
@@ -1420,18 +1441,198 @@ function renderTeam() {
     return;
   }
   const p = T.p, me = p.teams[T.t];
-  root.innerHTML = `
-    <header class="sticky top-0 z-10 text-white px-4 pt-3 pb-4 shadow-lg rounded-b-3xl" style="background:radial-gradient(circle at 90% -40%,rgba(255,255,255,.35),transparent 50%),linear-gradient(135deg,${me.color},#1e1b4b 140%)">
+  root.innerHTML = teamHeaderHTML(p, me) + `
+    ${T.lost ? '<div class="max-w-4xl mx-auto px-3 pt-3"><div class="rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-bold px-4 py-2.5"><i class="fa-solid fa-wifi fa-fade"></i> Mất kết nối với máy giáo viên – đang tự kết nối lại…</div></div>' : ''}
+    <main class="max-w-4xl mx-auto p-3 sm:p-6 pb-10">${teamScreen(p, T.t, { ro: false, pend: T.pend, cnvOpen: T.cnvOpen, pick: T.pick })}</main>`;
+  updateTimers();
+}
+function teamHeaderHTML(p, me, sticky = true) {
+  return `
+    <header class="${sticky ? 'sticky top-0 z-10' : ''} text-white px-4 pt-3 pb-4 shadow-lg rounded-b-3xl" style="background:radial-gradient(circle at 90% -40%,rgba(255,255,255,.35),transparent 50%),linear-gradient(135deg,${me.color},#1e1b4b 140%)">
       <div class="max-w-4xl mx-auto flex items-center justify-between gap-3">
         <div class="flex items-center gap-3 min-w-0"><div class="w-11 h-11 rounded-2xl bg-white/20 border border-white/30 grid place-items-center text-lg flex-shrink-0"><i class="fa-solid ${p.phase === 'game' ? ROUND_ICONS[p.round] : p.phase === 'end' ? 'fa-trophy' : 'fa-mountain'}"></i></div>
           <div class="min-w-0"><div class="font-black text-lg leading-tight truncate">${esc(me.name)}</div>
           <div class="text-[11px] font-bold opacity-85 truncate">${p.phase === 'game' ? `Vòng ${p.round}: ${ROUND_NAMES[p.round]}` : p.phase === 'end' ? 'Kết thúc' : 'Phòng chờ'}</div></div></div>
         <div class="text-right bg-white/15 border border-white/25 rounded-2xl px-3 py-1.5"><div class="text-[9px] font-black opacity-80 uppercase tracking-wider">Điểm</div><div class="text-2xl font-black tabular-nums leading-none">${me.score}</div></div></div>
       <div class="max-w-4xl mx-auto text-[11px] font-semibold opacity-80 mt-2 truncate"><i class="fa-solid fa-users"></i> ${esc(me.members.join(', '))}</div>
-    </header>
-    ${T.lost ? '<div class="max-w-4xl mx-auto px-3 pt-3"><div class="rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-bold px-4 py-2.5"><i class="fa-solid fa-wifi fa-fade"></i> Mất kết nối với máy giáo viên – đang tự kết nối lại…</div></div>' : ''}
-    <main class="max-w-4xl mx-auto p-3 sm:p-6 pb-10">${teamScreen(p, T.t, { ro: false, pend: T.pend, cnvOpen: T.cnvOpen, pick: T.pick })}</main>`;
-  updateTimers();
+    </header>`;
+}
+
+
+/* ===================== XEM TRƯỚC GIAO DIỆN (GV) ===================== */
+const PREVIEWS = [
+  ['lobby', 'fa-door-open', 'Phòng chờ', 'Đội đã nhập PIN, chờ GV bấm Bắt đầu'],
+  ['r1', 'fa-bolt', 'Vòng 1 · Khởi động', 'Mỗi đội tự làm 7 câu trong 45 giây'],
+  ['r2', 'fa-puzzle-piece', 'Vòng 2 · Vượt CNV', 'Hàng ngang + nút đoán chướng ngại vật'],
+  ['r3', 'fa-gauge-high', 'Vòng 3 · Tăng tốc', 'Cùng câu hỏi, tính thời gian'],
+  ['r4pick', 'fa-box-open', 'Vòng 4 · Chọn gói', 'Đội thi chọn gói & Ngôi sao hy vọng'],
+  ['r4q', 'fa-flag-checkered', 'Vòng 4 · Trả lời', 'Màn hình đội đang thi'],
+  ['r4buzz', 'fa-bell', 'Vòng 4 · Bấm chuông', 'Màn hình 3 đội còn lại khi đội thi sai'],
+  ['review', 'fa-ranking-star', 'Kết thúc vòng', 'Điểm & thứ hạng sau mỗi vòng'],
+  ['end', 'fa-trophy', 'Kết quả chung cuộc', 'Bảng xếp hạng cuối trận']];
+function h_preview(k) { UI.preview = k; renderHost(); }
+function previewMock(k) {
+  const b = buildBank(H.bankText), now = Net.now(), D = s => now + s * 1000;
+  const fb = { text: 'Câu hỏi mẫu', opts: ['Đáp án A', 'Đáp án B', 'Đáp án C', 'Đáp án D'], ans: 0 };
+  const q = (arr, i) => (arr && arr[i]) || fb;
+  const teams = H.teams.map((t, i) => ({ name: t.name, color: t.color, members: t.members.length ? t.members : ['Học sinh A', 'Học sinh B'], dev: 'demo' + i, score: [60, 40, 30, 10][i] ?? 0 }));
+  const p = { roomId: 'demo', teams, rejects: {}, phase: 'game', round: 1, status: 'play' };
+  let t = 0, ctx = { ro: true };
+  if (k === 'lobby') { p.phase = 'lobby'; teams.forEach(x => x.score = 0); teams[3] && (teams[3].dev = null); }
+  if (k === 'r1') {
+    const set = Array.from({ length: Math.max(1, b.r1.length) }, (_, i) => { const x = q(b.r1, i); return { text: x.text, opts: x.opts }; });
+    p.view = { startAt: now - 1000, deadline: D(32), sets: teams.map(() => set), prog: teams.map((_, ti) => set.slice(0, [2, 4, 1, 3][ti] ?? 2).map((_, qi) => { const x = q(b.r1, qi), ok = (qi + ti) % 3 !== 1; return { c: ok ? x.ans : (x.ans + 1) % 4, ok, a: x.ans }; })) };
+  }
+  if (k === 'r2') {
+    p.round = 2; const r0 = q(b.r2, 0), r1 = q(b.r2, 1), c = b.cnv || fb;
+    p.view = { row: 1, rs: 'play', start: now, deadline: D(12), finalDl: 0, solved: -1,
+      rows: [0, 1, 2, 3].map(i => i === 0 ? { text: r0.text, opts: r0.opts, ans: r0.ans, key: r0.opts[r0.ans], open: true } : i === 1 ? { text: r1.text, opts: r1.opts, ans: -1, key: null, open: false } : { text: null, opts: null, ans: -1, key: null, open: false }),
+      ans: [0, 1, 2, 3].map(i => teams.map((_, ti) => i === 0 ? (ti === 3 ? null : { c: ti === 2 ? (r0.ans + 1) % 4 : r0.ans, t: 2300 + ti * 1700, ok: ti !== 2 }) : i === 1 && ti === 2 ? { c: 0, t: 3400, ok: null } : null)), cnv: { text: c.text, opts: c.opts, ans: -1 }, hasCnv: true, cnvTry: teams.map(() => null), opened: 1 };
+  }
+  if (k === 'r3') { p.round = 3; const x = q(b.r3, 0); p.view = { q: 0, n: 4, qs: 'play', start: now, deadline: D(24), text: x.text, opts: x.opts, ans: -1, answers: teams.map((_, ti) => ti === 1 ? { c: x.ans, t: 4120, ok: null } : ti === 3 ? { c: (x.ans + 2) % 4, t: 6800, ok: null } : null), award: teams.map(() => 0) }; }
+  if (k.startsWith('r4')) {
+    p.round = 4; const x = q(b.v[20], 0);
+    p.view = { order: teams.map((_, i) => i), turn: 0, active: 0, st: 'pick', pkg: 0, star: -1, qi: 0, pts: [], hist: [], text: null, opts: null, ans: -1, deadline: D(15), total: 15, main: null, buzzer: -1, steal: null };
+    if (k === 'r4pick') ctx.pick = { pkg: 80, star: 1 };
+    if (k !== 'r4pick') Object.assign(p.view, { st: k === 'r4q' ? 'answer' : 'buzz', pkg: 80, star: 1, pts: [20, 30, 30], text: x.text, opts: x.opts, deadline: D(k === 'r4q' ? 11 : 4), total: k === 'r4q' ? 15 : RULES.BUZZ_TIME, main: k === 'r4buzz' ? { c: (x.ans + 1) % 4, ok: false } : null });
+    if (k === 'r4buzz') t = 1;
+  }
+  if (k === 'review') {
+    const set = Array.from({ length: Math.max(1, b.r1.length) }, (_, i) => { const x = q(b.r1, i); return { text: x.text, opts: x.opts }; });
+    p.status = 'review'; p.view = { startAt: now - 50000, deadline: now - 5000, sets: teams.map(() => set), prog: teams.map((_, ti) => set.map((_, qi) => ({ c: 0, ok: (qi + ti) % 3 !== 1, a: 0 }))) };
+  }
+  if (k === 'end') p.phase = 'end';
+  return { p, t, ctx };
+}
+function h_pvMode(m) { UI.pvMode = m; renderHost(); }
+function h_pvTab(t) { UI.pvTab = t; renderHost(); }
+function gvPreviewHTML(k, p) {
+  if (k === 'lobby') {
+    return `<div class="space-y-4"><div class="stage rounded-3xl p-5 text-white"><div class="text-[11px] font-black uppercase tracking-[.2em] text-white/60">Phòng chờ</div><div class="text-2xl sm:text-3xl font-black">CÁC ĐỘI NHẬP MÃ PIN</div><div class="text-xs text-white/75 mt-1">Đội vào rồi hiện SẴN SÀNG • đủ đội mới bấm được BẮT ĐẦU</div></div>
+      <div class="grid grid-cols-2 xl:grid-cols-4 gap-3">${p.teams.map(t => `<div class="rounded-3xl border-2 bg-white p-3 flex flex-col min-h-[210px]" style="border-color:${t.dev ? '#10b981' : t.color + '55'}">
+        <span class="self-start px-3 py-1 rounded-full text-white text-xs font-black" style="background:${t.color}">${esc(t.name)}</span>
+        ${t.dev ? `<div class="flex-1 mt-3 rounded-2xl text-white grid place-items-center text-center" style="background:linear-gradient(135deg,#10b981,#047857)"><div><i class="fa-solid fa-circle-check text-3xl"></i><div class="text-2xl font-black tracking-wider mt-1">SẴN SÀNG</div></div></div>
+          <div class="mt-2 text-[11px] font-bold text-slate-400"><i class="fa-solid fa-key"></i> PIN ••••••</div>`
+        : `<div class="mt-2 text-[11px] font-black text-amber-600 pulse-soft"><i class="fa-solid fa-hourglass-half"></i> Đang chờ đội vào…</div><div class="flex-1 mt-2 rounded-2xl bg-slate-900 text-white grid place-items-center"><div class="text-center"><div class="text-[10px] text-slate-400 font-bold uppercase">Mã PIN</div><div class="text-2xl font-black tracking-[.2em]">••••••</div></div></div>`}</div>`).join('')}</div>
+      <div class="card p-5 text-center"><div class="text-sm font-bold text-slate-500 mb-2">Đang chờ 1 đội vào phòng…</div><span class="btn btn-pri text-lg py-4 px-10 opacity-40"><i class="fa-solid fa-play"></i> BẮT ĐẦU</span></div></div>`;
+  }
+  if (k === 'end') return finalBoard(p);
+  const mg = { round: p.round, status: p.status, bank: buildBank(H.bankText) }, keepG = H.g, keepRR = RR, tab = UI.pvTab ?? 'main';
+  H.g = mg;
+  try {
+    const tabs = `<div class="flex flex-wrap gap-2">
+      <button class="btn ${tab === 'main' ? 'btn-dark' : 'btn-soft'}" onclick="h_pvTab('main')"><i class="fa-solid fa-display"></i> Màn hình chính</button>
+      ${p.teams.map((t, i) => `<button class="btn ${tab === i ? '' : 'btn-soft'}" style="${tab === i ? `background:${t.color};color:#fff` : ''}" onclick="h_pvTab(${i})"><i class="fa-solid fa-mobile-screen"></i> ${esc(t.name)} <span class="w-2 h-2 rounded-full bg-emerald-400"></span></button>`).join('')}</div>`;
+    const content = tab === 'main' ? hostMain(p).replace(/h_tab\(/g, 'h_pvTab(')
+      : `<div class="rounded-3xl border-4 p-3 sm:p-5 bg-slate-50" style="border-color:${p.teams[tab].color}">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-4"><div class="flex items-center gap-2">${badge(p.teams[tab])}<span class="text-xs font-bold text-slate-500">GV đang xem y hệt màn hình của đội (chỉ xem)</span></div><span class="text-2xl font-black tabular-nums">${p.teams[tab].score}đ</span></div>
+          ${teamScreen(p, tab, { ro: true })}</div>`;
+    return `<div class="space-y-4">${roundStepper(mg)}
+      <div class="card p-3 space-y-3"><div class="flex flex-wrap items-center justify-between gap-3">${tabs}<span class="text-[11px] font-bold text-purple-600"><i class="fa-solid fa-hand-pointer"></i> Bấm thẻ đội để xem màn hình phụ</span></div>
+        <div class="relative rounded-2xl bg-slate-50 border border-slate-200 p-3"><span class="absolute -top-2.5 right-3 text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200">Nút điều khiển của GV (minh họa)</span>
+          <div class="flex flex-wrap items-center gap-3 pointer-events-none select-none">${hostControls(p)}</div></div></div>
+      ${content}</div>`;
+  } finally { H.g = keepG; RR = keepRR; }
+}
+function previewHTML() {
+  const k = UI.preview, mode = UI.pvMode || 'team', { p, t, ctx } = previewMock(k), me = p.teams[t];
+  const keepRR = RR;
+  const screen = mode === 'team' ? teamScreen(p, t, ctx) : gvPreviewHTML(k, p);
+  RR = keepRR; // màn xem trước không tự vẽ lại theo đồng hồ
+  const seg = (m, ic, label) => `<button onclick="h_pvMode('${m}')" class="px-4 py-2 rounded-xl text-sm font-black flex items-center gap-2 transition ${mode === m ? 'bg-white text-slate-900 shadow' : 'text-white/80 hover:bg-white/10'}"><i class="fa-solid ${ic}"></i>${label}</button>`;
+  const phone = `<div class="w-full max-w-[400px] mx-auto">
+      <div class="text-center text-[11px] font-black uppercase tracking-wider text-slate-400 mb-2"><i class="fa-solid fa-mobile-screen"></i> Điện thoại của ${esc(me.name)}</div>
+      <div class="rounded-[2.6rem] bg-slate-900 p-2.5 shadow-2xl">
+        <div class="rounded-[2.1rem] overflow-hidden bg-[#f8fafc] h-[680px] overflow-y-auto relative">
+          <div class="h-6 bg-slate-900 w-32 mx-auto rounded-b-2xl"></div>
+          ${teamHeaderHTML(p, me, false)}
+          <div class="phone p-3 pb-8">${screen}</div>
+        </div></div></div>`;
+  const monitor = `<div class="w-full">
+      <div class="text-center text-[11px] font-black uppercase tracking-wider text-slate-400 mb-2"><i class="fa-solid fa-display"></i> Màn hình máy chiếu của giáo viên</div>
+      <div class="rounded-[1.6rem] bg-slate-900 p-2.5 shadow-2xl">
+        <div class="flex items-center gap-1.5 px-2 pb-2"><span class="w-2.5 h-2.5 rounded-full bg-rose-400"></span><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span><span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
+          <span class="ml-3 text-[10px] font-bold text-slate-400 truncate">EDU GAME / Đường Lên Đỉnh Olympia / ${k === 'lobby' ? 'Phòng chờ' : k === 'end' ? 'Kết quả' : `Vòng ${p.round}: ${ROUND_NAMES[p.round]}`}</span></div>
+        <div class="rounded-[1.1rem] bg-[#f8fafc] h-[640px] overflow-y-auto p-4">${screen}</div></div>
+      <div class="w-24 h-3 bg-slate-800 mx-auto rounded-b-xl"></div><div class="w-48 h-2 bg-slate-300 mx-auto rounded-full"></div></div>`;
+  return `<div class="fixed inset-0 z-[90] bg-slate-950/75 backdrop-blur-sm p-3 sm:p-6 overflow-y-auto" onclick="if(event.target===this)h_preview(null)">
+    <div class="max-w-[1400px] mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden pop">
+      <div class="stage text-white px-5 sm:px-7 py-5 flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-3"><div class="w-12 h-12 rounded-2xl bg-white/15 border border-white/25 grid place-items-center text-xl text-pink-300"><i class="fa-solid fa-eye"></i></div>
+          <div><div class="text-xl sm:text-2xl font-black">Xem trước giao diện</div><div class="text-xs text-white/70">Dùng bộ câu hỏi đang chọn • chỉ để xem, không ảnh hưởng trận đấu</div></div></div>
+        <div class="flex items-center gap-2"><div class="flex gap-1 p-1 rounded-2xl bg-white/10 border border-white/20">${seg('team', 'fa-mobile-screen', 'Màn hình đội')}${seg('gv', 'fa-display', 'Màn hình GV')}</div>
+          <button class="w-10 h-10 rounded-xl bg-white/15 hover:bg-white/25 border border-white/25 text-white" onclick="h_preview(null)" title="Đóng"><i class="fa-solid fa-xmark"></i></button></div></div>
+      <div class="grid lg:grid-cols-[280px_1fr] gap-0">
+        <div class="p-4 border-b lg:border-b-0 lg:border-r border-slate-100 bg-slate-50/60 space-y-1.5 lg:max-h-[80vh] overflow-y-auto">
+          ${PREVIEWS.map(([key, ic, name, sub]) => `<button onclick="h_preview('${key}')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl text-left transition ${key === k ? 'bg-slate-900 text-white shadow-md' : 'hover:bg-white text-slate-700'}">
+            <div class="w-9 h-9 rounded-xl grid place-items-center flex-shrink-0 ${key === k ? 'bg-white/15 text-amber-300' : 'bg-white border border-slate-200 text-purple-600'}"><i class="fa-solid ${ic}"></i></div>
+            <div class="min-w-0"><div class="text-sm font-black truncate">${name}</div><div class="text-[11px] truncate ${key === k ? 'text-white/60' : 'text-slate-400'}">${sub}</div></div></button>`).join('')}
+        </div>
+        <div class="p-4 sm:p-6 bg-gradient-to-br from-violet-50 via-white to-amber-50 min-w-0">${mode === 'team' ? phone : monitor}</div>
+      </div></div></div>`;
+}
+
+/* ============================ ĐĂNG NHẬP GV ============================ */
+const AUTH_HASH = '531ddb6aebcb5c05ed6a18e7ff3c66272aebb9cc9834e68e3af1cf1d59731b09'; // tài khoản quản trị (đã mã hóa)
+function authUser() { try { return localStorage.getItem('olp_auth') || sessionStorage.getItem('olp_auth') || ''; } catch (e) { return ''; } }
+function h_logout() { if (!confirm('Đăng xuất khỏi trang giáo viên?')) return; try { localStorage.removeItem('olp_auth'); sessionStorage.removeItem('olp_auth'); } catch (e) { } location.reload(); }
+async function sha256(t) { const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)); return [...new Uint8Array(d)].map(x => x.toString(16).padStart(2, '0')).join(''); }
+const LG = { err: '', show: false, modal: false };
+function renderLogin() {
+  $('#app').innerHTML = `
+  <div class="min-h-screen relative overflow-hidden grid place-items-center p-4" style="background:radial-gradient(circle at 15% 10%,#fce7f3 0,transparent 40%),radial-gradient(circle at 90% 90%,#fef3c7 0,transparent 40%),linear-gradient(135deg,#f5f3ff,#eef2ff)">
+    <div class="absolute -top-20 -left-16 w-72 h-72 rounded-full bg-purple-300/30 blur-3xl"></div><div class="absolute -bottom-24 -right-10 w-80 h-80 rounded-full bg-amber-300/30 blur-3xl"></div>
+    <i class="fa-solid fa-puzzle-piece absolute top-[12%] right-[14%] text-5xl text-purple-300/50 rotate-12 hidden sm:block"></i><i class="fa-solid fa-star absolute bottom-[16%] left-[12%] text-4xl text-amber-300/60 -rotate-12 hidden sm:block"></i><i class="fa-solid fa-bolt absolute top-[22%] left-[16%] text-4xl text-pink-300/60 hidden sm:block"></i>
+    <div class="relative w-full max-w-[440px]">
+      <div class="bg-white/90 backdrop-blur-xl rounded-[2rem] shadow-2xl border border-white p-7 sm:p-9 pop" id="login-card">
+        <div class="flex flex-col items-center text-center">
+          <div class="w-24 h-24 rounded-[1.75rem] p-1 shadow-xl" style="background:linear-gradient(135deg,#9333ea,#ec4899 55%,#f59e0b)">
+            <div class="w-full h-full rounded-[1.5rem] grid place-items-center text-white text-5xl" style="background:linear-gradient(135deg,#9333ea,#ec4899 55%,#f59e0b)"><i class="fa-solid fa-gamepad drop-shadow"></i></div></div>
+          <div class="mt-5 text-[11px] font-black uppercase tracking-[.25em] text-purple-500">EDU GAME • Trò chơi lớp học</div>
+          <h1 class="text-2xl sm:text-3xl font-black text-slate-900 mt-1">Đăng nhập giáo viên</h1>
+          <p class="text-sm text-slate-500 mt-1">Quản lý phòng thi, chia đội và điều khiển trò chơi</p>
+        </div>
+        <form class="mt-7 space-y-4" onsubmit="event.preventDefault(); doLogin(this)">
+          <label class="block"><span class="text-xs font-black text-slate-600">Tên đăng nhập</span>
+            <div class="mt-1.5 relative"><i class="fa-solid fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+              <input name="u" autocomplete="username" required class="w-full pl-11 pr-4 py-3.5 rounded-2xl border-2 border-slate-200 bg-slate-50 focus:bg-white focus:border-purple-500 focus:outline-none font-semibold" placeholder="Nhập tên đăng nhập"></div></label>
+          <label class="block"><span class="text-xs font-black text-slate-600">Mật khẩu</span>
+            <div class="mt-1.5 relative"><i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+              <input name="p" type="${LG.show ? 'text' : 'password'}" autocomplete="current-password" required class="w-full pl-11 pr-12 py-3.5 rounded-2xl border-2 border-slate-200 bg-slate-50 focus:bg-white focus:border-purple-500 focus:outline-none font-semibold" placeholder="Nhập mật khẩu">
+              <button type="button" onclick="const i=this.previousElementSibling;i.type=i.type==='password'?'text':'password';this.firstElementChild.classList.toggle('fa-eye');this.firstElementChild.classList.toggle('fa-eye-slash')" class="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 rounded-lg text-slate-400 hover:text-purple-600" title="Hiện/ẩn mật khẩu"><i class="fa-solid fa-eye"></i></button></div></label>
+          <div class="flex items-center justify-between text-xs"><label class="flex items-center gap-2 font-bold text-slate-600 cursor-pointer"><input type="checkbox" name="r" checked class="w-4 h-4 accent-purple-600"> Ghi nhớ đăng nhập</label>
+            <button type="button" onclick="showSoon()" class="font-bold text-purple-600 hover:underline">Quên mật khẩu?</button></div>
+          <div id="login-err" class="${LG.err ? '' : 'hidden'} text-sm font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2.5"><i class="fa-solid fa-circle-exclamation"></i> <span>${esc(LG.err)}</span></div>
+          <button class="w-full py-4 rounded-2xl text-white font-black text-base shadow-lg flex items-center justify-center gap-2 transition hover:brightness-110 active:scale-[.98]" style="background:linear-gradient(90deg,#9333ea,#4f46e5)"><i class="fa-solid fa-right-to-bracket"></i> Đăng nhập</button>
+        </form>
+        <div class="mt-5 flex items-center gap-3 text-[11px] font-bold text-slate-300"><div class="flex-1 h-px bg-slate-200"></div>HOẶC<div class="flex-1 h-px bg-slate-200"></div></div>
+        <button onclick="showSoon()" class="mt-4 w-full py-3.5 rounded-2xl border-2 border-purple-200 bg-purple-50 hover:bg-purple-100 text-purple-700 font-black flex items-center justify-center gap-2"><i class="fa-solid fa-user-plus"></i> Đăng ký tài khoản giáo viên</button>
+        <div class="mt-6 pt-5 border-t border-slate-100 flex items-center justify-between text-xs">
+          <a href="${location.pathname}" class="font-bold text-slate-500 hover:text-purple-600"><i class="fa-solid fa-arrow-left"></i> Học sinh nhập mã PIN</a>
+          <a href="index.html" class="font-bold text-slate-400 hover:text-purple-600"><i class="fa-solid fa-gamepad"></i> EDU GAME</a></div>
+      </div>
+      <div class="text-center text-[11px] text-slate-400 mt-4">© 2026 EDU GAME – Tương thích máy chiếu & TV thông minh</div>
+    </div>
+    ${LG.modal ? `<div class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm grid place-items-center p-4" onclick="if(event.target===this){LG.modal=false;renderLogin()}">
+      <div class="bg-white rounded-3xl shadow-2xl p-7 max-w-sm w-full text-center pop">
+        <div class="w-16 h-16 mx-auto rounded-2xl bg-amber-100 text-amber-600 grid place-items-center text-3xl"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+        <div class="text-xl font-black mt-4">Chức năng đang được cập nhật</div>
+        <p class="text-sm text-slate-500 mt-2">Tính năng đăng ký tài khoản giáo viên sẽ sớm ra mắt. Vui lòng liên hệ quản trị viên để được cấp tài khoản.</p>
+        <button class="btn btn-pri w-full mt-5 py-3" onclick="LG.modal=false;renderLogin()">Đã hiểu</button></div></div>` : ''}
+  </div>`;
+  if (!LG.modal) { const u = document.querySelector('input[name=u]'); u && !u.value && u.focus(); }
+}
+function showSoon() { LG.modal = true; renderLogin(); }
+async function doLogin(f) {
+  const u = f.u.value.trim(), pw = f.p.value;
+  let ok = false;
+  try { ok = (await sha256(u.toLowerCase() + ':' + pw)) === AUTH_HASH; } catch (e) { LG.err = 'Trình duyệt không hỗ trợ đăng nhập (cần mở trang qua https).'; return renderLogin(); }
+  if (!ok) {
+    const c = $('#login-card'); c.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-10px)' }, { transform: 'translateX(10px)' }, { transform: 'translateX(-6px)' }, { transform: 'translateX(0)' }], { duration: 350 });
+    const e = $('#login-err'); e.classList.remove('hidden'); e.querySelector('span').textContent = 'Sai tên đăng nhập hoặc mật khẩu.'; f.p.value = ''; f.p.focus(); return;
+  }
+  try { (f.r.checked ? localStorage : sessionStorage).setItem('olp_auth', u); } catch (e) { }
+  hostInit();
 }
 
 /* ============================ KHỞI CHẠY ============================ */
@@ -1445,7 +1646,7 @@ document.addEventListener('click', e => {
 });
 Net.init();
 setInterval(updateTimers, 200);
-IS_TEAM ? teamInit() : hostInit();
+IS_TEAM ? teamInit() : (authUser() ? hostInit() : renderLogin());
 </script>
 </body>
 </html>
