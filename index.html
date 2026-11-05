@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="vi" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduPlay - Đấu Trường Trò Chơi Học Tập Thông Minh</title>
+    <meta name="description" content="Trang web trò chơi học tập tương tác cho giáo viên và học sinh: Ai là triệu phú, Đào vàng, Olympia, Vòng quay may mắn">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#ecfeff',
+                            100: '#cffafe',
+                            400: '#22d3ee',
+                            500: '#06b6d4',
+                            600: '#0891b2',
+                            900: '#164e63',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Font Awesome Icons 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- KaTeX for Math Formulas (LaTeX) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <!-- SheetJS for Excel Reading/Writing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <!-- Mammoth.js for Word (.docx) Parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+
+    <!-- Canvas Confetti for Celebrations -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="min-h-screen flex flex-col bg-[#080d1a] text-slate-100 selection:bg-amber-400 selection:text-slate-950">
+
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800/80 px-4 lg:px-8 py-3">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            <!-- Brand Logo -->
+            <div class="flex items-center gap-3 cursor-pointer" onclick="window.app.showGameSelection()">
+                <div id="app-logo-badge" class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-400 via-rose-500 to-cyan-500 p-0.5 shadow-lg shadow-cyan-500/20">
+                    <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center text-amber-400 text-xl font-black overflow-hidden">
+                        <i class="fa-solid fa-gamepad"></i>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="text-xl font-black tracking-tight text-white flex items-center gap-1.5 leading-none">
+                        <span>Edu</span><span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-rose-400">Play</span>
+                        <span class="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">V2.0</span>
+                    </h1>
+                    <p class="text-[11px] text-slate-400 font-medium">Trò Chơi Học Tập Tương Tác</p>
+                </div>
+            </div>
+
+            <!-- Header Quick Actions -->
+            <div class="flex items-center gap-2 md:gap-3">
+                <!-- Logo Showcase Button -->
+                <button onclick="window.app.openLogoModal()" class="px-3 md:px-4 py-2 rounded-xl bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 font-bold text-xs md:text-sm border border-purple-500/40 flex items-center gap-2 transition" title="Xem và chọn bộ sưu tập Logo EduPlay">
+                    <i class="fa-solid fa-palette text-amber-400"></i>
+                    <span class="hidden sm:inline">Bộ Logo</span>
+                </button>
+
+                <!-- Quick Student Random Picker -->
+                <button onclick="window.app.quickPickStudent()" class="px-3 md:px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs md:text-sm shadow-md flex items-center gap-2 transition active:scale-95" title="Chọn ngẫu nhiên học sinh trong lớp">
+                    <i class="fa-solid fa-shuffle"></i>
+                    <span class="hidden sm:inline">Gọi Học Sinh</span>
+                </button>
+
+                <!-- Class List / Scoreboard Button -->
+                <button onclick="window.app.openClassListModal()" class="px-3 md:px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700/80 text-amber-300 font-bold text-xs md:text-sm border border-slate-700 flex items-center gap-2 transition" title="Bảng điểm và danh sách lớp">
+                    <i class="fa-solid fa-trophy"></i>
+                    <span class="hidden sm:inline">Bảng Điểm</span>
+                </button>
+
+                <!-- Audio Toggle -->
+                <button onclick="window.app.toggleSound()" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center justify-center transition" title="Bật/Tắt âm thanh">
+                    <i id="sound-icon" class="fa-solid fa-volume-high text-cyan-400"></i>
+                </button>
+
+                <!-- Fullscreen Toggle for Projector / TV -->
+                <button onclick="window.app.toggleFullscreen()" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 flex items-center justify-center transition" title="Chiếu toàn màn hình (Máy chiếu / Smart TV)">
+                    <i id="fullscreen-icon" class="fa-solid fa-expand"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 lg:p-8">
+
+        <!-- TEACHER CONTROL DASHBOARD (Shown by default) -->
+        <section id="teacher-dashboard" class="space-y-8">
+            <!-- Hero Banner -->
+            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-blue-900/60 via-purple-900/40 to-slate-900/80 border border-cyan-500/30 p-6 md:p-10 shadow-2xl">
+                <div class="absolute -right-10 -bottom-10 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="relative z-10 max-w-2xl">
+                    <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-400/30 text-cyan-300 font-bold text-xs uppercase tracking-wider mb-4">
+                        <i class="fa-solid fa-chalkboard-user"></i> Dành Cho Giáo Viên & Giảng Dạy
+                    </span>
+                    <h2 class="text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight font-heading">
+                        Biến Giờ Học Thành <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-400 to-rose-400">Đấu Trường Tri Thức</span>
+                    </h2>
+                    <p class="text-slate-300 text-sm md:text-base mt-3 leading-relaxed">
+                        Tải file câu hỏi Word (<code>.docx</code>) và danh sách lớp Excel (<code>.xlsx</code>) để bắt đầu các trò chơi tương tác sôi động: <strong>Ai là triệu phú, Đào vàng, Olympia, Vòng quay may mắn</strong>.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Two-Column Setup Cards (Word & Excel) -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                <!-- CARD 1: WORD (.DOCX) QUESTION BANK UPLOADER -->
+                <div class="glass-card rounded-3xl p-6 md:p-7 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-2xl bg-blue-500/20 border border-blue-500/40 flex items-center justify-center text-blue-400 text-2xl">
+                                    <i class="fa-solid fa-file-word"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-white">1. File Bài Tập & Câu Hỏi</h3>
+                                    <p class="text-xs text-slate-400">Hỗ trợ file Word (.docx) hoặc dùng bộ mẫu</p>
+                                </div>
+                            </div>
+                            <span class="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-300 border border-blue-400/20">
+                                <span id="q-total-count">15</span> câu
+                            </span>
+                        </div>
+
+                        <!-- Dropzone / File Picker -->
+                        <div class="relative border-2 border-dashed border-slate-700 hover:border-cyan-400 rounded-2xl p-6 text-center transition group bg-slate-900/40">
+                            <input type="file" id="docx-file-input" accept=".docx" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                            <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-400 group-hover:text-cyan-400 transition mb-2"></i>
+                            <div class="text-sm font-bold text-white">Kéo thả file .docx hoặc <span class="text-cyan-400 underline">chọn từ máy tính</span></div>
+                            <p class="text-xs text-slate-400 mt-1">Tự động nhận diện: <em>Câu 1: ... A. ... B. ... C. ... D. ... Đáp án: A</em></p>
+                        </div>
+
+                        <!-- Status badge -->
+                        <div id="docx-status" class="hidden mt-3 text-xs p-3 rounded-xl bg-slate-800/80 border border-slate-700"></div>
+
+                        <!-- Question Difficulty Badges -->
+                        <div class="flex items-center gap-2 mt-4 text-xs">
+                            <span class="text-slate-400">Phân loại dạng bài:</span>
+                            <span id="q-easy-count" class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">5 Dễ</span>
+                            <span id="q-med-count" class="px-2 py-0.5 rounded-md bg-blue-500/20 text-blue-300 font-bold border border-blue-500/30">6 Vừa</span>
+                            <span id="q-hard-count" class="px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-300 font-bold border border-rose-500/30">4 Khó</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between gap-3 mt-6 pt-4 border-t border-slate-800">
+                        <button onclick="window.app.loadSampleBank('chung')" class="text-xs text-cyan-400 hover:text-cyan-300 font-bold flex items-center gap-1.5">
+                            <i class="fa-solid fa-sparkles"></i> Nạp lại câu hỏi mẫu
+                        </button>
+                        <button onclick="window.app.openQuestionPreviewModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-700 flex items-center gap-2">
+                            <i class="fa-solid fa-eye"></i> Xem trước câu hỏi
+                        </button>
+                    </div>
+                </div>
+
+                <!-- CARD 2: EXCEL (.XLSX) CLASS LIST UPLOADER -->
+                <div class="glass-card rounded-3xl p-6 md:p-7 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 text-2xl">
+                                    <i class="fa-solid fa-file-excel"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-lg font-bold text-white">2. Danh Sách Lớp Học</h3>
+                                    <p class="text-xs text-slate-400">Tải file Excel (.xlsx / .csv) học sinh</p>
+                                </div>
+                            </div>
+                            <span id="class-student-count" class="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-300 border border-emerald-400/20">
+                                20 Học sinh
+                            </span>
+                        </div>
+
+                        <!-- Dropzone / File Picker -->
+                        <div class="relative border-2 border-dashed border-slate-700 hover:border-emerald-400 rounded-2xl p-6 text-center transition group bg-slate-900/40">
+                            <input type="file" id="excel-file-input" accept=".xlsx, .xls, .csv" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                            <i class="fa-solid fa-cloud-arrow-up text-3xl text-slate-400 group-hover:text-emerald-400 transition mb-2"></i>
+                            <div class="text-sm font-bold text-white">Kéo thả file Excel hoặc <span class="text-emerald-400 underline">chọn danh sách lớp</span></div>
+                            <p class="text-xs text-slate-400 mt-1">Cột tự nhận diện: <em>STT, Họ và tên, Lớp</em></p>
+                        </div>
+
+                        <!-- Status badge -->
+                        <div id="excel-status" class="hidden mt-3 text-xs p-3 rounded-xl bg-slate-800/80 border border-slate-700"></div>
+
+                        <!-- Teams Preview Pills -->
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4 text-xs">
+                            <div class="p-2 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 font-bold text-center">Rồng Đỏ</div>
+                            <div class="p-2 rounded-xl bg-blue-500/10 border border-blue-500/30 text-blue-400 font-bold text-center">Đại Bàng</div>
+                            <div class="p-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 font-bold text-center">Hổ Vàng</div>
+                            <div class="p-2 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-400 font-bold text-center">Sư Tử Tím</div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between gap-3 mt-6 pt-4 border-t border-slate-800">
+                        <span id="class-current-name" class="text-xs text-slate-400 font-semibold truncate">Lớp 10A1 (Mẫu)</span>
+                        <div class="flex gap-2">
+                            <button onclick="window.classManager.exportToExcel()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-400 font-bold text-xs border border-slate-700 flex items-center gap-1.5" title="Xuất kết quả điểm học tập">
+                                <i class="fa-solid fa-download"></i> Xuất điểm
+                            </button>
+                            <button onclick="window.app.openClassListModal()" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-700 flex items-center gap-1.5">
+                                <i class="fa-solid fa-list"></i> Xem lớp
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- STEP 3: GAME SELECTION SHOWCASE -->
+            <div>
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="text-2xl font-black text-white font-heading">3. Chọn Trò Chơi Học Tập</h3>
+                        <p class="text-slate-400 text-sm">Nhấn vào trò chơi để bắt đầu giờ học hào hứng</p>
+                    </div>
+                    <span class="text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-500/30 px-3 py-1 rounded-full">
+                        5 Trò chơi sẵn sàng
+                    </span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                    <!-- GAME 1: AI LÀ TRIỆU PHÚ -->
+                    <div class="glass-card rounded-3xl p-6 border-2 border-cyan-500/30 hover:border-cyan-400 flex flex-col justify-between group cursor-pointer relative overflow-hidden"
+                         onclick="window.app.selectGame('millionaire')">
+                        <div class="absolute -top-12 -right-12 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl group-hover:scale-150 transition duration-500"></div>
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-cyan-600 to-blue-700 flex items-center justify-center text-white text-2xl shadow-lg shadow-cyan-500/30 group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-circle-question"></i>
+                                </div>
+                                <span class="px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-300 font-bold text-xs border border-cyan-400/30">
+                                    Trắc nghiệm 4 đáp án
+                                </span>
+                            </div>
+                            <h4 class="text-xl font-black text-white group-hover:text-cyan-300 transition">Ai Là Triệu Phú</h4>
+                            <p class="text-slate-400 text-xs md:text-sm mt-2 leading-relaxed">
+                                Trò chơi trắc nghiệm kinh điển 15 câu hỏi kịch tính với 4 quyền trợ giúp (50:50, hỏi cả lớp, gọi cố vấn, đổi câu) cùng bậc thang tiền thưởng hoành tráng.
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-slate-800 flex items-center justify-between text-xs font-bold text-cyan-400">
+                            <span>Chơi ngay</span>
+                            <i class="fa-solid fa-arrow-right transform group-hover:translate-x-1.5 transition"></i>
+                        </div>
+                    </div>
+
+                    <!-- GAME 2: ĐÀO VÀNG TRI THỨC -->
+                    <div class="glass-card rounded-3xl p-6 border-2 border-amber-500/30 hover:border-amber-400 flex flex-col justify-between group cursor-pointer relative overflow-hidden"
+                         onclick="window.app.selectGame('goldminer')">
+                        <div class="absolute -top-12 -right-12 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl group-hover:scale-150 transition duration-500"></div>
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-600 flex items-center justify-center text-slate-950 text-2xl shadow-lg shadow-amber-500/30 group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-person-digging"></i>
+                                </div>
+                                <span class="px-3 py-1 rounded-full bg-amber-500/10 text-amber-300 font-bold text-xs border border-amber-400/30">
+                                    Tương tác mỏ quặng
+                                </span>
+                            </div>
+                            <h4 class="text-xl font-black text-white group-hover:text-amber-300 transition">Đào Vàng Tri Thức</h4>
+                            <p class="text-slate-400 text-xs md:text-sm mt-2 leading-relaxed">
+                                Bốc trúng quặng vàng, kim cương hoặc túi bí ẩn -> giải câu hỏi để kéo quặng lên và tích lũy số lượng vàng khổng lồ cho các đội thi đấu!
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-slate-800 flex items-center justify-between text-xs font-bold text-amber-400">
+                            <span>Chơi ngay</span>
+                            <i class="fa-solid fa-arrow-right transform group-hover:translate-x-1.5 transition"></i>
+                        </div>
+                    </div>
+
+                    <!-- GAME 3: ĐƯỜNG LÊN ĐỈNH OLYMPIA -->
+                    <div class="glass-card rounded-3xl p-6 border-2 border-rose-500/30 hover:border-rose-400 flex flex-col justify-between group cursor-pointer relative overflow-hidden"
+                         onclick="window.app.selectGame('olympia')">
+                        <div class="absolute -top-12 -right-12 w-32 h-32 bg-rose-500/10 rounded-full blur-2xl group-hover:scale-150 transition duration-500"></div>
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-rose-500 to-red-700 flex items-center justify-center text-white text-2xl shadow-lg shadow-rose-500/30 group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-laurel-wreath"></i>
+                                </div>
+                                <span class="px-3 py-1 rounded-full bg-rose-500/10 text-rose-300 font-bold text-xs border border-rose-400/30">
+                                    Trọn vẹn 4 vòng thi
+                                </span>
+                            </div>
+                            <h4 class="text-xl font-black text-white group-hover:text-rose-300 transition">Đường Lên Đỉnh Olympia</h4>
+                            <p class="text-slate-400 text-xs md:text-sm mt-2 leading-relaxed">
+                                Trải nghiệm đỉnh cao: Khởi Động 60s, Vượt Chướng Ngại Vật hàng ngang bí ẩn, Tăng Tốc tính thời gian, và Về Đích với Ngôi Sao Hy Vọng!
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-slate-800 flex items-center justify-between text-xs font-bold text-rose-400">
+                            <span>Chơi ngay</span>
+                            <i class="fa-solid fa-arrow-right transform group-hover:translate-x-1.5 transition"></i>
+                        </div>
+                    </div>
+
+                    <!-- GAME 4: VÒNG QUAY MAY MẮN -->
+                    <div class="glass-card rounded-3xl p-6 border-2 border-purple-500/30 hover:border-purple-400 flex flex-col justify-between group cursor-pointer relative overflow-hidden"
+                         onclick="window.app.selectGame('wheel')">
+                        <div class="absolute -top-12 -right-12 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl group-hover:scale-150 transition duration-500"></div>
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-purple-500 to-indigo-600 flex items-center justify-center text-white text-2xl shadow-lg shadow-purple-500/30 group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-dharmachakra"></i>
+                                </div>
+                                <span class="px-3 py-1 rounded-full bg-purple-500/10 text-purple-300 font-bold text-xs border border-purple-400/30">
+                                    Vui nhộn & Ngẫu nhiên
+                                </span>
+                            </div>
+                            <h4 class="text-xl font-black text-white group-hover:text-purple-300 transition">Vòng Quay May Mắn</h4>
+                            <p class="text-slate-400 text-xs md:text-sm mt-2 leading-relaxed">
+                                Bánh xe quay sinh động với hiệu ứng âm thanh kích thích, hỗ trợ quay chọn học sinh ngẫu nhiên lên bảng hoặc quay tặng điểm thưởng học tập.
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-slate-800 flex items-center justify-between text-xs font-bold text-purple-400">
+                            <span>Chơi ngay</span>
+                            <i class="fa-solid fa-arrow-right transform group-hover:translate-x-1.5 transition"></i>
+                        </div>
+                    </div>
+
+                    <!-- GAME 5: HỘP QUÀ BÍ MẬT -->
+                    <div class="glass-card rounded-3xl p-6 border-2 border-emerald-500/30 hover:border-emerald-400 flex flex-col justify-between group cursor-pointer relative overflow-hidden"
+                         onclick="window.app.selectGame('mystery')">
+                        <div class="absolute -top-12 -right-12 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl group-hover:scale-150 transition duration-500"></div>
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-600 flex items-center justify-center text-white text-2xl shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-gift"></i>
+                                </div>
+                                <span class="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-300 font-bold text-xs border border-emerald-400/30">
+                                    Bất ngờ & Thưởng phạt
+                                </span>
+                            </div>
+                            <h4 class="text-xl font-black text-white group-hover:text-emerald-300 transition">Hộp Quà Bí Mật</h4>
+                            <p class="text-slate-400 text-xs md:text-sm mt-2 leading-relaxed">
+                                Các hộp quà sắc màu ẩn chứa điểm 10 kiểm tra miệng, tràng pháo tay, quyền miễn bài tập hoặc x2 điểm khi trả lời chính xác câu hỏi.
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-slate-800 flex items-center justify-between text-xs font-bold text-emerald-400">
+                            <span>Chơi ngay</span>
+                            <i class="fa-solid fa-arrow-right transform group-hover:translate-x-1.5 transition"></i>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- GAME ARENA STAGE (Hidden by default, shown when game is active) -->
+        <section id="game-arena" class="hidden">
+            <div id="game-stage">
+                <!-- Dynamically rendered by active game script -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Global Modal for Roster, Question Preview, Random Draw -->
+    <div id="global-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-slate-900 border-2 border-cyan-500/50 rounded-3xl max-w-2xl w-full p-6 md:p-8 shadow-2xl relative animate-scale-up" id="global-modal-body">
+            <!-- Injected dynamically -->
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-auto border-t border-slate-800/80 bg-slate-950/60 py-6 px-4 text-center text-xs text-slate-500">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div>
+                © 2026 <strong>EduPlay</strong> - Nền tảng trò chơi học tập tương tác cho trường học.
+            </div>
+            <div class="flex items-center gap-4 text-slate-400">
+                <span>Hỗ trợ định dạng Word .docx & Excel .xlsx</span>
+                <span>•</span>
+                <span>Công thức toán KaTeX</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Core App Scripts -->
+    <script src="js/audio.js"></script>
+    <script src="js/docx-parser.js"></script>
+    <script src="js/excel-parser.js"></script>
+    <script src="js/games/millionaire.js"></script>
+    <script src="js/games/goldminer.js"></script>
+    <script src="js/games/olympia.js"></script>
+    <script src="js/games/wheel.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+/* Custom Styles & Visual Effects for Educational Games */
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,900;1,400&family=Montserrat:wght@700;800;900&display=swap');
+
+:root {
+    --primary-glow: #06b6d4;
+    --accent-glow: #f59e0b;
+}
+
+body {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    background-color: #0b0f19;
+    color: #f8fafc;
+    overflow-x: hidden;
+    user-select: none;
+}
+
+h1, h2, h3, .font-heading {
+    font-family: 'Baloo 2', cursive, sans-serif;
+}
+
+/* Glassmorphism Cards */
+.glass-panel {
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.8) 100%);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(245, 158, 11, 0.4);
+    box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.5), 0 0 20px 2px rgba(245, 158, 11, 0.15);
+}
+
+/* Neon Glow Animations */
+@keyframes pulse-glow {
+    0%, 100% {
+        box-shadow: 0 0 15px rgba(245, 158, 11, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 25px rgba(245, 158, 11, 0.8), 0 0 40px rgba(245, 158, 11, 0.3);
+    }
+}
+
+.glow-active {
+    animation: pulse-glow 2s infinite ease-in-out;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #0f172a;
+}
+::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+}
+
+/* Math formula styling inside KaTeX */
+.katex {
+    font-size: 1.1em !important;
+}
+
+/* Smooth Scale Animation */
+@keyframes scaleUp {
+    from {
+        opacity: 0;
+        transform: scale(0.92);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.animate-scale-up {
+    animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500" width="100%" height="100%">
+  <defs>
+    <radialGradient id="bgGlow4" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#311042" stop-opacity="0.8"/>
+      <stop offset="60%" stop-color="#0e1726" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#060911" stop-opacity="1"/>
+    </radialGradient>
+
+    <linearGradient id="rocketGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="60%" stop-color="#f1f5f9"/>
+      <stop offset="100%" stop-color="#cbd5e1"/>
+    </linearGradient>
+
+    <linearGradient id="flameGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="30%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#ef4444"/>
+    </linearGradient>
+
+    <linearGradient id="wingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#06b6d4"/>
+      <stop offset="100%" stop-color="#3b82f6"/>
+    </linearGradient>
+
+    <filter id="rocketGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#06b6d4" flood-opacity="0.5"/>
+    </filter>
+
+    <filter id="flameGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="20" flood-color="#f97316" flood-opacity="0.8"/>
+    </filter>
+  </defs>
+
+  <!-- Badge Background -->
+  <rect x="25" y="25" width="450" height="450" rx="90" fill="url(#bgGlow4)" stroke="#334155" stroke-width="3"/>
+
+  <!-- Orbit Ring -->
+  <ellipse cx="250" cy="220" rx="160" ry="45" fill="none" stroke="#a855f7" stroke-width="2" stroke-dasharray="6 8" transform="rotate(-25 250 220)" opacity="0.6"/>
+  <circle cx="120" cy="260" r="8" fill="#ec4899"/>
+  <circle cx="370" cy="170" r="5" fill="#38bdf8"/>
+
+  <!-- ROCKET THRUST FLAME -->
+  <g filter="url(#flameGlow)">
+    <path d="M225 295 Q250 380 250 380 Q250 380 275 295 Z" fill="url(#flameGrad)"/>
+    <path d="M235 295 Q250 350 250 350 Q250 350 265 295 Z" fill="#fef08a"/>
+  </g>
+
+  <!-- ROCKET SHIP BODY & BOOK WINGS -->
+  <g filter="url(#rocketGlow)">
+    <!-- Left Wing (Open Book Page Left) -->
+    <path d="M210 230 C160 240 120 280 135 305 C165 305 195 285 210 270 Z" fill="url(#wingGrad)" stroke="#ffffff" stroke-width="3"/>
+    
+    <!-- Right Wing (Open Book Page Right) -->
+    <path d="M290 230 C340 240 380 280 365 305 C335 305 305 285 290 270 Z" fill="url(#wingGrad)" stroke="#ffffff" stroke-width="3"/>
+
+    <!-- Rocket Fuselage -->
+    <path d="M250 85 C215 140 210 250 215 295 L285 295 C290 250 285 140 250 85 Z" 
+          fill="url(#rocketGrad)" stroke="#ffffff" stroke-width="4"/>
+
+    <!-- Rocket Red Tip -->
+    <path d="M250 85 C233 112 225 145 224 160 L276 160 C275 145 267 112 250 85 Z" fill="#ef4444"/>
+
+    <!-- Round Porthole Window with Math Symbol -->
+    <circle cx="250" cy="205" r="24" fill="#0284c7" stroke="#ffffff" stroke-width="4"/>
+    <circle cx="250" cy="205" r="18" fill="#38bdf8"/>
+    <!-- Pencil / Game Controller cross inside window -->
+    <text x="250" y="213" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="20" fill="#ffffff">🎮</text>
+  </g>
+
+  <!-- Bottom Brand Text -->
+  <text x="250" y="420" text-anchor="middle" font-family="'Baloo 2', 'Be Vietnam Pro', sans-serif" font-weight="900" font-size="28" fill="#ffffff" letter-spacing="3">
+    EDU<tspan fill="#ec4899">ROCKET</tspan>
+  </text>
+  <text x="250" y="445" text-anchor="middle" font-family="'Be Vietnam Pro', sans-serif" font-weight="700" font-size="12" fill="#38bdf8" letter-spacing="4">
+    KHÁM PHÁ TRI THỨC
+  </text>
+</svg>
