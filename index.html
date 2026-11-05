@@ -59,6 +59,14 @@
   .phone .sm\:grid-cols-4{grid-template-columns:repeat(2,minmax(0,1fr))!important}
   .phone .sm\:text-2xl{font-size:1.25rem!important}.phone .sm\:p-7,.phone .sm\:p-12{padding:1.25rem!important}
   .katex{font-size:1.08em}.opt .katex{font-size:1.05em}.katex-display{margin:.4em 0}
+  .tikz{display:block;max-width:100%;height:auto;max-height:300px;object-fit:contain;margin:.6rem auto;background:#fff;border-radius:.6rem;padding:.25rem}
+  .big .tikz{max-height:360px}.opt .tikz{max-height:120px;margin:.2rem 0;display:inline-block}
+  .tikz-miss{display:inline-flex;align-items:center;gap:.35rem;font-size:.75rem;font-weight:700;color:#b45309;background:#fffbeb;border:1px dashed #f59e0b;border-radius:.6rem;padding:.35rem .6rem;margin:.3rem 0}
+  .immini{display:flex;flex-wrap:wrap;gap:1rem;align-items:center}.immini-t{flex:1 1 220px;min-width:0}.immini-f{flex:0 1 auto;margin:0 auto}
+  .phone .immini{flex-direction:column}
+  .logo-word{font-family:'Be Vietnam Pro',system-ui,sans-serif;font-weight:900;letter-spacing:-.035em;line-height:.9}
+  .logo-grad{background:linear-gradient(90deg,#7c3aed 0%,#db2777 55%,#f59e0b 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .logo-badge{background:linear-gradient(135deg,#6d28d9 0%,#db2777 60%,#f59e0b 100%);box-shadow:0 8px 18px -6px rgba(219,39,119,.55),inset 0 1px 0 rgba(255,255,255,.35)}
   .pulse-soft{animation:ps 1.4s infinite}@keyframes ps{50%{opacity:.45}}
   .pop{animation:pop .35s ease-out}@keyframes pop{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
   .tabular-nums{font-variant-numeric:tabular-nums}
@@ -433,12 +441,252 @@ const Net = {
   }
 };
 
+
+/* ===================== VĂN BẢN GIÀU: in đậm, xuống dòng, hình TikZ, \immini =====================
+   Câu hỏi/đáp án có thể chứa các "mã đánh dấu" ⟦...⟧ do bộ đọc file LaTeX sinh ra. */
+const TIKZ_SERVICE = 'https://i.upmath.me/svg/';   // dịch vụ vẽ LaTeX/TikZ trực tuyến (miễn phí)
+function rich(t) {
+  t = String(t ?? '');
+  if (t.indexOf('⟦') < 0) return esc(t);
+  return t.split(/(⟦[^⟧]*⟧)/).map(part => {
+    const m = part.match(/^⟦([^:⟧]+)(?::([^⟧]*))?⟧$/);
+    if (!m) return esc(part);
+    switch (m[1]) {
+      case 'b': return '<b>'; case '/b': return '</b>'; case 'i': return '<i>'; case '/i': return '</i>'; case 'u': return '<u>'; case '/u': return '</u>';
+      case 'br': return '<br>';
+      case 'IM': return '<span class="immini"><span class="immini-t">'; case 'IMS': return '</span><span class="immini-f">'; case '/IM': return '</span></span>';
+      case 'T': return `<img class="tikz" alt="Hình vẽ" loading="lazy" src="${TIKZ_SERVICE}${m[2]}" onload="this.style.width=Math.min(this.naturalWidth*1.8,560)+'px'" onerror="this.outerHTML='<span class=&quot;tikz-miss&quot;>⚠ Không vẽ được hình TikZ – kiểm tra Internet hoặc mã hình</span>'">`;
+      case 'F': return `<span class="tikz-miss">🖼 Hình: ${esc(decodeURIComponent(m[2] || ''))} (chưa hỗ trợ ảnh từ file)</span>`;
+    }
+    return esc(part);
+  }).join('');
+}
+
+/* ===================== ĐỌC FILE LaTeX (gói ex_test) =====================
+   \begin{ex}%[KHỞI ĐỘNG]            ← (tùy chọn) ghi vòng thi ngay sau \begin{ex}
+     Nội dung câu hỏi, có thể dùng $...$, \immini{chữ}{\begin{tikzpicture}...\end{tikzpicture}}
+     \choice
+       {\True đáp án đúng}
+       {đáp án sai}{đáp án sai}{đáp án sai}
+     \loigiai{ ... }                 ← bỏ qua
+   \end{ex}
+   Chia vòng bằng \section{Khởi động}, \section{Về đích 30}… hoặc dòng %[TĂNG TỐC]. */
+function texGroup(s, i) {
+  while (i < s.length && /\s/.test(s[i])) i++;
+  if (s[i] !== '{') return null;
+  let d = 0;
+  for (let j = i; j < s.length; j++) {
+    const c = s[j];
+    if (c === '\\') { j++; continue; }
+    if (c === '{') d++;
+    else if (c === '}' && --d === 0) return [s.slice(i + 1, j), j + 1];
+  }
+  return null;
+}
+function texOpt(s, i) {
+  let k = i; while (k < s.length && /\s/.test(s[k])) k++;
+  if (s[k] !== '[') return [null, i];
+  let d = 0;
+  for (let j = k; j < s.length; j++) { if (s[j] === '[') d++; else if (s[j] === ']' && --d === 0) return [s.slice(k + 1, j), j + 1]; }
+  return [null, i];
+}
+const texNoComments = s => s.replace(/(^|[^\\])%.*$/gm, '$1');
+function texCmd(s, name, fn) {   // thay \name[opt]{a}{b}... bằng fn(args)
+  const re = new RegExp('\\\\' + name + '(?![A-Za-z])', 'g'); let out = '', last = 0, m;
+  while ((m = re.exec(s))) {
+    let i = m.index + m[0].length; const [, j] = texOpt(s, i); i = j;
+    const args = []; for (let k = 0; k < fn.length; k++) { const g = texGroup(s, i); if (!g) break; args.push(g[0]); i = g[1]; }
+    if (args.length < fn.length) continue;
+    out += s.slice(last, m.index) + fn(...args); last = i; re.lastIndex = i;
+  }
+  return out + s.slice(last);
+}
+function texInline(src, libs) {   // src đã bỏ chú thích %
+  let s = String(src || ''); const keep = [];
+  const stash = v => { keep.push(v); return `⟦K${keep.length - 1}⟧`; };
+  // hình TikZ → mã ảnh (được cất riêng để không bị xử lý tiếp)
+  s = s.replace(/\\begin\{tikzpicture\}[\s\S]*?\\end\{tikzpicture\}/g, code => stash(`⟦T:${encodeURIComponent((libs ? libs + '\n' : '') + code.trim()).replace(/[!'()*~]/g, c => '%' + c.charCodeAt(0).toString(16).toUpperCase())}⟧`));
+  s = s.replace(/\\includegraphics(\[[^\]]*\])?\{([^}]*)\}/g, (_, o, f) => stash(`⟦F:${encodeURIComponent(f)}⟧`));
+  // \immini{chữ}{hình}
+  s = texCmd(s, 'immini', (a, b) => `⟦IM⟧${texInline(a, libs)}⟦IMS⟧${texInline(b, libs)}⟦/IM⟧`);
+  // bảo vệ công thức toán
+  const math = [];
+  s = s.replace(/\$\$[\s\S]*?\$\$|\$(?:\\\$|[^$])+?\$|\\\([\s\S]*?\\\)|\\\[[\s\S]*?\\\]/g, m => { math.push(m.replace(/\s*\n\s*/g, ' ')); return `⟦M${math.length - 1}⟧`; });
+  s = texCmd(s, 'textbf', a => `⟦b⟧${a}⟦/b⟧`);
+  s = texCmd(s, 'textit', a => `⟦i⟧${a}⟦/i⟧`); s = texCmd(s, 'emph', a => `⟦i⟧${a}⟦/i⟧`);
+  s = texCmd(s, 'underline', a => `⟦u⟧${a}⟦/u⟧`);
+  s = texCmd(s, 'text', a => a); s = texCmd(s, 'mbox', a => a); s = texCmd(s, 'textrm', a => a); s = texCmd(s, 'textnormal', a => a);
+  s = texCmd(s, 'vspace', () => ''); s = texCmd(s, 'hspace', () => ''); s = texCmd(s, 'vspace\\*', () => ''); s = texCmd(s, 'hspace\\*', () => '');
+  s = s.replace(/\\item(\[[^\]]*\])?/g, (_, o) => `⟦br⟧${o ? o.slice(1, -1) + ' ' : '• '}`)
+    .replace(/\\begin\{(center|flushleft|flushright|itemize|enumerate|minipage)\}(\{[^}]*\})?|\\end\{(center|flushleft|flushright|itemize|enumerate|minipage)\}/g, '⟦br⟧')
+    .replace(/\\\\(\[[^\]]*\])?|\\newline|\\par(?![A-Za-z])|\n\s*\n/g, '⟦br⟧')
+    .replace(/\\(centering|noindent|indent|medskip|bigskip|smallskip|hfill|vfill|newpage|clearpage|allowdisplaybreaks)(?![A-Za-z])/g, ' ')
+    .replace(/\\(ldots|dots|cdots)(?![A-Za-z])/g, '…').replace(/\\%/g, '%').replace(/\\&/g, '&').replace(/\\#/g, '#').replace(/\\_/g, '_')
+    .replace(/``|''/g, '"').replace(/~/g, ' ').replace(/[{}]/g, '').replace(/\s+/g, ' ');
+  s = s.replace(/(\s*⟦br⟧\s*)+/g, '⟦br⟧').replace(/^(⟦br⟧)+|(⟦br⟧)+$/g, '');
+  s = s.replace(/⟦M(\d+)⟧/g, (_, k) => math[+k]);
+  for (let r = 0; r < 3 && /⟦K\d+⟧/.test(s); r++) s = s.replace(/⟦K(\d+)⟧/g, (m0, k) => keep[+k] ?? m0);
+  return s.trim();
+}
+const SEC_LABEL = { r1: '[KHỞI ĐỘNG]', r2: '[VƯỢT CHƯỚNG NGẠI VẬT]', cnv: '[CNV]', r3: '[TĂNG TỐC]', v20: '[VỀ ĐÍCH 20]', v30: '[VỀ ĐÍCH 30]', v40: '[VỀ ĐÍCH 40]', pool: '[CÂU CHUNG]' };
+function texToBank(tex) {
+  let s = String(tex).replace(/\r/g, '');
+  const libs = (texNoComments(s).match(/\\usetikzlibrary\{[^}]*\}/g) || []).join('');
+  const bd = s.indexOf('\\begin{document}'); if (bd >= 0) { s = s.slice(bd + 16); const ed = s.indexOf('\\end{document}'); if (ed >= 0) s = s.slice(0, ed); }
+  // giữ lại các nhãn vòng viết trong chú thích, rồi mới bỏ chú thích
+  s = s.replace(/\\begin\{ex\}[ \t]*%([^\n]*)/g, (all, c) => { const t = (c.match(/\[[^\]]+\]/g) || []).map(x => x.slice(1, -1)).find(x => secKey(x) !== 'pool'); return t ? `\\begin{ex}⟦SEC:${t}⟧` : '\\begin{ex}'; })
+       .replace(/^[ \t]*%[ \t]*\[([^\]\n]+)\][^\n]*$/gm, (_, t) => `[${t}]`);
+  s = texNoComments(s);
+  const lines = []; let n = 0, skipped = 0, sec = 'pool';
+  const re = /\\begin\{ex\}|\\(?:sub)*section\*?\{([^}]*)\}|^[ \t]*%?[ \t]*\[([^\]\n]+)\][ \t]*$/gm; let m;
+  while ((m = re.exec(s))) {
+    if (m[0].startsWith('\\begin{ex}')) {
+      const end = s.indexOf('\\end{ex}', re.lastIndex); if (end < 0) break;
+      let body = s.slice(re.lastIndex, end); re.lastIndex = end + 8;
+      const tag = (body.match(/^⟦SEC:([^⟧]*)⟧/) || [])[1];
+      let own = tag && secKey(tag) !== 'pool' ? secKey(tag) : null;
+      body = body.replace(/^⟦SEC:[^⟧]*⟧/, '');
+      const [oa, oe] = texOpt(body, 0); body = body.slice(oe);
+      if (!own && oa && secKey(oa) !== 'pool') own = secKey(oa);
+      body = texCmd(body, 'loigiai', () => '');
+      const cm = /\\choice(?![A-Za-z])/.exec(body);
+      if (!cm) { skipped++; continue; }
+      let i = cm.index + cm[0].length; i = texOpt(body, i)[1];
+      const opts = []; let ans = -1;
+      for (let k = 0; k < 4; k++) { const g = texGroup(body, i); if (!g) break; let o = g[0]; if (/\\True(?![A-Za-z])/.test(o)) { ans = k; o = o.replace(/\\True(?![A-Za-z])/g, ''); } opts.push(texInline(o, libs) || '—'); i = g[1]; }
+      if (opts.length < 2 || ans < 0) { skipped++; continue; }
+      const q = texInline(body.slice(0, cm.index), libs);
+      if (own) lines.push(SEC_LABEL[own]);
+      lines.push(`Câu ${++n}: ${q || '(không có nội dung)'}`); opts.forEach((o, k) => lines.push(`${L[k]}. ${o}`)); lines.push(`Đáp án: ${L[ans]}`);
+      if (own) lines.push(SEC_LABEL[sec]);
+    } else {
+      const k = secKey(m[1] || m[2] || '');
+      if (k !== 'pool' || m[1]) { sec = k; lines.push(SEC_LABEL[sec]); }
+    }
+  }
+  return { text: lines.join('\n'), n, skipped };
+}
+const SAMPLE_TEX = String.raw`\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{vietnam}
+\usepackage{amsmath,amssymb}
+\usepackage[dethi]{ex_test}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\begin{document}
+%==========================================================================
+% ĐỀ THI ĐƯỜNG LÊN ĐỈNH OLYMPIA – MẪU (gói ex_test)
+% MÃ VÒNG THI – ghi ngay sau \begin{ex} dạng %[MÃ]  (được kèm mã ID riêng: %[8H1Y1-2][TT])
+%   [KD]   Khởi động (7 câu)            [VCNV] Vượt CNV – 4 hàng ngang
+%   [CNV]  Câu đoán từ khóa CNV (1 câu)  [TT]   Tăng tốc (4 câu)
+%   [VD20] [VD30] [VD40]  Về đích – câu 20 / 30 / 40 điểm
+% Hoặc ghi 1 lần cho cả nhóm câu:  \section{KD}  /  %[TT]  (đứng riêng 1 dòng)
+% Câu KHÔNG có mã sẽ không được dùng. Đáp án đúng đánh dấu \True.
+%==========================================================================
+
+%------------------------------ KHỞI ĐỘNG ---------------------------------
+\begin{ex}%[KD]
+Công thức tính số mol theo khối lượng là
+\choice
+{$n = m \cdot M$}
+{\True $n = \dfrac{m}{M}$}
+{$n = \dfrac{M}{m}$}
+{$n = m + M$}
+\loigiai{Số mol $n = \dfrac{m}{M}$.}
+\end{ex}
+
+\begin{ex}%[KD]
+\immini{Trong sơ đồ bên, chất được tạo thành sau phản ứng gọi là}{
+\begin{tikzpicture}[>=Stealth]
+\node[draw,rounded corners,fill=blue!10] (a) at (0,0) {A + B};
+\node[draw,rounded corners,fill=green!15] (b) at (3.5,0) {?};
+\draw[->,thick] (a) -- (b);
+\end{tikzpicture}}
+\choice
+{chất xúc tác}
+{\True sản phẩm}
+{dung môi}
+{chất tan}
+\end{ex}
+
+%------------------------ VƯỢT CHƯỚNG NGẠI VẬT ----------------------------
+\begin{ex}%[VCNV]
+Chất làm tăng tốc độ phản ứng nhưng không bị biến đổi sau phản ứng là
+\choice
+{\True chất xúc tác}
+{chất phản ứng}
+{sản phẩm}
+{dung môi}
+\end{ex}
+
+\begin{ex}%[CNV]
+Từ khóa chướng ngại vật: đại lượng cho biết độ acid hay base của dung dịch?
+\choice
+{Nồng độ mol}
+{\True pH}
+{Tỉ khối}
+{Độ tan}
+\end{ex}
+
+%------------------------------- TĂNG TỐC ---------------------------------
+\begin{ex}%[TT]
+Dung dịch có pH ứng với vị trí mũi tên trên thang pH có môi trường
+\begin{center}
+\begin{tikzpicture}
+\shade[left color=red!70,right color=blue!70] (0,0) rectangle (7,0.5);
+\foreach \x/\l in {0/0,3.5/7,7/14} \draw (\x,0) -- (\x,-0.15) node[below]{\l};
+\draw[-{Stealth},very thick] (1.5,1.2) -- (1.5,0.55);
+\end{tikzpicture}
+\end{center}
+\choice
+{\True acid}
+{base}
+{trung tính}
+{không xác định}
+\end{ex}
+
+%------------------------------- VỀ ĐÍCH ----------------------------------
+\begin{ex}%[VD20]
+Khí làm đục nước vôi trong là
+\choice
+{$\ce{O2}$}
+{\True $\ce{CO2}$}
+{$\ce{H2}$}
+{$\ce{N2}$}
+\end{ex}
+
+\begin{ex}%[VD30]
+Cân bằng phương trình $\ce{?Fe + ?O2 -> ?Fe3O4}$, hệ số lần lượt là
+\choice
+{$1, 2, 1$}
+{\True $3, 2, 1$}
+{$2, 3, 1$}
+{$3, 4, 1$}
+\end{ex}
+
+\begin{ex}%[VD40]
+Đốt 2,4 g Mg trong oxygen thu được 4 g MgO. Khối lượng oxygen đã phản ứng là
+\choice
+{\True $1{,}6$ g}
+{$6{,}4$ g}
+{$2{,}4$ g}
+{$0{,}8$ g}
+\end{ex}
+
+\end{document}
+`;
+function h_sampleTex() { dl(new Blob([SAMPLE_TEX], { type: 'text/x-tex;charset=utf-8' }), 'Mau_de_Olympia.tex'); }
+
 /* ========================= ĐỌC FILE CÂU HỎI =========================
    Cấu trúc: các mục [KHỞI ĐỘNG] [VƯỢT CHƯỚNG NGẠI VẬT] [CNV] [TĂNG TỐC]
    [VỀ ĐÍCH 20] [VỀ ĐÍCH 30] [VỀ ĐÍCH 40]; mỗi câu: "Câu n: ...", A./B./C./D., "Đáp án: X".
    Câu không thuộc mục nào sẽ được tự chia vào các vòng còn thiếu. */
+/* Mã vòng thi (viết trong [ ] ở Word, hoặc %[ ] / \section{ } ở LaTeX):
+   KD = Khởi động · VCNV = Vượt chướng ngại vật (hàng ngang) · CNV = câu từ khóa chướng ngại vật
+   TT = Tăng tốc · VD20 / VD30 / VD40 = Về đích câu 20 / 30 / 40 điểm */
+const ROUND_CODES = { KD: 'r1', KHOIDONG: 'r1', VCNV: 'r2', HN: 'r2', HANGNGANG: 'r2', CNV: 'cnv', TUKHOA: 'cnv', TT: 'r3', TANGTOC: 'r3', VD20: 'v20', VD30: 'v30', VD40: 'v40', VD: 'v20' };
 function secKey(s) {
-  const n = norm(s);
+  const n = norm(s), c = n.replace(/[^A-Z0-9]/g, '');
+  if (ROUND_CODES[c]) return ROUND_CODES[c];
   if (n.includes('KHOI')) return 'r1';
   if (n.includes('VUOT') || /\bVCNV\b/.test(n) || n.includes('HANG NGANG')) return 'r2';
   if (/\bCNV\b/.test(n) || n.includes('CHUONG NGAI') || n.includes('TU KHOA')) return 'cnv';
@@ -479,15 +727,20 @@ function parseQuestions(raw) {
   flush(); return out;
 }
 function buildBank(text) {
-  const p = parseQuestions(text), pool = shuffle(p.pool), warn = [];
-  const take = (arr, n, label) => { const o = arr.slice(0, n); while (o.length < n && pool.length) o.push(pool.shift()); if (o.length < n) warn.push(`${label}: cần ${n} câu, mới có ${o.length}`); return o; };
+  const p = parseQuestions(text), warn = [];
+  // Nhận diện nghiêm ngặt: mỗi vòng CHỈ dùng câu có đúng mã vòng đó; câu không có mã thì không dùng.
+  const take = (arr, n, label) => {
+    if (arr.length < n) warn.push(`${label}: cần ${n} câu, mới có ${arr.length}`);
+    else if (arr.length > n) warn.push(`${label}: có ${arr.length} câu, chỉ dùng ${n} câu đầu`);
+    return arr.slice(0, n);
+  };
+  if (p.pool.length) warn.push(`${p.pool.length} câu chưa có mã vòng thi nên KHÔNG được dùng – hãy đặt dưới mục [KD], [VCNV], [CNV], [TT], [VD20], [VD30] hoặc [VD40]`);
   const b = { r1: take(p.r1, RULES.R1_COUNT, 'Khởi động'), r2: take(p.r2, 4, 'Vượt CNV (hàng ngang)'), cnv: take(p.cnv, 1, 'Câu từ khóa CNV')[0] || null, r3: take(p.r3, 4, 'Tăng tốc') };
   b.v = { 20: [...p.v20], 30: [...p.v30], 40: [...p.v40] };
-  pool.forEach((q, i) => b.v[[20, 30, 40][i % 3]].push(q));
   const r4n = b.v[20].length + b.v[30].length + b.v[40].length;
-  if (r4n < 12) warn.push(`Về đích: nên có ≥ 12 câu (đang có ${r4n}), thiếu sẽ dùng lại câu`);
+  if (r4n < 12) warn.push(`Về đích: nên có ≥ 12 câu (đang có ${r4n}), thiếu sẽ dùng lại câu Về đích`);
   b.total = Object.values(p).reduce((s, a) => s + a.length, 0); b.warn = warn;
-  b.count = { r1: b.r1.length, r2: b.r2.length, cnv: b.cnv ? 1 : 0, r3: b.r3.length, v20: b.v[20].length, v30: b.v[30].length, v40: b.v[40].length };
+  b.count = { r1: b.r1.length, r2: b.r2.length, cnv: b.cnv ? 1 : 0, r3: b.r3.length, v20: b.v[20].length, v30: b.v[30].length, v40: b.v[40].length, pool: p.pool.length };
   return b;
 }
 
@@ -520,7 +773,7 @@ function optsHTML(opts, o = {}) {
     if (correct >= 0) cls += i === correct ? ' opt-ok' : (i === chosen || i === wrong) ? ' opt-bad' : ' opt-dim';
     else if (i === wrong) cls += ' opt-bad';
     else if (i === chosen) cls += ' opt-sel';
-    return `<button class="${cls}" ${disabled ? 'disabled' : ''} data-a="${act}" data-c="${i}" ${extra}><span class="optL">${L[i]}</span><span>${esc(txt)}</span></button>`;
+    return `<button class="${cls}" ${disabled ? 'disabled' : ''} data-a="${act}" data-c="${i}" ${extra}><span class="optL">${L[i]}</span><span>${rich(txt)}</span></button>`;
   }).join('')}</div>`;
 }
 const badge = t => `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-white text-xs font-black" style="background:${t.color}">${esc(t.name)}</span>`;
@@ -581,7 +834,7 @@ function r1Team(p, t, ctx) {
   return `<div class="space-y-4">${timerHTML(v.deadline, RULES.R1_TIME)}
     <div class="card p-4 flex flex-wrap items-center justify-between gap-3">${strip}${fb}</div>
     <div class="card qcard p-5 sm:p-7 pop"><div class="text-xs font-black text-violet-600 uppercase tracking-wider mb-2">Câu ${i + 1}/${set.length}</div>
-      <div class="text-xl sm:text-2xl font-black text-slate-900 mb-5 leading-snug">${esc(q.text)}</div>
+      <div class="text-xl sm:text-2xl font-black text-slate-900 mb-5 leading-snug">${rich(q.text)}</div>
       ${optsHTML(q.opts, { act: 'r1', extra: `data-i="${i}"`, disabled: ctx.ro || pend, chosen: pend ? ctx.pend.c : -1 })}</div></div>`;
 }
 
@@ -590,7 +843,7 @@ function rowsBoard(v) {
     const playing = v.row === i && v.rs === 'play';
     return `<div class="flex items-center gap-3 rounded-xl px-3 py-2 border-2 ${playing ? 'border-violet-500 bg-violet-50' : r.open ? 'border-emerald-300 bg-emerald-50' : 'border-slate-200 bg-white'}">
       <div class="w-8 h-8 rounded-lg grid place-items-center font-black text-white ${r.open ? 'bg-emerald-600' : playing ? 'bg-violet-600' : 'bg-slate-400'}">${i + 1}</div>
-      <div class="font-black tracking-wide ${r.open ? 'text-emerald-800' : 'text-slate-400'}">${r.open ? esc(r.key) : playing ? 'Đang hỏi…' : '? ? ? ? ?'}</div></div>`; }).join('')}</div>`;
+      <div class="font-black tracking-wide ${r.open ? 'text-emerald-800' : 'text-slate-400'}">${r.open ? rich(r.key) : playing ? 'Đang hỏi…' : '? ? ? ? ?'}</div></div>`; }).join('')}</div>`;
 }
 function r2Team(p, t, ctx) {
   const v = p.view, my = v.cnvTry[t];
@@ -600,20 +853,20 @@ function r2Team(p, t, ctx) {
     rerenderAt(v.finalDl);
     main = my ? waitBox(my.ok ? 'Đội bạn đã đoán ĐÚNG chướng ngại vật!' : 'Đã gửi câu trả lời CNV', 'Chờ hết giờ…')
       : `<div class="card p-6 pop">${timerHTML(v.finalDl, RULES.CNV_FINAL_TIME)}<div class="text-xs font-black text-amber-600 uppercase mt-4 mb-2">Cơ hội cuối – đoán chướng ngại vật (+${RULES.CNV_POINTS[RULES.CNV_POINTS.length - 1]}đ)</div>
-        <div class="text-xl font-black mb-4">${esc(v.cnv.text)}</div>${optsHTML(v.cnv.opts, { act: 'cnv', disabled: ctx.ro || !!ctx.pend, chosen: ctx.pend && ctx.pend.type === 'cnv' ? ctx.pend.c : -1 })}</div>`;
+        <div class="text-xl font-black mb-4">${rich(v.cnv.text)}</div>${optsHTML(v.cnv.opts, { act: 'cnv', disabled: ctx.ro || !!ctx.pend, chosen: ctx.pend && ctx.pend.type === 'cnv' ? ctx.pend.c : -1 })}</div>`;
   } else if (ctx.cnvOpen && v.cnv && !my && !ctx.ro) {
     main = `<div class="card p-6 border-2 border-amber-400 pop"><div class="flex items-center justify-between mb-3"><div class="text-xs font-black text-amber-600 uppercase">Đoán chướng ngại vật • đúng +${cnvVal}đ • sai mất quyền</div><button class="btn btn-soft" data-a="cnvClose">Hủy</button></div>
-      <div class="text-xl font-black mb-4">${esc(v.cnv.text)}</div>${optsHTML(v.cnv.opts, { act: 'cnv', disabled: !!ctx.pend, chosen: ctx.pend && ctx.pend.type === 'cnv' ? ctx.pend.c : -1 })}</div>`;
+      <div class="text-xl font-black mb-4">${rich(v.cnv.text)}</div>${optsHTML(v.cnv.opts, { act: 'cnv', disabled: !!ctx.pend, chosen: ctx.pend && ctx.pend.type === 'cnv' ? ctx.pend.c : -1 })}</div>`;
   } else if (v.rs === 'play') {
     rerenderAt(v.deadline);
     const r = v.rows[v.row], a = v.ans[v.row][t], pend = ctx.pend && ctx.pend.type === 'r2' && ctx.pend.row === v.row;
     main = `<div class="card qcard p-5 sm:p-7 pop">${timerHTML(v.deadline, RULES.R2_ROW_TIME)}
-      <div class="text-xs font-black text-violet-600 uppercase mt-4 mb-2">Hàng ngang ${v.row + 1}</div><div class="text-xl sm:text-2xl font-black mb-5">${esc(r.text)}</div>
+      <div class="text-xs font-black text-violet-600 uppercase mt-4 mb-2">Hàng ngang ${v.row + 1}</div><div class="text-xl sm:text-2xl font-black mb-5">${rich(r.text)}</div>
       ${optsHTML(r.opts, { act: 'r2', extra: `data-row="${v.row}"`, disabled: ctx.ro || !!a || pend, chosen: a ? a.c : pend ? ctx.pend.c : -1 })}
       ${a ? `<div class="mt-4 text-sm font-bold text-slate-500"><i class="fa-solid fa-lock"></i> Đã chốt đáp án ${L[a.c]} sau ${fmtT(a.t)} – chờ hết giờ</div>` : ''}</div>`;
   } else {
     const last = v.row >= 0 ? v.rows[v.row] : null, a = last ? v.ans[v.row][t] : null;
-    main = last ? `<div class="card p-6 pop"><div class="text-xs font-black text-emerald-600 uppercase mb-2">Đáp án hàng ngang ${v.row + 1}</div><div class="text-lg font-black mb-4">${esc(last.text)}</div>
+    main = last ? `<div class="card p-6 pop"><div class="text-xs font-black text-emerald-600 uppercase mb-2">Đáp án hàng ngang ${v.row + 1}</div><div class="text-lg font-black mb-4">${rich(last.text)}</div>
       ${optsHTML(last.opts, { disabled: true, chosen: a ? a.c : -1, correct: last.ans })}
       <div class="mt-4 font-black ${a && a.ok ? 'text-emerald-600' : 'text-rose-600'}">${a ? (a.ok ? `Đội bạn trả lời đúng (+${RULES.R2_POINT}đ) • ${fmtT(a.t)}` : 'Đội bạn trả lời chưa đúng') : 'Đội bạn chưa trả lời'}</div>
       <div class="text-slate-500 text-sm mt-1">Chờ giáo viên mở hàng ngang tiếp theo…</div></div>` : waitBox('Chờ giáo viên mở hàng ngang đầu tiên');
@@ -638,12 +891,12 @@ function r3Team(p, t, ctx) {
     const pend = ctx.pend && ctx.pend.type === 'r3' && ctx.pend.q === v.q;
     return `<div class="card qcard p-5 sm:p-7 pop">${timerHTML(v.deadline, RULES.R3_TIME)}
       <div class="text-xs font-black text-sky-600 uppercase mt-4 mb-2">Tăng tốc • Câu ${v.q + 1}/${v.n} • nhanh nhất +${RULES.R3_POINTS[0]}đ</div>
-      <div class="text-xl sm:text-2xl font-black mb-5">${esc(v.text)}</div>
+      <div class="text-xl sm:text-2xl font-black mb-5">${rich(v.text)}</div>
       ${optsHTML(v.opts, { act: 'r3', extra: `data-q="${v.q}"`, disabled: ctx.ro || !!a || pend, chosen: a ? a.c : pend ? ctx.pend.c : -1 })}
       ${a ? `<div class="mt-4 text-sm font-bold text-slate-500"><i class="fa-solid fa-stopwatch"></i> Đã chốt ${L[a.c]} sau ${fmtT(a.t)} – chờ các đội khác</div>` : ''}</div>`;
   }
   const pts = v.award[t] || 0;
-  return `<div class="card p-6 pop"><div class="text-xs font-black text-emerald-600 uppercase mb-2">Đáp án câu ${v.q + 1}</div><div class="text-lg font-black mb-4">${esc(v.text)}</div>
+  return `<div class="card p-6 pop"><div class="text-xs font-black text-emerald-600 uppercase mb-2">Đáp án câu ${v.q + 1}</div><div class="text-lg font-black mb-4">${rich(v.text)}</div>
     ${optsHTML(v.opts, { disabled: true, chosen: a ? a.c : -1, correct: v.ans })}
     <div class="mt-4 font-black text-lg ${pts ? 'text-emerald-600' : 'text-rose-600'}">${a ? (a.ok ? `Đúng sau ${fmtT(a.t)} • +${pts}đ` : 'Chưa đúng') : 'Đội bạn chưa trả lời'}</div>
     <div class="text-slate-500 text-sm mt-1">Chờ giáo viên chuyển câu…</div></div>`;
@@ -685,7 +938,7 @@ function r4Team(p, t, ctx) {
   }
   if (v.st === 'ready') return head + `<div class="mt-4">${waitBox(`Chuẩn bị câu ${v.qi + 1} – ${pts} điểm${v.star === v.qi ? ' ⭐' : ''}`, 'Chờ giáo viên hiện câu hỏi…')}</div>`;
   if (v.st !== 'reveal') rerenderAt(v.deadline);
-  let body = `<div class="text-xs font-black text-pink-600 uppercase mb-2">Câu ${v.qi + 1} • ${pts} điểm${v.star === v.qi ? ' • ⭐ Ngôi sao hy vọng' : ''}</div><div class="text-xl sm:text-2xl font-black mb-5">${esc(v.text)}</div>`;
+  let body = `<div class="text-xs font-black text-pink-600 uppercase mb-2">Câu ${v.qi + 1} • ${pts} điểm${v.star === v.qi ? ' • ⭐ Ngôi sao hy vọng' : ''}</div><div class="text-xl sm:text-2xl font-black mb-5">${rich(v.text)}</div>`;
   const pend = ctx.pend && ['r4ans', 'r4steal', 'buzz'].includes(ctx.pend.type);
   if (v.st === 'answer') {
     body = timerHTML(v.deadline, v.total) + '<div class="mt-4"></div>' + body +
@@ -710,7 +963,7 @@ function reviewTeam(p, t) {
   const rk = rankOf(p.teams), pos = rk.findIndex(x => x.i === t) + 1;
   let extra = '';
   if (p.round === 1 && p.view) { const pr = p.view.prog[t]; extra = `<div class="mt-2 text-slate-600 font-bold">Vòng Khởi động: đúng ${pr.filter(x => x.ok).length}/${p.view.sets[t].length} câu</div>`; }
-  if (p.round === 2 && p.view && p.view.cnv && p.view.cnv.ans >= 0) extra = `<div class="mt-2 text-slate-600 font-bold">Chướng ngại vật: <span class="text-emerald-700">${esc(p.view.cnv.opts[p.view.cnv.ans])}</span>${p.view.solved >= 0 ? ` – ${esc(p.teams[p.view.solved].name)} đoán đúng` : ''}</div>`;
+  if (p.round === 2 && p.view && p.view.cnv && p.view.cnv.ans >= 0) extra = `<div class="mt-2 text-slate-600 font-bold">Chướng ngại vật: <span class="text-emerald-700">${rich(p.view.cnv.opts[p.view.cnv.ans])}</span>${p.view.solved >= 0 ? ` – ${esc(p.teams[p.view.solved].name)} đoán đúng` : ''}</div>`;
   return `<div class="card p-8 text-center pop"><div class="text-sm font-black text-violet-600 uppercase">Kết thúc vòng ${p.round}: ${ROUND_NAMES[p.round]}</div>
     <div class="text-5xl font-black mt-3">${p.teams[t].score}<span class="text-xl"> điểm</span></div><div class="mt-1 font-bold text-slate-500">Đội bạn đang xếp hạng ${pos}/${p.teams.length}</div>${extra}
     <div class="mt-6">${scoreStrip(p, t)}</div><div class="mt-4 text-sm text-slate-400 font-semibold">Chờ giáo viên chuyển sang vòng tiếp theo…</div></div>`;
@@ -880,8 +1133,8 @@ function drawR4(pts) {
   const g = H.g, l = g.r4.left;
   if (l[pts].length) return l[pts].shift();
   for (const k of [20, 30, 40]) if (l[k].length) return l[k].shift();
-  const all = [...g.bank.v[20], ...g.bank.v[30], ...g.bank.v[40], ...g.bank.r3, ...g.bank.r1];
-  return all[Math.floor(Math.random() * all.length)];
+  const all = [...g.bank.v[20], ...g.bank.v[30], ...g.bank.v[40]];   // chỉ dùng lại câu Về đích, không lấy câu vòng khác
+  return all.length ? all[Math.floor(Math.random() * all.length)] : { text: '(Chưa có câu hỏi Về đích – hãy thêm câu có mã [VD20]/[VD30]/[VD40])', opts: ['—', '—', '—', '—'], ans: 0 };
 }
 function pickPkg(pkg, star) {
   const r = H.g.r4; r.pkg = pkg; r.star = star >= 0 && star < 3 ? star : -1;
@@ -1033,8 +1286,13 @@ function h_useSaved() { const r = findSavedRoster(); if (r) setStudents(r.names,
 async function h_bankFile(file) {
   if (!file) return;
   try {
-    const text = /\.docx$/i.test(file.name) ? (await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() })).value : await file.text();
+    let text, note = '';
+    if (/\.tex$/i.test(file.name)) {
+      const r = texToBank(await file.text()); text = r.text;
+      note = `Đã đọc ${r.n} câu trắc nghiệm từ file LaTeX` + (r.skipped ? ` (bỏ qua ${r.skipped} câu không phải \\choice 4 đáp án hoặc thiếu \\True)` : '') + '.';
+    } else text = /\.docx$/i.test(file.name) ? (await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() })).value : await file.text();
     const b = buildBank(text);
+    if (note) setTimeout(() => alert(note), 50);
     if (!b.total) return alert('Không nhận được câu hỏi nào. Kiểm tra định dạng: "Câu 1: ...", "A. ...", "Đáp án: A".');
     H.bankText = text; H.bankName = file.name; commit();
   } catch (e) { alert('Không đọc được file: ' + e.message); }
@@ -1084,6 +1342,18 @@ function renderHost() {
   </div>`;
   renderMath($('#app')); updateTimers();
 }
+function logoHTML(size = 'md') {
+  const L = size === 'lg' ? { b: 'w-20 h-20 text-4xl rounded-[1.6rem]', w: 'text-[44px]', t: 'text-[11px] mt-2', bar: 'h-1.5 w-16' }
+    : { b: 'w-12 h-12 text-2xl rounded-2xl', w: 'text-[27px]', t: 'text-[9px] mt-1.5', bar: 'h-1 w-5' };
+  return `<span class="inline-flex items-center gap-3 select-none">
+    <span class="relative ${L.b} logo-badge grid place-items-center text-white -rotate-6 flex-shrink-0">
+      <i class="fa-solid fa-gamepad drop-shadow"></i>
+      <span class="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-amber-300 border-2 border-white"></span></span>
+    <span class="flex flex-col items-start">
+      <span class="logo-word ${L.w} whitespace-nowrap"><span class="text-slate-900">EDU</span> <span class="logo-grad">GAME</span></span>
+      <span class="flex items-center gap-1.5 ${L.t}"><span class="${L.bar} rounded-full" style="background:linear-gradient(90deg,#7c3aed,#db2777,#f59e0b)"></span><span class="font-extrabold uppercase tracking-[.12em] text-slate-400 whitespace-nowrap">Học tập &amp; Trò chơi</span></span>
+    </span></span>`;
+}
 function h_side() { UI.side = !UI.side; renderHost(); }
 function sidebarHTML() {
   const ph = H.phase, g = H.g;
@@ -1101,10 +1371,7 @@ function sidebarHTML() {
   return `
   <aside class="w-60 xl:w-64 flex-shrink-0 bg-white border-r border-slate-200/90 flex flex-col h-screen top-0 z-40 shadow-sm transition-all duration-300 fixed lg:sticky ${UI.side ? '' : '-translate-x-full lg:hidden'}">
     <div class="p-4 border-b border-slate-100 flex items-center justify-between">
-      <a href="index.html" class="flex items-center gap-3">
-        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-purple-500 via-pink-500 to-amber-400 p-0.5 shadow-sm"><div class="w-full h-full bg-white rounded-[14px] flex items-center justify-center text-purple-600 text-xl"><i class="fa-solid fa-gamepad"></i></div></div>
-        <div><div class="text-lg font-black tracking-tight text-slate-900 leading-tight">EDU GAME</div><span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">HỌC TẬP & TRÒ CHƠI</span></div>
-      </a>
+      <a href="index.html" class="block" title="Về trang chủ EDU GAME">${logoHTML()}</a>
       <button onclick="h_side()" class="lg:hidden text-slate-400 hover:text-slate-700 p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
     </div>
     <div class="flex-1 overflow-y-auto px-3 py-3 space-y-5">
@@ -1184,12 +1451,13 @@ function setupHTML() {
   const bank = `
     <div class="flex flex-wrap items-center justify-between gap-2 mb-3"><div class="font-bold text-sm"><i class="fa-solid fa-file-lines text-blue-600"></i> ${esc(H.bankName)} <span class="text-slate-400">(${b.total} câu)</span></div>
       <div class="flex flex-wrap gap-2">
-        <label class="btn btn-soft cursor-pointer"><i class="fa-solid fa-file-word text-blue-600"></i> Nạp file Word / .txt<input type="file" accept=".docx,.txt" class="hidden" onchange="h_bankFile(this.files[0])"></label>
+        <label class="btn btn-soft cursor-pointer"><i class="fa-solid fa-file-word text-blue-600"></i> Nạp file Word / LaTeX<input type="file" accept=".docx,.txt,.tex" class="hidden" onchange="h_bankFile(this.files[0])"></label>
         <button class="btn btn-soft" onclick="h_sampleBank()"><i class="fa-solid fa-flask"></i> Dùng bộ mẫu KHTN 8</button>
         <button class="btn btn-soft" onclick="h_sampleDocx()"><i class="fa-solid fa-file-word text-blue-600"></i> Tải file Word mẫu</button>
+        <button class="btn btn-soft" onclick="h_sampleTex()"><i class="fa-solid fa-file-code text-purple-600"></i> Tải .tex mẫu</button>
         <button class="btn btn-soft" onclick="h_help('word')"><i class="fa-solid fa-circle-question text-amber-600"></i> Cách soạn đề</button></div></div>
-    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 text-center">${[['Khởi động', cnt.r1, RULES.R1_COUNT], ['Hàng ngang', cnt.r2, 4], ['Từ khóa CNV', cnt.cnv, 1], ['Tăng tốc', cnt.r3, 4], ['Về đích 20đ', cnt.v20, 0], ['Về đích 30đ', cnt.v30, 0], ['Về đích 40đ', cnt.v40, 0]].map(([n, c, need]) =>
-      `<div class="rounded-xl p-2 border ${need && c < need ? 'border-rose-200 bg-rose-50' : 'border-slate-200 bg-slate-50'}"><div class="text-[11px] font-bold text-slate-500">${n}</div><div class="text-xl font-black">${c}${need ? `<span class="text-xs text-slate-400">/${need}</span>` : ''}</div></div>`).join('')}</div>
+    <div class="grid grid-cols-2 sm:grid-cols-4 ${cnt.pool ? 'lg:grid-cols-8' : 'lg:grid-cols-7'} gap-2 text-center">${[['Khởi động', cnt.r1, RULES.R1_COUNT], ['Hàng ngang', cnt.r2, 4], ['Từ khóa CNV', cnt.cnv, 1], ['Tăng tốc', cnt.r3, 4], ['Về đích 20đ', cnt.v20, 0], ['Về đích 30đ', cnt.v30, 0], ['Về đích 40đ', cnt.v40, 0]].concat(cnt.pool ? [['Chưa có mã (bỏ)', cnt.pool, -1]] : []).map(([n, c, need]) =>
+      `<div class="rounded-xl p-2 border ${need < 0 || (need && c < need) ? 'border-rose-200 bg-rose-50' : 'border-slate-200 bg-slate-50'}"><div class="text-[11px] font-bold text-slate-500">${n}</div><div class="text-xl font-black ${need < 0 ? 'text-rose-600' : ''}">${c}${need > 0 ? `<span class="text-xs text-slate-400">/${need}</span>` : ''}</div></div>`).join('')}</div>
     ${b.warn.length ? `<div class="mt-3 text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3">${b.warn.map(esc).join('<br>')}</div>` : ''}
     <details class="mt-3 text-xs text-slate-600"><summary class="cursor-pointer font-bold">Cấu trúc file câu hỏi</summary><pre class="mt-2 bg-slate-50 rounded-xl p-3 whitespace-pre-wrap">[KHỞI ĐỘNG]  (7 câu)
 Câu 1: Nội dung câu hỏi
@@ -1332,14 +1600,14 @@ function hostMain(p) {
   if (g.round === 2) {
     const cur = v.rs !== 'idle' && v.row >= 0 ? v.rows[v.row] : null;
     return `<div class="grid lg:grid-cols-[1fr_320px] gap-5 mb-5">
-      <div class="card qcard p-6 big">${cur ? `<div class="text-xs font-black text-violet-600 uppercase mb-2">Hàng ngang ${v.row + 1}</div><div class="text-2xl sm:text-3xl font-black mb-5">${esc(cur.text)}</div>${optsHTML(cur.opts, { disabled: true, correct: v.rs === 'reveal' ? cur.ans : -1 })}`
-        : g.status === 'final' || g.status === 'review' ? `<div class="text-xs font-black text-amber-600 uppercase mb-2">Chướng ngại vật</div><div class="text-2xl font-black mb-5">${esc(v.cnv ? v.cnv.text : '')}</div>${v.cnv ? optsHTML(v.cnv.opts, { disabled: true, correct: v.cnv.ans }) : ''}` : '<div class="text-center text-slate-400 font-bold py-10">Bấm “Mở hàng ngang 1” để bắt đầu</div>'}</div>
-      <div class="card p-4 space-y-3 h-fit">${rowsBoard(v)}<div class="rounded-xl bg-slate-900 text-white p-3 text-center"><div class="text-[10px] uppercase font-bold text-slate-400">Chướng ngại vật</div><div class="text-lg font-black">${g.status === 'review' && v.cnv ? esc(v.cnv.opts[v.cnv.ans]) : '? ? ?'}</div><div class="text-[11px] text-amber-300 font-bold">${v.opened && g.status === 'play' ? `Đoán ngay: +${RULES.CNV_POINTS[Math.min(v.opened, 4) - 1]}đ` : ''}</div></div></div></div>` +
+      <div class="card qcard p-6 big">${cur ? `<div class="text-xs font-black text-violet-600 uppercase mb-2">Hàng ngang ${v.row + 1}</div><div class="text-2xl sm:text-3xl font-black mb-5">${rich(cur.text)}</div>${optsHTML(cur.opts, { disabled: true, correct: v.rs === 'reveal' ? cur.ans : -1 })}`
+        : g.status === 'final' || g.status === 'review' ? `<div class="text-xs font-black text-amber-600 uppercase mb-2">Chướng ngại vật</div><div class="text-2xl font-black mb-5">${rich(v.cnv ? v.cnv.text : '')}</div>${v.cnv ? optsHTML(v.cnv.opts, { disabled: true, correct: v.cnv.ans }) : ''}` : '<div class="text-center text-slate-400 font-bold py-10">Bấm “Mở hàng ngang 1” để bắt đầu</div>'}</div>
+      <div class="card p-4 space-y-3 h-fit">${rowsBoard(v)}<div class="rounded-xl bg-slate-900 text-white p-3 text-center"><div class="text-[10px] uppercase font-bold text-slate-400">Chướng ngại vật</div><div class="text-lg font-black">${g.status === 'review' && v.cnv ? rich(v.cnv.opts[v.cnv.ans]) : '? ? ?'}</div><div class="text-[11px] text-amber-300 font-bold">${v.opened && g.status === 'play' ? `Đoán ngay: +${RULES.CNV_POINTS[Math.min(v.opened, 4) - 1]}đ` : ''}</div></div></div></div>` +
       scoreCards(p, i => { const a = v.row >= 0 ? v.ans[v.row][i] : null, c = v.cnvTry[i];
         return `<div class="text-xs font-bold mt-2">${v.row >= 0 ? `Hàng ${v.row + 1}: ${okBadge(a)}` : ''}</div>${c ? `<div class="text-xs font-black mt-1 ${c.ok ? 'text-emerald-600' : 'text-rose-600'}">CNV: ${c.ok ? 'đúng +' + c.pts : 'sai – mất quyền'}</div>` : ''}`; });
   }
   if (g.round === 3) {
-    return (v.q >= 0 ? `<div class="card qcard p-6 big mb-5"><div class="text-xs font-black text-sky-600 uppercase mb-2">Tăng tốc • Câu ${v.q + 1}/${v.n}</div><div class="text-2xl sm:text-3xl font-black mb-5">${esc(v.text)}</div>${optsHTML(v.opts, { disabled: true, correct: v.ans })}</div>` : '') +
+    return (v.q >= 0 ? `<div class="card qcard p-6 big mb-5"><div class="text-xs font-black text-sky-600 uppercase mb-2">Tăng tốc • Câu ${v.q + 1}/${v.n}</div><div class="text-2xl sm:text-3xl font-black mb-5">${rich(v.text)}</div>${optsHTML(v.opts, { disabled: true, correct: v.ans })}</div>` : '') +
       scoreCards(p, i => `<div class="text-xs font-bold mt-2">${v.q >= 0 ? okBadge(v.answers[i]) : ''}${v.award[i] ? ` <span class="text-emerald-700 font-black">+${v.award[i]}đ</span>` : ''}</div>`);
   }
   if (g.round === 4) {
@@ -1347,7 +1615,7 @@ function hostMain(p) {
     let center;
     if (v.st === 'pick') center = `<div class="text-center py-10"><div class="text-slate-500 font-bold">Lượt thi của</div><div class="text-4xl font-black mt-1" style="color:${act.color}">${esc(act.name)}</div><div class="mt-3 text-slate-500 font-bold pulse-soft">Đang chọn gói câu hỏi…</div></div>`;
     else if (v.st === 'ready') center = `<div class="text-center py-10"><div class="text-3xl font-black">Câu ${v.qi + 1} – ${v.pts[v.qi]} điểm ${v.star === v.qi ? '⭐' : ''}</div><div class="text-slate-500 font-bold mt-2">Bấm “Hiện câu” khi sẵn sàng</div></div>`;
-    else center = `<div class="text-xs font-black text-pink-600 uppercase mb-2">Câu ${v.qi + 1} • ${v.pts[v.qi]} điểm${v.star === v.qi ? ' • ⭐ Ngôi sao hy vọng' : ''}</div><div class="text-2xl sm:text-4xl font-black mb-6 leading-snug">${esc(v.text)}</div>
+    else center = `<div class="text-xs font-black text-pink-600 uppercase mb-2">Câu ${v.qi + 1} • ${v.pts[v.qi]} điểm${v.star === v.qi ? ' • ⭐ Ngôi sao hy vọng' : ''}</div><div class="text-2xl sm:text-4xl font-black mb-6 leading-snug">${rich(v.text)}</div>
       ${optsHTML(v.opts, { disabled: true, correct: v.ans, chosen: v.main ? v.main.c : -1, wrong: v.st === 'reveal' && v.steal ? v.steal.c : (v.main && !v.main.ok ? v.main.c : -1) })}
       ${v.st === 'buzz' ? `<div class="mt-5 text-center text-2xl font-black text-amber-600 pulse-soft"><i class="fa-solid fa-bell"></i> Các đội bấm chuông giành quyền!</div>` : ''}
       ${v.st === 'steal' ? `<div class="mt-5 text-center text-2xl font-black" style="color:${p.teams[v.buzzer].color}"><i class="fa-solid fa-bell"></i> ${esc(p.teams[v.buzzer].name)} giành quyền trả lời!</div>` : ''}${r4Outcome(p)}`;
@@ -1453,8 +1721,9 @@ function renderTeam() {
   if (T.t < 0 || !T.p) {
     root.innerHTML = `<div class="min-h-screen grid place-items-center p-4 bg-gradient-to-br from-rose-50 via-violet-50 to-amber-50">
       <div class="card p-7 sm:p-9 w-full max-w-md text-center pop">
-        <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-rose-500 via-violet-600 to-amber-400 grid place-items-center text-white text-2xl"><i class="fa-solid fa-mountain"></i></div>
-        <div class="text-2xl font-black mt-4">Đường Lên Đỉnh Olympia</div><div class="text-sm text-slate-500 font-semibold">Nhập mã PIN của đội bạn</div>
+        <div class="flex justify-center">${logoHTML()}</div>
+        <div class="mt-5 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-50 border border-rose-200 text-rose-700 text-xs font-black"><i class="fa-solid fa-mountain"></i> ĐƯỜNG LÊN ĐỈNH OLYMPIA</div>
+        <div class="text-2xl font-black mt-3">Vào phòng thi</div><div class="text-sm text-slate-500 font-semibold">Nhập mã PIN của đội bạn</div>
         ${T.connecting ? `<div class="mt-8 text-violet-600 font-black"><i class="fa-solid fa-spinner fa-spin"></i> Đang xác nhận mã PIN…</div>` : `
         <form onsubmit="event.preventDefault();teamJoin(this.pin.value)" class="mt-6 space-y-3">
           <input name="pin" inputmode="numeric" autocomplete="off" maxlength="6" value="${esc(T.pin || '')}" placeholder="••••••" class="w-full text-center text-4xl font-black tracking-[.3em] rounded-2xl border-2 border-slate-200 focus:border-violet-500 focus:outline-none py-4 tabular-nums" autofocus>
@@ -1521,7 +1790,7 @@ function h_sampleDocx() {
   } catch (e) { h_downloadTemplate(); }
 }
 const HELP_SECTIONS = [
-  ['start', 'fa-rocket', 'Bắt đầu nhanh'], ['word', 'fa-file-word', 'File Word câu hỏi'], ['excel', 'fa-file-excel', 'File Excel danh sách lớp'],
+  ['start', 'fa-rocket', 'Bắt đầu nhanh'], ['word', 'fa-file-word', 'File Word câu hỏi'], ['latex', 'fa-square-root-variable', 'File LaTeX (ex_test, TikZ)'], ['excel', 'fa-file-excel', 'File Excel danh sách lớp'],
   ['teams', 'fa-users-gear', 'Chia đội & mã PIN'], ['rounds', 'fa-flag-checkered', 'Luật & điều khiển 4 vòng'], ['students', 'fa-mobile-screen', 'Học sinh vào thi'],
   ['custom', 'fa-sliders', 'Tùy chỉnh'], ['trouble', 'fa-life-ring', 'Xử lý sự cố']];
 function helpContent(k) {
@@ -1542,8 +1811,14 @@ function helpContent(k) {
       step(6, 'Bấm BẮT ĐẦU', 'Khi đủ 4 đội, nút BẮT ĐẦU sáng lên. Cả 4 đội cùng vào Vòng 1 – Khởi động.') +
       tip('<i class="fa-solid fa-eye"></i> Muốn xem trước học sinh sẽ thấy gì? Bấm <b>Xem trước giao diện</b> ở menu trái – xem được cả màn hình điện thoại của đội và màn hình máy chiếu của giáo viên ở từng vòng.', 'purple') +
       tip('<i class="fa-solid fa-triangle-exclamation"></i> Máy giáo viên phải <b>có Internet và giữ trang mở suốt buổi thi</b>. Đóng trang thì các đội mất kết nối.', 'rose');
-    case 'word': return H2('Cấu trúc file Word câu hỏi') + P('File <b>.docx</b> (hoặc .txt) gồm các <b>mục vòng thi</b> viết trong ngoặc vuông, dưới mỗi mục là các câu hỏi trắc nghiệm 4 đáp án.') +
+    case 'word': return H2('Cấu trúc file Word câu hỏi') + P('File <b>.docx</b> (hoặc .txt; file <b>.tex</b> xem mục <i>File LaTeX</i>) gồm các <b>mục vòng thi</b> viết trong ngoặc vuông, dưới mỗi mục là các câu hỏi trắc nghiệm 4 đáp án.') +
       btn('h_sampleDocx()', 'fa-file-word text-blue-600', 'Tải file Word mẫu') + btn('h_downloadTemplate()', 'fa-file-lines', 'Tải bản .txt') +
+      P('<b>Mỗi vòng chỉ lấy đúng những câu nằm dưới mã của vòng đó.</b> Câu không có mã sẽ <b>không được dùng</b> (trang báo số câu bị bỏ). Có thể ghi tên đầy đủ hoặc mã ngắn:') +
+      tbl(['Vòng', 'Mã ngắn', 'Hoặc tên đầy đủ', 'Số câu cần'], [
+        ['Khởi động', '<code>[KD]</code>', '<code>[KHỞI ĐỘNG]</code>', `${RULES.R1_COUNT} câu`], ['Vượt CNV – hàng ngang', '<code>[VCNV]</code>', '<code>[VƯỢT CHƯỚNG NGẠI VẬT]</code>', '4 câu'],
+        ['Câu từ khóa CNV', '<code>[CNV]</code>', '<code>[TỪ KHÓA]</code>', '1 câu'], ['Tăng tốc', '<code>[TT]</code>', '<code>[TĂNG TỐC]</code>', '4 câu'],
+        ['Về đích 20đ / 30đ / 40đ', '<code>[VD20]</code> <code>[VD30]</code> <code>[VD40]</code>', '<code>[VỀ ĐÍCH 20]</code> …', '≥ 12 câu tổng']]) +
+      P('Ví dụ trong Word:') + code('[KD]\nCâu 1: Chất nào sau đây là base?\nA. HCl\nB. NaOH\nC. NaCl\nD. CO2\nĐáp án: B\n\n[TT]\nCâu 1: Tỉ khối của khí $\\ce{SO2}$ so với $\\ce{O2}$ là\nA. 2  B. 0,5  C. 1,5  D. 4\nĐáp án: A') +
       tbl(['Mục (gõ đúng như sau)', 'Dùng cho', 'Số câu cần'], [
         ['<code>[KHỞI ĐỘNG]</code>', 'Vòng 1', `${RULES.R1_COUNT} câu`], ['<code>[VƯỢT CHƯỚNG NGẠI VẬT]</code>', 'Vòng 2 – 4 hàng ngang', '4 câu'],
         ['<code>[CNV]</code>', 'Vòng 2 – câu đoán từ khóa chướng ngại vật', '1 câu'], ['<code>[TĂNG TỐC]</code>', 'Vòng 3', '4 câu'],
@@ -1555,6 +1830,28 @@ function helpContent(k) {
       tbl(['Gõ trong Word', 'Hiển thị'], [['<code>$x^2$</code>', '$x^2$'], ['<code>$H_2O$</code>', '$H_2O$'], ['<code>$\\dfrac{m}{M}$</code>', '$\\dfrac{m}{M}$'], ['<code>$\\sqrt{16}$</code>', '$\\sqrt{16}$'],
         ['<code>$\\ce{H2SO4}$</code> (hóa học, tự hạ chỉ số)', '$\\ce{H2SO4}$'], ['<code>$\\ce{2H2 + O2 -> 2H2O}$</code>', '$\\ce{2H2 + O2 -> 2H2O}$'], ['<code>$25^\\circ C$</code>', '$25^\\circ C$']]) +
       tip('<b>Lưu ý:</b> Công thức tạo bằng <i>Insert → Equation</i> của Word sẽ bị mất khi nạp – hãy gõ dạng <code>$…$</code>. Câu không nằm dưới mục nào sẽ được tự chia vào vòng còn thiếu. Sau khi nạp, ô đếm số câu từng vòng hiện đỏ nếu còn thiếu.');
+    case 'latex': return H2('File LaTeX (.tex) – gói ex_test, hình TikZ, \\immini') +
+      P('Nạp thẳng file <b>.tex</b> soạn theo gói <b>ex_test</b> ở nút <b>Nạp file Word / LaTeX</b>. Trang đọc các câu <code>\\begin{ex} … \\end{ex}</code> có <code>\\choice</code> 4 đáp án; đáp án đúng đánh dấu <code>\\True</code>; <code>\\loigiai{…}</code> được bỏ qua.') +
+      btn('h_sampleTex()', 'fa-file-code text-purple-600', 'Tải file .tex mẫu') +
+      P('<b>Ghi mã vòng ngay sau <code>\\begin{ex}</code></b> theo dạng <code>%[MÃ]</code>. Vòng nào chỉ lấy đúng các câu mang mã của vòng đó; câu không có mã sẽ không được dùng.') +
+      tbl(['Vòng', 'Ghi sau \\begin{ex}', 'Số câu cần'], [
+        ['Khởi động', '<code>\\begin{ex}%[KD]</code>', `${RULES.R1_COUNT} câu`], ['Vượt CNV – hàng ngang', '<code>\\begin{ex}%[VCNV]</code>', '4 câu'],
+        ['Câu từ khóa CNV', '<code>\\begin{ex}%[CNV]</code>', '1 câu'], ['Tăng tốc', '<code>\\begin{ex}%[TT]</code>', '4 câu'],
+        ['Về đích 20 điểm', '<code>\\begin{ex}%[VD20]</code>', 'tổng các câu'], ['Về đích 30 điểm', '<code>\\begin{ex}%[VD30]</code>', 'Về đích'], ['Về đích 40 điểm', '<code>\\begin{ex}%[VD40]</code>', 'nên ≥ 12']]) +
+      P('<b>Ví dụ từng phần:</b>') +
+      code('% Khởi động\n\\begin{ex}%[KD]\nCông thức tính số mol là\n\\choice\n  {$n = m \\cdot M$}\n  {\\True $n = \\dfrac{m}{M}$}\n  {$n = \\dfrac{M}{m}$}\n  {$n = m + M$}\n\\loigiai{ ... }\n\\end{ex}') +
+      code('% Vượt chướng ngại vật: 4 câu hàng ngang [VCNV] + 1 câu từ khóa [CNV]\n\\begin{ex}%[VCNV]\nChất làm tăng tốc độ phản ứng là\n\\choice\n  {\\True chất xúc tác}{chất phản ứng}{sản phẩm}{dung môi}\n\\end{ex}\n\n\\begin{ex}%[CNV]\nTừ khóa: đại lượng cho biết độ acid/base?\n\\choice\n  {Nồng độ}{\\True pH}{Tỉ khối}{Độ tan}\n\\end{ex}') +
+      code('% Tăng tốc – có hình TikZ đặt bên phải bằng \\immini\n\\begin{ex}%[TT]\n\\immini{Mũi tên chỉ dung dịch có môi trường gì?}{\n\\begin{tikzpicture}\n  \\shade[left color=red,right color=blue] (0,0) rectangle (5,0.4);\n  \\draw[->,thick] (1,1) -- (1,0.45);\n\\end{tikzpicture}}\n\\choice\n  {\\True acid}{base}{trung tính}{không xác định}\n\\end{ex}') +
+      code('% Về đích – mã theo số điểm của câu\n\\begin{ex}%[VD20]  ...  \\end{ex}\n\\begin{ex}%[VD30]  ...  \\end{ex}\n\\begin{ex}%[VD40]  ...  \\end{ex}') +
+      P('Nếu câu đã có mã ID của ex_test, ghi thêm mã vòng phía sau: <code>\\begin{ex}%[8H1Y1-2][TT]</code>. Muốn ghi 1 lần cho cả nhóm câu: đặt <code>\\section{TT}</code> hoặc dòng <code>%[TT]</code> phía trên nhóm câu đó.') +
+      tbl(['Hỗ trợ', 'Ghi chú'], [
+        ['<code>\\begin{tikzpicture} … \\end{tikzpicture}</code>', 'Vẽ thành hình (trong câu hỏi hoặc đáp án). Thư viện khai báo bằng <code>\\usetikzlibrary{…}</code> ở đầu file được tự đưa vào.'],
+        ['<code>\\immini[…]{chữ}{hình}</code>', 'Chữ bên trái – hình bên phải (trên điện thoại: hình nằm dưới chữ).'],
+        ['<code>$…$</code>, <code>\\(…\\)</code>, <code>$$…$$</code>, <code>\\ce{…}</code>', 'Công thức toán, hóa học.'],
+        ['<code>\\textbf</code>, <code>\\textit</code>, <code>\\emph</code>, <code>\\underline</code>, <code>\\\\</code>, <code>itemize</code>, <code>center</code>', 'Định dạng chữ, xuống dòng, gạch đầu dòng.'],
+        ['<code>\\choiceTF</code>, <code>\\shortans</code>, câu tự luận', 'Bỏ qua (trò chơi chỉ dùng trắc nghiệm 4 đáp án) – trang báo số câu bị bỏ qua.']]) +
+      tip('<b>Lưu ý về hình TikZ:</b> hình được vẽ qua dịch vụ trực tuyến miễn phí <b>Upmath</b> nên <b>cần Internet</b> trên mọi máy. Nên dùng nhãn <b>không dấu / ký hiệu</b> trong hình (chữ tiếng Việt có dấu trong hình có thể không hiển thị). Các gói vẽ riêng như <code>tkz-euclide</code>, <code>tkz-tab</code> có thể không được hỗ trợ – nếu hình không vẽ được, ô hình sẽ hiện cảnh báo màu vàng. Lệnh <code>\\includegraphics</code> (ảnh từ file) chưa hỗ trợ.') +
+      tip('Mẹo: soạn và biên dịch thử file .tex như bình thường để chắc mã đúng, rồi mới nạp vào trò chơi.', 'emerald');
     case 'excel': return H2('Cấu trúc file Excel danh sách lớp') + P('File <b>.xlsx</b>, <b>.xls</b> hoặc <b>.csv</b>, lấy <b>trang tính đầu tiên</b>. Hàng đầu là tiêu đề cột.') +
       btn('h_sampleExcel()', 'fa-file-excel text-emerald-600', 'Tải file Excel mẫu') +
       tbl(['STT', 'Họ và tên', 'Lớp'], [['1', 'Nguyễn Văn An', '8A4'], ['2', 'Trần Thị Bình', '8A4'], ['3', 'Lê Minh Châu', '8A4'], ['…', '…', '…']]) +
@@ -1605,22 +1902,22 @@ function helpContent(k) {
 }
 function helpHTML() {
   const k = UI.help;
-  return `<div class="fixed inset-0 z-[95] bg-slate-950/70 backdrop-blur-sm p-3 sm:p-6 overflow-y-auto" onclick="if(event.target===this)h_help(null)">
-    <div class="max-w-5xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden pop">
-      <div class="hero-gradient text-white px-5 sm:px-7 py-5 flex items-center justify-between gap-3"><div class="relative z-10 flex items-center gap-3">
+  return `<div class="fixed inset-0 z-[95] bg-slate-950/70 backdrop-blur-sm p-2 sm:p-4" onclick="if(event.target===this)h_help(null)">
+    <div class="w-full max-w-[1500px] h-full mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden pop flex flex-col">
+      <div class="hero-gradient text-white px-5 sm:px-7 py-4 flex items-center justify-between gap-3 flex-shrink-0"><div class="relative z-10 flex items-center gap-3">
           <div class="w-12 h-12 rounded-2xl bg-white/20 border border-white/30 grid place-items-center text-xl"><i class="fa-solid fa-book-open"></i></div>
           <div><div class="text-xl sm:text-2xl font-black">Hướng dẫn sử dụng</div><div class="text-xs text-white/80">EDU GAME • Đường lên đỉnh Olympia • thi đấu theo đội</div></div></div>
         <button class="relative z-10 w-10 h-10 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30" onclick="h_help(null)" title="Đóng"><i class="fa-solid fa-xmark"></i></button></div>
-      <div class="grid md:grid-cols-[240px_1fr]">
-        <nav class="p-3 border-b md:border-b-0 md:border-r border-slate-100 bg-slate-50/70 flex md:flex-col gap-1.5 overflow-x-auto">
+      <div class="flex-1 min-h-0 flex flex-col md:flex-row">
+        <nav class="md:w-[250px] flex-shrink-0 p-3 border-b md:border-b-0 md:border-r border-slate-100 bg-slate-50/70 flex md:flex-col gap-1.5 overflow-x-auto md:overflow-y-auto">
           ${HELP_SECTIONS.map(([key, ic, name]) => `<button onclick="h_help('${key}')" class="flex-shrink-0 flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-left text-sm font-black transition ${key === k ? 'bg-slate-900 text-white shadow' : 'text-slate-600 hover:bg-white'}">
             <i class="fa-solid ${ic} w-5 text-center ${key === k ? 'text-amber-300' : 'text-purple-500'}"></i><span class="whitespace-nowrap">${name}</span></button>`).join('')}
         </nav>
-        <div id="help-body" class="p-5 sm:p-7 md:max-h-[72vh] overflow-y-auto">${helpContent(k)}
+        <div id="help-body" class="flex-1 min-h-0 min-w-0 p-5 sm:p-8 overflow-y-auto"><div class="max-w-[1100px]">${helpContent(k)}
           <div class="mt-6 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
             ${(() => { const i = HELP_SECTIONS.findIndex(x => x[0] === k), pv = HELP_SECTIONS[i - 1], nx = HELP_SECTIONS[i + 1];
               return `${pv ? `<button class="btn btn-soft" onclick="h_help('${pv[0]}')"><i class="fa-solid fa-arrow-left"></i> ${pv[2]}</button>` : '<span></span>'}${nx ? `<button class="btn btn-pri" onclick="h_help('${nx[0]}')">${nx[2]} <i class="fa-solid fa-arrow-right"></i></button>` : `<button class="btn btn-pri" onclick="h_help(null)"><i class="fa-solid fa-check"></i> Đã hiểu</button>`}`; })()}
-          </div></div>
+          </div></div></div>
       </div></div></div>`;
 }
 
@@ -1751,10 +2048,8 @@ function renderLogin() {
     <div class="relative w-full max-w-[440px]">
       <div class="bg-white/90 backdrop-blur-xl rounded-[2rem] shadow-2xl border border-white p-7 sm:p-9 pop" id="login-card">
         <div class="flex flex-col items-center text-center">
-          <div class="w-24 h-24 rounded-[1.75rem] p-1 shadow-xl" style="background:linear-gradient(135deg,#9333ea,#ec4899 55%,#f59e0b)">
-            <div class="w-full h-full rounded-[1.5rem] grid place-items-center text-white text-5xl" style="background:linear-gradient(135deg,#9333ea,#ec4899 55%,#f59e0b)"><i class="fa-solid fa-gamepad drop-shadow"></i></div></div>
-          <div class="mt-5 text-[11px] font-black uppercase tracking-[.25em] text-purple-500">EDU GAME • Trò chơi lớp học</div>
-          <h1 class="text-2xl sm:text-3xl font-black text-slate-900 mt-1">Đăng nhập giáo viên</h1>
+          ${logoHTML('lg')}
+          <h1 class="text-2xl sm:text-[28px] font-black text-slate-900 mt-6">Đăng nhập giáo viên</h1>
           <p class="text-sm text-slate-500 mt-1">Quản lý phòng thi, chia đội và điều khiển trò chơi</p>
         </div>
         <form class="mt-7 space-y-4" onsubmit="event.preventDefault(); doLogin(this)">
