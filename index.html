@@ -1,1338 +1,656 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" class="light">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Olympia Lớp Học – Thi đấu theo đội</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
-<!-- Firebase (chỉ dùng khi điền FIREBASE_CONFIG bên dưới để các đội chơi trên máy/điện thoại riêng) -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<style>
-  body{font-family:'Be Vietnam Pro',system-ui,sans-serif;background:#f8fafc}
-  .card{background:#fff;border:2px solid #e2e8f0;border-radius:1.5rem;box-shadow:0 1px 3px rgba(15,23,42,.05)}
-  .hero-gradient{background:linear-gradient(120deg,#e11d48 0%,#c026d3 45%,#7c3aed 75%,#4f46e5 100%);position:relative}
-  .hero-gradient::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 85% 15%,rgba(255,255,255,.25),transparent 45%),radial-gradient(circle at 10% 110%,rgba(251,191,36,.35),transparent 40%);pointer-events:none}
-  .badge-live{white-space:nowrap;flex-shrink:0;display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:900;text-transform:uppercase;padding:2px 6px;border-radius:6px;background:#e11d48;color:#fff}
-  .badge-live::before{content:'';width:5px;height:5px;border-radius:9px;background:#fff;animation:ps 1.2s infinite}
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;padding:.6rem 1rem;border-radius:.9rem;font-weight:800;font-size:.85rem;transition:.15s;white-space:nowrap}
-  .btn:disabled{opacity:.4;cursor:not-allowed}
-  .btn-dark{background:#0f172a;color:#fff}.btn-dark:hover:not(:disabled){background:#1e293b}
-  .btn-pri{background:linear-gradient(90deg,#9333ea,#4f46e5);color:#fff;box-shadow:0 6px 18px rgba(79,70,229,.25)}
-  .btn-pri:hover:not(:disabled){filter:brightness(1.08)}
-  .btn-soft{background:#f1f5f9;color:#334155;border:1px solid #e2e8f0}.btn-soft:hover:not(:disabled){background:#e2e8f0}
-  .btn-ok{background:#059669;color:#fff}.btn-ok:hover:not(:disabled){background:#047857}
-  .opt{display:flex;align-items:center;gap:.85rem;text-align:left;padding:1rem 1.1rem;border-radius:1rem;border:2px solid #e2e8f0;background:#fff;font-weight:700;font-size:1.05rem;min-height:64px;transition:.12s;width:100%}
-  .opt:hover:not(:disabled){border-color:#7c3aed;background:#faf5ff;transform:translateY(-1px)}
-  .opt:disabled{cursor:default}
-  .optL{flex:none;width:2.3rem;height:2.3rem;border-radius:.7rem;background:#0f172a;color:#fff;display:grid;place-items:center;font-weight:900}
-  .opt-sel{border-color:#7c3aed;background:#f5f3ff}.opt-sel .optL{background:#7c3aed}
-  .opt-ok{border-color:#059669;background:#ecfdf5}.opt-ok .optL{background:#059669}
-  .opt-bad{border-color:#e11d48;background:#fff1f2}.opt-bad .optL{background:#e11d48}
-  .opt-dim{opacity:.5}
-  .opt:nth-child(1) .optL{background:#e11d48}.opt:nth-child(2) .optL{background:#2563eb}.opt:nth-child(3) .optL{background:#d97706}.opt:nth-child(4) .optL{background:#059669}
-  .opt:nth-child(1):hover:not(:disabled){border-color:#e11d48;background:#fff1f2}.opt:nth-child(2):hover:not(:disabled){border-color:#2563eb;background:#eff6ff}
-  .opt:nth-child(3):hover:not(:disabled){border-color:#d97706;background:#fffbeb}.opt:nth-child(4):hover:not(:disabled){border-color:#059669;background:#ecfdf5}
-  .opt.opt-ok .optL{background:#059669}.opt.opt-bad .optL{background:#e11d48}.opt.opt-sel .optL{background:#7c3aed}
-  .opt.opt-ok{box-shadow:0 0 0 4px rgba(5,150,105,.15)}.opt.opt-sel{box-shadow:0 0 0 4px rgba(124,58,237,.15)}
-  .stage{background:radial-gradient(circle at 85% -20%,rgba(236,72,153,.55),transparent 45%),radial-gradient(circle at 0% 120%,rgba(251,191,36,.35),transparent 40%),linear-gradient(120deg,#0f172a 0%,#312e81 55%,#6d28d9 100%)}
-  .qcard{position:relative;overflow:hidden}.qcard::before{content:'';position:absolute;inset:0 0 auto 0;height:6px;background:linear-gradient(90deg,#e11d48,#9333ea,#4f46e5,#f59e0b)}
-  .big .opt{font-size:1.35rem;min-height:84px}.big .optL{width:2.8rem;height:2.8rem;font-size:1.2rem}
-  .chip{display:inline-flex;align-items:center;gap:.35rem;padding:.3rem .6rem;border-radius:.6rem;background:#f8fafc;border:1px solid #e2e8f0;font-size:.75rem;font-weight:600;cursor:grab}
-  .drop-hot{outline:3px dashed #7c3aed;outline-offset:2px}
-  .bell{width:min(70vw,260px);height:min(70vw,260px);border-radius:999px;background:radial-gradient(circle at 35% 30%,#fde68a,#f59e0b 55%,#b45309);color:#fff;font-size:5rem;box-shadow:0 18px 40px rgba(245,158,11,.45);animation:ring 1s infinite}
-  @keyframes ring{0%,100%{transform:rotate(0)}20%{transform:rotate(-8deg)}40%{transform:rotate(8deg)}60%{transform:rotate(-5deg)}80%{transform:rotate(5deg)}}
-  .pulse-soft{animation:ps 1.4s infinite}@keyframes ps{50%{opacity:.45}}
-  .pop{animation:pop .35s ease-out}@keyframes pop{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
-  .tabular-nums{font-variant-numeric:tabular-nums}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EDU GAME - Học Tập & Trò Chơi</title>
+    <meta name="description" content="EDU GAME - Nền tảng trò chơi học tập tương tác cho giáo viên: Olympia, Ai là triệu phú, Đào vàng, Vòng quay may mắn">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Font Awesome Icons 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- KaTeX for Math Formulas (LaTeX) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <!-- SheetJS for Excel Reading/Writing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <!-- Mammoth.js for Word (.docx) Parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+
+    <!-- Canvas Confetti for Celebrations -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="min-h-screen text-slate-800 antialiased">
-<div id="app"></div>
+<body class="w-full min-h-screen flex flex-col lg:flex-row bg-[#f8fafc] text-slate-800 antialiased selection:bg-purple-200 selection:text-purple-900 overflow-x-hidden">
 
-<script>
-/* =====================================================================
-   CẤU HÌNH
-   ---------------------------------------------------------------------
-   • Để trống FIREBASE_CONFIG: chạy thử trên MỘT máy (mỗi đội 1 tab trình duyệt).
-   • Muốn 4 đội dùng 4 máy/điện thoại riêng: tạo dự án Firebase (miễn phí)
-     → Build → Realtime Database → Create (chế độ test) → Project settings
-     → Web app → chép config dán vào đây (nhớ có databaseURL).
-   ===================================================================== */
-const FIREBASE_CONFIG = null;
-/* Ví dụ:
-const FIREBASE_CONFIG = {
-  apiKey: "AIza...", authDomain: "olympia-lop-hoc.firebaseapp.com",
-  databaseURL: "https://olympia-lop-hoc-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "olympia-lop-hoc", appId: "1:...:web:..."
-};
-*/
+    <!-- ==================== LEFT SIDEBAR (GIAO DIỆN CỘT DỌC) ==================== -->
+    <aside id="sidebar" class="w-60 xl:w-64 flex-shrink-0 bg-white border-r border-slate-200/90 flex flex-col justify-between h-screen sticky top-0 z-40 transition-all duration-300 shadow-sm -translate-x-full lg:translate-x-0 fixed lg:static">
+        
+        <div class="flex flex-col h-full overflow-hidden">
+            <!-- Brand Logo Top Header -->
+            <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+                <div class="flex items-center gap-3 cursor-pointer" onclick="window.app.showGameSelection()">
+                    <div id="app-logo-badge" class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-purple-500 via-pink-500 to-amber-400 p-0.5 shadow-sm">
+                        <div class="w-full h-full bg-white rounded-[14px] flex items-center justify-center text-purple-600 text-xl font-black overflow-hidden">
+                            <i class="fa-solid fa-gamepad"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-black tracking-tight text-slate-900 leading-tight font-heading">
+                            EDU GAME
+                        </h2>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">HỌC TẬP & TRÒ CHƠI</span>
+                    </div>
+                </div>
+                <!-- Mobile Close Button -->
+                <button onclick="window.app.toggleSidebar()" class="lg:hidden text-slate-400 hover:text-slate-700 p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
 
-const RULES = {
-  TEAM_COUNT: 4,
-  R1_TIME: 45, R1_COUNT: 7, R1_POINT: 10,
-  R2_ROW_TIME: 15, R2_POINT: 10, CNV_POINTS: [80, 60, 40, 20], CNV_FINAL_TIME: 15,
-  R3_TIME: 30, R3_POINTS: [40, 30, 20, 10],
-  R4_TIME: { 20: 15, 30: 20, 40: 20 },
-  PACKAGES: { 60: [20, 20, 20], 80: [20, 30, 30], 100: [20, 40, 40] },
-  BUZZ_TIME: 5, STEAL_TIME: 10,
-  STEAL_TAKES_FROM_MAIN: true   // true: đội cướp đúng lấy điểm của đội đang thi (luật VTV3)
-};
-const ROUND_NAMES = ['', 'Khởi Động', 'Vượt Chướng Ngại Vật', 'Tăng Tốc', 'Về Đích'];
-const ROUND_ICONS = ['', 'fa-bolt', 'fa-puzzle-piece', 'fa-gauge-high', 'fa-flag-checkered'];
-const COLORS = ['#e11d48', '#2563eb', '#059669', '#d97706', '#7c3aed', '#0891b2'];
-const L = 'ABCD';
+            <!-- Search Bar in Sidebar -->
+            <div class="px-3 pt-3 pb-2">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                    <input type="text" id="game-search-input" oninput="window.app.filterSidebarGames(this.value)" placeholder="Tìm trò chơi, hoạt động..." 
+                        class="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:bg-white transition">
+                </div>
+            </div>
 
-/* ======================= BỘ CÂU HỎI MẪU (KHTN 8) ======================= */
-const SAMPLE_BANK = `[KHỞI ĐỘNG]
-Câu 1: Quá trình nào sau đây là biến đổi hóa học?
-A. Nước đá tan thành nước lỏng
-B. Cồn trong lọ hở bị bay hơi
-C. Đốt cháy cây nến
-D. Hòa tan muối ăn vào nước
-Đáp án: C
-Câu 2: Ở điều kiện chuẩn (25 °C, 1 bar), 1 mol chất khí bất kì chiếm thể tích
-A. 22,4 L
-B. 24,79 L
-C. 11,2 L
-D. 2,479 L
-Đáp án: B
-Câu 3: Khối lượng mol của CO2 là (C = 12, O = 16)
-A. 28 g/mol
-B. 32 g/mol
-C. 44 g/mol
-D. 40 g/mol
-Đáp án: C
-Câu 4: Dung dịch có pH = 3 có môi trường
-A. acid
-B. base
-C. trung tính
-D. không xác định được
-Đáp án: A
-Câu 5: Chất nào sau đây là base?
-A. HCl
-B. NaOH
-C. NaCl
-D. CO2
-Đáp án: B
-Câu 6: Theo định luật bảo toàn khối lượng, trong một phản ứng hóa học
-A. khối lượng sản phẩm luôn lớn hơn khối lượng chất phản ứng
-B. tổng khối lượng sản phẩm bằng tổng khối lượng các chất phản ứng
-C. số phân tử các chất được bảo toàn
-D. khối lượng từng chất được giữ nguyên
-Đáp án: B
-Câu 7: Dung dịch acid làm quỳ tím chuyển sang màu
-A. đỏ
-B. xanh
-C. tím
-D. vàng
-Đáp án: A
+            <!-- Sidebar Navigation Links (Scrollable) -->
+            <div class="flex-1 overflow-y-auto sidebar-scroll px-3 py-2 space-y-5">
+                
+                <!-- Section 1: KHÁM PHÁ -->
+                <div>
+                    <div class="text-[10px] font-black uppercase text-slate-400 tracking-wider px-3 mb-1.5">Khám Phá</div>
+                    <div class="space-y-1">
+                        <button onclick="window.app.showGameSelection(); window.app.setActiveSidebar(this)" id="side-home-btn" class="sidebar-link active w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-left">
+                            <div class="w-7 h-7 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-sm">
+                                <i class="fa-solid fa-house"></i>
+                            </div>
+                            <span>Trang chủ</span>
+                        </button>
 
-[VƯỢT CHƯỚNG NGẠI VẬT]
-Câu 1: Chất làm tăng tốc độ phản ứng nhưng không bị tiêu hao sau phản ứng gọi là
-A. chất xúc tác
-B. chất phản ứng
-C. sản phẩm
-D. dung môi
-Đáp án: A
-Câu 2: Trong dung dịch nước muối, nước đóng vai trò là
-A. chất tan
-B. dung môi
-C. chất xúc tác
-D. kết tủa
-Đáp án: B
-Câu 3: Oxide nào sau đây là oxide acid?
-A. CaO
-B. Na2O
-C. SO2
-D. MgO
-Đáp án: C
-Câu 4: Thang pH thường dùng có giá trị từ
-A. 0 đến 7
-B. 7 đến 14
-C. 0 đến 14
-D. 1 đến 10
-Đáp án: C
+                        <button onclick="location.href='olympia.html'" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 text-left">
+                            <div class="w-7 h-7 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm">
+                                <i class="fa-solid fa-keyboard"></i>
+                            </div>
+                            <span>Vào phòng bằng PIN</span>
+                        </button>
 
-[CNV]
-Câu 1: Từ khóa chướng ngại vật: đại lượng cho biết độ acid hay base của dung dịch là gì?
-A. Nồng độ mol
-B. pH
-C. Tỉ khối
-D. Độ tan
-Đáp án: B
+                        <button onclick="window.roomManager.openClassDivideModal(); window.app.setActiveSidebar(this)" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 text-left">
+                            <div class="w-7 h-7 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-sm">
+                                <i class="fa-solid fa-users-gear"></i>
+                            </div>
+                            <span>Chia Đội (Kéo thả 4, 6, 8 đội)</span>
+                        </button>
 
-[TĂNG TỐC]
-Câu 1: Tỉ khối của khí SO2 so với khí O2 là (S = 32, O = 16)
-A. 2
-B. 0,5
-C. 1,5
-D. 4
-Đáp án: A
-Câu 2: Hòa tan 10 g đường vào 40 g nước. Nồng độ phần trăm của dung dịch là
-A. 25%
-B. 20%
-C. 10%
-D. 40%
-Đáp án: B
-Câu 3: Số mol có trong 5,6 g Fe là (Fe = 56)
-A. 0,1 mol
-B. 0,2 mol
-C. 1 mol
-D. 0,5 mol
-Đáp án: A
-Câu 4: Hệ số cân bằng của phương trình: ? Al + ? O2 → ? Al2O3 lần lượt là
-A. 2, 3, 1
-B. 4, 3, 2
-C. 4, 3, 1
-D. 2, 1, 2
-Đáp án: B
+                        <button onclick="window.roomManager.openWaitingLobbyModal(); window.app.setActiveSidebar(this)" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 text-left">
+                            <div class="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center text-sm">
+                                <i class="fa-solid fa-door-open"></i>
+                            </div>
+                            <span>Phòng chờ trực tuyến</span>
+                        </button>
 
-[VỀ ĐÍCH 20]
-Câu 1: NaCl thuộc loại hợp chất nào?
-A. Acid
-B. Base
-C. Muối
-D. Oxide
-Đáp án: C
-Câu 2: Khí làm đục nước vôi trong là
-A. O2
-B. CO2
-C. H2
-D. N2
-Đáp án: B
-Câu 3: Base tan được trong nước gọi là
-A. kiềm
-B. muối
-C. oxide
-D. acid
-Đáp án: A
-Câu 4: Đơn vị của nồng độ mol là
-A. g/L
-B. mol/L
-C. %
-D. mol
-Đáp án: B
-Câu 5: Khi tăng nhiệt độ, tốc độ phản ứng thường
-A. giảm
-B. tăng
-C. không đổi
-D. bằng 0
-Đáp án: B
-Câu 6: Dung dịch NaOH làm phenolphthalein chuyển sang màu
-A. hồng
-B. xanh
-C. vàng
-D. tím
-Đáp án: A
+                        <button onclick="window.roomManager.openJudgeSpectatorMode(); window.app.setActiveSidebar(this)" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 text-left">
+                            <div class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm">
+                                <i class="fa-solid fa-users-viewfinder"></i>
+                            </div>
+                            <span>Màn hình các đội (Chiếu BGK)</span>
+                        </button>
 
-[VỀ ĐÍCH 30]
-Câu 1: Phản ứng trung hòa giữa acid và base tạo ra
-A. muối và nước
-B. muối và khí H2
-C. oxide và nước
-D. base và khí H2
-Đáp án: A
-Câu 2: Kim loại Zn tác dụng với dung dịch HCl giải phóng khí
-A. O2
-B. Cl2
-C. H2
-D. CO2
-Đáp án: C
-Câu 3: Số mol khí có trong 4,958 L khí ở điều kiện chuẩn là
-A. 0,1 mol
-B. 0,2 mol
-C. 0,5 mol
-D. 2 mol
-Đáp án: B
-Câu 4: Để cải tạo đất chua, người ta thường bón
-A. vôi
-B. phân đạm
-C. muối ăn
-D. đường
-Đáp án: A
+                        <button onclick="window.app.openClassListModal(); window.app.setActiveSidebar(this)" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 text-left">
+                            <div class="w-7 h-7 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center text-sm">
+                                <i class="fa-solid fa-trophy"></i>
+                            </div>
+                            <span>Bảng vàng lớp học</span>
+                        </button>
 
-[VỀ ĐÍCH 40]
-Câu 1: Đốt 2,4 g Mg trong oxygen thu được 4 g MgO. Khối lượng oxygen đã phản ứng là
-A. 1,6 g
-B. 6,4 g
-C. 2,4 g
-D. 0,8 g
-Đáp án: A
-Câu 2: Khối lượng NaOH cần để pha 200 mL dung dịch NaOH 0,5 M là (NaOH = 40)
-A. 2 g
-B. 4 g
-C. 8 g
-D. 10 g
-Đáp án: B
-Câu 3: Cho 6,5 g Zn vào dung dịch HCl dư. Thể tích khí H2 thu được ở điều kiện chuẩn là (Zn = 65)
-A. 2,479 L
-B. 4,958 L
-C. 1,2395 L
-D. 24,79 L
-Đáp án: A
-Câu 4: Khí X có tỉ khối so với H2 bằng 22. X có thể là
-A. CO2
-B. SO2
-C. O2
-D. N2
-Đáp án: A
-`;
+                        <button onclick="window.app.toggleTeacherDrawer(); window.app.setActiveSidebar(this)" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 text-left">
+                            <div class="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center text-sm">
+                                <i class="fa-solid fa-folder-open"></i>
+                            </div>
+                            <span>Nạp file Word & Excel</span>
+                        </button>
 
-/* ============================ TIỆN ÍCH ============================ */
-const $ = s => document.querySelector(s);
-const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
-const norm = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/g, 'd').replace(/Đ/g, 'D').toUpperCase().trim();
-const rid = () => Math.random().toString(36).slice(2, 8).toUpperCase();
-const fmtT = ms => (Math.max(0, ms) / 1000).toFixed(2) + 's';
-function makePins(n) { const s = new Set(); while (s.size < n) s.add(String(100000 + Math.floor(Math.random() * 900000))); return [...s]; }
+                        <button onclick="window.app.openGuideModal(); window.app.setActiveSidebar(this)" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 text-left">
+                            <div class="w-7 h-7 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center text-sm">
+                                <i class="fa-solid fa-book-open"></i>
+                            </div>
+                            <span>Hướng dẫn & Mẫu đề</span>
+                        </button>
+                    </div>
+                </div>
 
-/* ===================== KẾT NỐI (1 máy hoặc Firebase) ===================== */
-const Net = {
-  mode: 'local', offset: 0, db: null, bc: null,
-  init() {
-    if (FIREBASE_CONFIG && window.firebase) {
-      firebase.initializeApp(FIREBASE_CONFIG); this.db = firebase.database(); this.mode = 'firebase';
-      this.db.ref('.info/serverTimeOffset').on('value', s => this.offset = s.val() || 0);
-    } else if ('BroadcastChannel' in window) this.bc = new BroadcastChannel('olympia_live_v1');
-  },
-  now() { return Date.now() + this.offset; },
-  publish(roomId, pub) {
-    const s = JSON.stringify(pub);
-    if (this.db) this.db.ref(`olp/rooms/${roomId}/pub`).set(s);
-    else { try { localStorage.setItem('olp_pub', s); } catch (e) { } this.bc && this.bc.postMessage({ k: 'pub', s }); }
-  },
-  registerPins(roomId, pins, oldPins = []) {
-    if (!this.db) return;
-    oldPins.forEach(p => p && !pins.includes(p) && this.db.ref(`olp/pins/${p}`).remove());
-    pins.forEach(p => this.db.ref(`olp/pins/${p}`).set(roomId));
-  },
-  listenActions(roomId, cb) {
-    if (this.db) {
-      this.db.ref(`olp/rooms/${roomId}/actions`).on('child_added', s => {
-        const v = s.val(); s.ref.remove();
-        try { const a = JSON.parse(v.d); a.ts = v.ts; cb(a); } catch (e) { }
-      });
-    } else if (this.bc) this.bc.addEventListener('message', e => { if (e.data && e.data.k === 'act') cb(e.data.a); });
-  },
-  async resolvePin(pin) {
-    if (this.db) { const s = await this.db.ref(`olp/pins/${pin}`).get(); return s.val(); }
-    try { const p = JSON.parse(localStorage.getItem('olp_pub') || 'null'); return p && (p.phase === 'lobby' || p.phase === 'game') ? p.roomId : null; } catch (e) { return null; }
-  },
-  listenPub(roomId, cb) {
-    if (this.db) { this.db.ref(`olp/rooms/${roomId}/pub`).on('value', s => { const v = s.val(); if (v) cb(JSON.parse(v)); }); return; }
-    const read = () => { try { const p = JSON.parse(localStorage.getItem('olp_pub') || 'null'); if (p && p.roomId === roomId) cb(p); } catch (e) { } };
-    read();
-    this.bc && this.bc.addEventListener('message', e => { if (e.data && e.data.k === 'pub') { const p = JSON.parse(e.data.s); if (p.roomId === roomId) cb(p); } });
-    window.addEventListener('storage', e => { if (e.key === 'olp_pub') read(); });
-  },
-  send(roomId, a) {
-    if (this.db) this.db.ref(`olp/rooms/${roomId}/actions`).push({ d: JSON.stringify(a), ts: firebase.database.ServerValue.TIMESTAMP });
-    else { a.ts = Date.now(); this.bc && this.bc.postMessage({ k: 'act', a }); }
-  }
-};
+                <!-- Section 2: ĐẤU TRƯỜNG CHÍNH -->
+                <div>
+                    <div class="text-[10px] font-black uppercase text-slate-400 tracking-wider px-3 mb-1.5 flex items-center justify-between">
+                        <span>Đấu Trường Học Tập</span>
+                        <span class="text-[9px] bg-rose-50 text-rose-600 px-1.5 py-0.5 rounded font-bold">Trọng tâm</span>
+                    </div>
+                    
+                    <div class="space-y-1">
+                        <!-- Game Duy Nhất: Đường Lên Đỉnh Olympia -->
+                        <button onclick="location.href='olympia.html?gv'" class="sidebar-link active w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold text-slate-900 bg-rose-50/70 border border-rose-200 text-left group">
+                            <div class="flex items-center gap-2.5 truncate">
+                                <div class="w-8 h-8 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-sm flex-shrink-0 shadow-xs">
+                                    <i class="fa-solid fa-mountain"></i>
+                                </div>
+                                <div>
+                                    <div class="truncate font-black text-rose-700">Đường Lên Đỉnh Olympia</div>
+                                    <div class="text-[10px] text-slate-500 font-normal">4 Vòng thi đấu kịch tính</div>
+                                </div>
+                            </div>
+                            <span class="badge-online flex-shrink-0">Trực tiếp</span>
+                        </button>
+                    </div>
+                </div>
 
-/* ========================= ĐỌC FILE CÂU HỎI =========================
-   Cấu trúc: các mục [KHỞI ĐỘNG] [VƯỢT CHƯỚNG NGẠI VẬT] [CNV] [TĂNG TỐC]
-   [VỀ ĐÍCH 20] [VỀ ĐÍCH 30] [VỀ ĐÍCH 40]; mỗi câu: "Câu n: ...", A./B./C./D., "Đáp án: X".
-   Câu không thuộc mục nào sẽ được tự chia vào các vòng còn thiếu. */
-function secKey(s) {
-  const n = norm(s);
-  if (n.includes('KHOI')) return 'r1';
-  if (n.includes('VUOT') || /\bVCNV\b/.test(n) || n.includes('HANG NGANG')) return 'r2';
-  if (/\bCNV\b/.test(n) || n.includes('CHUONG NGAI') || n.includes('TU KHOA')) return 'cnv';
-  if (n.includes('TANG TOC')) return 'r3';
-  if (n.includes('VE DICH')) { if (n.includes('40')) return 'v40'; if (n.includes('30')) return 'v30'; return 'v20'; }
-  return 'pool';
-}
-function parseQuestions(raw) {
-  const out = { r1: [], r2: [], cnv: [], r3: [], v20: [], v30: [], v40: [], pool: [] };
-  let sec = 'pool', cur = null;
-  const flush = () => {
-    if (cur) {
-      const n = cur.opts.filter(o => o !== undefined).length;
-      if (n >= 2 && cur.ans >= 0 && cur.opts[cur.ans] !== undefined)
-        out[sec].push({ text: cur.text.trim(), opts: Array.from(cur.opts, o => o ?? ''), ans: cur.ans });
-    }
-    cur = null;
-  };
-  for (let line of String(raw).replace(/\r/g, '').split('\n')) {
-    line = line.trim(); if (!line) continue;
-    const sm = line.match(/^\[(.+?)\]\s*$/) || line.match(/^#{1,3}\s*(.+)$/);
-    if (sm) { flush(); sec = secKey(sm[1]); continue; }
-    const qm = line.match(/^(?:C.u|Question)\s*\d+\s*[:.)]\s*(.*)$/i);
-    if (qm) { flush(); cur = { text: qm[1], opts: [], ans: -1 }; continue; }
-    if (!cur) continue;
-    const am = norm(line).match(/^(?:DAP AN|DA)(?:\s*DUNG)?\s*[:\-]?\s*([A-D])\b/);
-    if (am) { cur.ans = L.indexOf(am[1]); continue; }
-    if (/^[A-D]\s*[.)]/.test(line)) {
-      for (const m of line.matchAll(/([A-D])\s*[.)]\s*(.*?)(?=\s+[A-D]\s*[.)]\s|$)/g)) {
-        let t = m[2].trim();
-        if (t.startsWith('*')) { t = t.slice(1).trim(); cur.ans = L.indexOf(m[1]); }
-        cur.opts[L.indexOf(m[1])] = t;
-      }
-      continue;
-    }
-    if (!cur.opts.length) cur.text += ' ' + line;
-  }
-  flush(); return out;
-}
-function buildBank(text) {
-  const p = parseQuestions(text), pool = shuffle(p.pool), warn = [];
-  const take = (arr, n, label) => { const o = arr.slice(0, n); while (o.length < n && pool.length) o.push(pool.shift()); if (o.length < n) warn.push(`${label}: cần ${n} câu, mới có ${o.length}`); return o; };
-  const b = { r1: take(p.r1, RULES.R1_COUNT, 'Khởi động'), r2: take(p.r2, 4, 'Vượt CNV (hàng ngang)'), cnv: take(p.cnv, 1, 'Câu từ khóa CNV')[0] || null, r3: take(p.r3, 4, 'Tăng tốc') };
-  b.v = { 20: [...p.v20], 30: [...p.v30], 40: [...p.v40] };
-  pool.forEach((q, i) => b.v[[20, 30, 40][i % 3]].push(q));
-  const r4n = b.v[20].length + b.v[30].length + b.v[40].length;
-  if (r4n < 12) warn.push(`Về đích: nên có ≥ 12 câu (đang có ${r4n}), thiếu sẽ dùng lại câu`);
-  b.total = Object.values(p).reduce((s, a) => s + a.length, 0); b.warn = warn;
-  b.count = { r1: b.r1.length, r2: b.r2.length, cnv: b.cnv ? 1 : 0, r3: b.r3.length, v20: b.v[20].length, v30: b.v[30].length, v40: b.v[40].length };
-  return b;
-}
+            </div>
 
-/* ===================== KHUNG GIAO DIỆN DÙNG CHUNG ===================== */
-let RR = 0; // thời điểm cần vẽ lại
-function rerenderAt(t) { if (!RR || t < RR) RR = t; }
-function timerHTML(dl, total, big) {
-  return `<div class="flex items-center gap-3">
-    <div class="flex-1 ${big ? 'h-4' : 'h-3'} bg-slate-200 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-emerald-500 via-amber-400 to-rose-500 tbar" data-dl="${dl}" data-total="${total}" style="width:100%"></div></div>
-    <div class="font-black ${big ? 'text-4xl w-20' : 'text-2xl w-14'} tabular-nums text-right tnum" data-dl="${dl}">--</div></div>`;
-}
-function updateTimers() {
-  const now = Net.now();
-  document.querySelectorAll('.tnum').forEach(e => { const s = Math.max(0, Math.ceil((+e.dataset.dl - now) / 1000)); e.textContent = s; e.classList.toggle('text-rose-600', s <= 5); });
-  document.querySelectorAll('.tbar').forEach(e => { const r = Math.max(0, (+e.dataset.dl - now) / (+e.dataset.total * 1000)); e.style.width = (Math.min(1, r) * 100) + '%'; });
-  document.querySelectorAll('[data-until]').forEach(e => { const s = Math.ceil((+e.dataset.until - now) / 1000); e.textContent = s > 0 ? s : 'Bắt đầu!'; });
-  if (RR && now >= RR) { RR = 0; IS_TEAM ? renderTeam() : renderHost(); }
-}
-function optsHTML(opts, o = {}) {
-  const { act = '', extra = '', disabled = false, chosen = -1, correct = -1, wrong = -1 } = o;
-  return `<div class="grid sm:grid-cols-2 gap-3">${opts.map((txt, i) => {
-    let cls = 'opt';
-    if (correct >= 0) cls += i === correct ? ' opt-ok' : (i === chosen || i === wrong) ? ' opt-bad' : ' opt-dim';
-    else if (i === wrong) cls += ' opt-bad';
-    else if (i === chosen) cls += ' opt-sel';
-    return `<button class="${cls}" ${disabled ? 'disabled' : ''} data-a="${act}" data-c="${i}" ${extra}><span class="optL">${L[i]}</span><span>${esc(txt)}</span></button>`;
-  }).join('')}</div>`;
-}
-const badge = t => `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-white text-xs font-black" style="background:${t.color}">${esc(t.name)}</span>`;
-function waitBox(title, sub = '', extra = '') {
-  return `<div class="card p-8 sm:p-12 text-center pop"><div class="w-16 h-16 mx-auto rounded-2xl bg-violet-100 text-violet-600 grid place-items-center text-2xl mb-4"><i class="fa-solid fa-hourglass-half pulse-soft"></i></div>
-    <div class="text-xl sm:text-2xl font-black text-slate-900">${title}</div>${sub ? `<div class="text-slate-500 mt-2 font-semibold">${sub}</div>` : ''}${extra}</div>`;
-}
-function roundRule(r) {
-  return ['',
-    `${RULES.R1_COUNT} câu trong ${RULES.R1_TIME} giây cho cả vòng • đúng +${RULES.R1_POINT}đ/câu • mỗi đội có thứ tự câu và vị trí A, B, C, D khác nhau.`,
-    `4 hàng ngang (${RULES.R2_ROW_TIME}s/câu, đúng +${RULES.R2_POINT}đ). Đoán chướng ngại vật càng sớm càng nhiều điểm: ${RULES.CNV_POINTS.join(' – ')}đ. Đoán sai mất quyền đoán.`,
-    `4 câu, ${RULES.R3_TIME}s/câu. Đội trả lời đúng nhanh nhất +${RULES.R3_POINTS[0]}đ, tiếp theo ${RULES.R3_POINTS.slice(1).join(' – ')}đ.`,
-    `Lần lượt từng đội chọn gói 60 / 80 / 100đ và có thể đặt Ngôi sao hy vọng (đúng ×2, sai bị trừ). Đội thi sai → 3 đội còn lại có ${RULES.BUZZ_TIME} giây bấm chuông giành quyền.`][r];
-}
-function rankOf(teams) { return teams.map((t, i) => ({ ...t, i })).sort((a, b) => b.score - a.score); }
-function scoreStrip(p, me = -1) {
-  return `<div class="grid grid-cols-2 sm:grid-cols-4 gap-2">${p.teams.map((t, i) => `<div class="rounded-xl px-3 py-2 border-2 ${i === me ? 'bg-white' : 'bg-slate-50'}" style="border-color:${i === me ? t.color : '#e2e8f0'}">
-    <div class="text-[11px] font-black truncate" style="color:${t.color}">${esc(t.name)}</div><div class="text-2xl font-black tabular-nums">${t.score}</div></div>`).join('')}</div>`;
-}
+            <!-- Sidebar Bottom Footer -->
+            <div class="p-3 border-t border-slate-100 bg-slate-50/60 flex items-center justify-between">
+                <button onclick="window.app.openLogoModal()" class="flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-purple-600">
+                    <i class="fa-solid fa-palette text-purple-500"></i>
+                    <span>Bộ Logo</span>
+                </button>
 
-/* =====================================================================
-   MÀN HÌNH CỦA TỪNG ĐỘI (dùng cho máy đội và cho GV xem màn phụ)
-   ctx = { ro: chỉ xem, pend: thao tác đang gửi, cnvOpen, pick }
-   ===================================================================== */
-function teamScreen(p, t, ctx) {
-  if (p.phase === 'lobby') {
-    const n = p.teams.filter(x => x.dev).length;
-    return waitBox('Đã vào phòng – chờ giáo viên bắt đầu', `${n}/${p.teams.length} đội đã sẵn sàng`,
-      `<div class="mt-5 flex flex-wrap justify-center gap-2">${p.teams.map(x => `<span class="px-3 py-1.5 rounded-full text-xs font-black ${x.dev ? 'text-white' : 'bg-slate-100 text-slate-400'}" style="${x.dev ? `background:${x.color}` : ''}">${esc(x.name)} • ${x.dev ? 'Sẵn sàng' : 'Đang chờ'}</span>`).join('')}</div>`);
-  }
-  if (p.phase === 'end') return finalBoard(p, t);
-  if (p.status === 'intro') return waitBox(`Vòng ${p.round}: ${ROUND_NAMES[p.round]}`, 'Chờ giáo viên bắt đầu vòng thi…', `<p class="mt-4 text-sm text-slate-600 max-w-xl mx-auto">${roundRule(p.round)}</p>`);
-  if (p.status === 'review') return reviewTeam(p, t);
-  if (p.round === 1) return r1Team(p, t, ctx);
-  if (p.round === 2) return r2Team(p, t, ctx);
-  if (p.round === 3) return r3Team(p, t, ctx);
-  if (p.round === 4) return r4Team(p, t, ctx);
-  return '';
-}
+                <div class="flex items-center gap-2">
+                    <button onclick="window.app.toggleSound()" class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-purple-600 flex items-center justify-center text-xs shadow-sm" title="Bật/Tắt âm">
+                        <i id="sound-icon" class="fa-solid fa-volume-high"></i>
+                    </button>
+                    <button onclick="window.app.toggleFullscreen()" class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-purple-600 flex items-center justify-center text-xs shadow-sm" title="Toàn màn hình">
+                        <i id="fullscreen-icon" class="fa-solid fa-expand"></i>
+                    </button>
+                </div>
+            </div>
 
-function r1Team(p, t, ctx) {
-  const v = p.view, now = Net.now();
-  if (now < v.startAt) { rerenderAt(v.startAt); return `<div class="card p-12 text-center"><div class="text-slate-500 font-bold">Vòng 1 – Khởi động bắt đầu sau</div><div class="text-8xl font-black text-violet-600 mt-3" data-until="${v.startAt}">3</div></div>`; }
-  rerenderAt(v.deadline);
-  const set = v.sets[t], prog = v.prog[t], i = prog.length;
-  const strip = `<div class="flex gap-1.5">${set.map((_, k) => {
-    const c = k < prog.length ? (prog[k].ok ? 'bg-emerald-500 text-white' : 'bg-rose-500 text-white') : k === i ? 'bg-violet-600 text-white' : 'bg-slate-200 text-slate-500';
-    const ic = k < prog.length ? (prog[k].ok ? '✓' : '✗') : k + 1;
-    return `<div class="w-8 h-8 rounded-lg grid place-items-center text-xs font-black ${c}">${ic}</div>`; }).join('')}</div>`;
-  const last = prog[prog.length - 1];
-  const fb = last ? `<div class="text-sm font-bold ${last.ok ? 'text-emerald-600' : 'text-rose-600'}">Câu vừa rồi: ${last.ok ? 'Đúng! +' + RULES.R1_POINT + 'đ' : 'Chưa đúng – đáp án là ' + L[last.a]}</div>` : '';
-  if (i >= set.length || now > v.deadline) {
-    const c = prog.filter(x => x.ok).length;
-    return `<div class="space-y-4">${timerHTML(v.deadline, RULES.R1_TIME)}<div class="card p-6 flex flex-wrap items-center justify-between gap-3">${strip}</div>
-      ${waitBox(i >= set.length ? 'Đội bạn đã hoàn thành!' : 'Hết giờ!', `Đúng ${c}/${set.length} câu • +${c * RULES.R1_POINT} điểm. Chờ các đội khác…`)}</div>`;
-  }
-  const q = set[i], pend = ctx.pend && ctx.pend.type === 'r1' && ctx.pend.idx === i;
-  return `<div class="space-y-4">${timerHTML(v.deadline, RULES.R1_TIME)}
-    <div class="card p-4 flex flex-wrap items-center justify-between gap-3">${strip}${fb}</div>
-    <div class="card qcard p-5 sm:p-7 pop"><div class="text-xs font-black text-violet-600 uppercase tracking-wider mb-2">Câu ${i + 1}/${set.length}</div>
-      <div class="text-xl sm:text-2xl font-black text-slate-900 mb-5 leading-snug">${esc(q.text)}</div>
-      ${optsHTML(q.opts, { act: 'r1', extra: `data-i="${i}"`, disabled: ctx.ro || pend, chosen: pend ? ctx.pend.c : -1 })}</div></div>`;
-}
+        </div>
+    </aside>
 
-function rowsBoard(v) {
-  return `<div class="grid gap-2">${v.rows.map((r, i) => {
-    const playing = v.row === i && v.rs === 'play';
-    return `<div class="flex items-center gap-3 rounded-xl px-3 py-2 border-2 ${playing ? 'border-violet-500 bg-violet-50' : r.open ? 'border-emerald-300 bg-emerald-50' : 'border-slate-200 bg-white'}">
-      <div class="w-8 h-8 rounded-lg grid place-items-center font-black text-white ${r.open ? 'bg-emerald-600' : playing ? 'bg-violet-600' : 'bg-slate-400'}">${i + 1}</div>
-      <div class="font-black tracking-wide ${r.open ? 'text-emerald-800' : 'text-slate-400'}">${r.open ? esc(r.key) : playing ? 'Đang hỏi…' : '? ? ? ? ?'}</div></div>`; }).join('')}</div>`;
-}
-function r2Team(p, t, ctx) {
-  const v = p.view, my = v.cnvTry[t];
-  const cnvVal = v.opened ? RULES.CNV_POINTS[Math.min(v.opened, RULES.CNV_POINTS.length) - 1] : 0;
-  let main = '';
-  if (p.status === 'final') {
-    rerenderAt(v.finalDl);
-    main = my ? waitBox(my.ok ? 'Đội bạn đã đoán ĐÚNG chướng ngại vật!' : 'Đã gửi câu trả lời CNV', 'Chờ hết giờ…')
-      : `<div class="card p-6 pop">${timerHTML(v.finalDl, RULES.CNV_FINAL_TIME)}<div class="text-xs font-black text-amber-600 uppercase mt-4 mb-2">Cơ hội cuối – đoán chướng ngại vật (+${RULES.CNV_POINTS[RULES.CNV_POINTS.length - 1]}đ)</div>
-        <div class="text-xl font-black mb-4">${esc(v.cnv.text)}</div>${optsHTML(v.cnv.opts, { act: 'cnv', disabled: ctx.ro || !!ctx.pend, chosen: ctx.pend && ctx.pend.type === 'cnv' ? ctx.pend.c : -1 })}</div>`;
-  } else if (ctx.cnvOpen && v.cnv && !my && !ctx.ro) {
-    main = `<div class="card p-6 border-2 border-amber-400 pop"><div class="flex items-center justify-between mb-3"><div class="text-xs font-black text-amber-600 uppercase">Đoán chướng ngại vật • đúng +${cnvVal}đ • sai mất quyền</div><button class="btn btn-soft" data-a="cnvClose">Hủy</button></div>
-      <div class="text-xl font-black mb-4">${esc(v.cnv.text)}</div>${optsHTML(v.cnv.opts, { act: 'cnv', disabled: !!ctx.pend, chosen: ctx.pend && ctx.pend.type === 'cnv' ? ctx.pend.c : -1 })}</div>`;
-  } else if (v.rs === 'play') {
-    rerenderAt(v.deadline);
-    const r = v.rows[v.row], a = v.ans[v.row][t], pend = ctx.pend && ctx.pend.type === 'r2' && ctx.pend.row === v.row;
-    main = `<div class="card qcard p-5 sm:p-7 pop">${timerHTML(v.deadline, RULES.R2_ROW_TIME)}
-      <div class="text-xs font-black text-violet-600 uppercase mt-4 mb-2">Hàng ngang ${v.row + 1}</div><div class="text-xl sm:text-2xl font-black mb-5">${esc(r.text)}</div>
-      ${optsHTML(r.opts, { act: 'r2', extra: `data-row="${v.row}"`, disabled: ctx.ro || !!a || pend, chosen: a ? a.c : pend ? ctx.pend.c : -1 })}
-      ${a ? `<div class="mt-4 text-sm font-bold text-slate-500"><i class="fa-solid fa-lock"></i> Đã chốt đáp án ${L[a.c]} sau ${fmtT(a.t)} – chờ hết giờ</div>` : ''}</div>`;
-  } else {
-    const last = v.row >= 0 ? v.rows[v.row] : null, a = last ? v.ans[v.row][t] : null;
-    main = last ? `<div class="card p-6 pop"><div class="text-xs font-black text-emerald-600 uppercase mb-2">Đáp án hàng ngang ${v.row + 1}</div><div class="text-lg font-black mb-4">${esc(last.text)}</div>
-      ${optsHTML(last.opts, { disabled: true, chosen: a ? a.c : -1, correct: last.ans })}
-      <div class="mt-4 font-black ${a && a.ok ? 'text-emerald-600' : 'text-rose-600'}">${a ? (a.ok ? `Đội bạn trả lời đúng (+${RULES.R2_POINT}đ) • ${fmtT(a.t)}` : 'Đội bạn trả lời chưa đúng') : 'Đội bạn chưa trả lời'}</div>
-      <div class="text-slate-500 text-sm mt-1">Chờ giáo viên mở hàng ngang tiếp theo…</div></div>` : waitBox('Chờ giáo viên mở hàng ngang đầu tiên');
-  }
-  let cnvBox = '';
-  if (v.hasCnv && p.status === 'play') {
-    if (my) cnvBox = `<div class="card p-4 text-center font-black ${my.ok ? 'text-emerald-600' : 'text-rose-600'}">${my.ok ? `Đoán đúng CNV! +${my.pts}đ` : 'Đoán CNV chưa đúng – đội bạn đã mất quyền đoán'}</div>`;
-    else if (v.opened && !ctx.cnvOpen) cnvBox = `<button class="btn btn-dark w-full py-4 text-base" data-a="cnvOpen" ${ctx.ro ? 'disabled' : ''}><i class="fa-solid fa-bell text-amber-400"></i> ĐOÁN CHƯỚNG NGẠI VẬT (+${cnvVal}đ)</button>`;
-    else if (!v.opened) cnvBox = `<div class="text-center text-xs font-bold text-slate-400">Mở được ít nhất 1 hàng ngang mới được đoán chướng ngại vật</div>`;
-  }
-  return `<div class="grid lg:grid-cols-[1fr_280px] gap-4"><div class="space-y-4">${main}${cnvBox}</div>
-    <div class="card p-4 space-y-3 h-fit"><div class="text-xs font-black uppercase text-slate-500">Các hàng ngang</div>${rowsBoard(v)}
-    <div class="rounded-xl bg-slate-900 text-white p-3 text-center"><div class="text-[10px] uppercase font-bold text-slate-400">Chướng ngại vật</div><div class="text-lg font-black tracking-widest">? ? ?</div></div></div></div>`;
-}
+    <!-- Sidebar Backdrop for Mobile -->
+    <div id="sidebar-backdrop" onclick="window.app.toggleSidebar()" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-30 hidden lg:hidden"></div>
 
-function r3Team(p, t, ctx) {
-  const v = p.view;
-  if (v.q < 0) return waitBox('Chờ giáo viên mở câu hỏi Tăng tốc đầu tiên', roundRule(3));
-  const a = v.answers[t];
-  if (v.qs === 'play') {
-    rerenderAt(v.deadline);
-    const pend = ctx.pend && ctx.pend.type === 'r3' && ctx.pend.q === v.q;
-    return `<div class="card qcard p-5 sm:p-7 pop">${timerHTML(v.deadline, RULES.R3_TIME)}
-      <div class="text-xs font-black text-sky-600 uppercase mt-4 mb-2">Tăng tốc • Câu ${v.q + 1}/${v.n} • nhanh nhất +${RULES.R3_POINTS[0]}đ</div>
-      <div class="text-xl sm:text-2xl font-black mb-5">${esc(v.text)}</div>
-      ${optsHTML(v.opts, { act: 'r3', extra: `data-q="${v.q}"`, disabled: ctx.ro || !!a || pend, chosen: a ? a.c : pend ? ctx.pend.c : -1 })}
-      ${a ? `<div class="mt-4 text-sm font-bold text-slate-500"><i class="fa-solid fa-stopwatch"></i> Đã chốt ${L[a.c]} sau ${fmtT(a.t)} – chờ các đội khác</div>` : ''}</div>`;
-  }
-  const pts = v.award[t] || 0;
-  return `<div class="card p-6 pop"><div class="text-xs font-black text-emerald-600 uppercase mb-2">Đáp án câu ${v.q + 1}</div><div class="text-lg font-black mb-4">${esc(v.text)}</div>
-    ${optsHTML(v.opts, { disabled: true, chosen: a ? a.c : -1, correct: v.ans })}
-    <div class="mt-4 font-black text-lg ${pts ? 'text-emerald-600' : 'text-rose-600'}">${a ? (a.ok ? `Đúng sau ${fmtT(a.t)} • +${pts}đ` : 'Chưa đúng') : 'Đội bạn chưa trả lời'}</div>
-    <div class="text-slate-500 text-sm mt-1">Chờ giáo viên chuyển câu…</div></div>`;
-}
-
-function r4Head(p) {
-  const v = p.view, act = p.teams[v.active];
-  const chips = v.pts.length ? v.pts.map((x, i) => {
-    const h = v.hist[i]; const c = h === 'ok' ? 'bg-emerald-500 text-white' : h === 'bad' ? 'bg-rose-500 text-white' : h === 'steal' ? 'bg-amber-500 text-white' : i === v.qi ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-500';
-    return `<span class="px-2.5 py-1 rounded-lg text-xs font-black ${c}">Câu ${i + 1}: ${x}đ${v.star === i ? ' ⭐' : ''}</span>`; }).join('') : '';
-  return `<div class="card p-4 flex flex-wrap items-center justify-between gap-3" style="border-left:6px solid ${act.color}">
-    <div class="flex items-center gap-2"><span class="text-xs font-bold text-slate-500">Lượt thi:</span>${badge(act)}${v.pkg ? `<span class="text-xs font-black text-slate-700">Gói ${v.pkg}đ</span>` : ''}</div><div class="flex flex-wrap gap-1.5">${chips}</div></div>`;
-}
-function r4Outcome(p) {
-  const v = p.view, act = p.teams[v.active], pts = v.pts[v.qi];
-  if (!v.main) return '';
-  let s = '';
-  if (v.main.ok) s = `<span class="text-emerald-600">${esc(act.name)} trả lời ĐÚNG • +${pts * (v.star === v.qi ? 2 : 1)}đ${v.star === v.qi ? ' (Ngôi sao ×2)' : ''}</span>`;
-  else {
-    s = `<span class="text-rose-600">${esc(act.name)} ${v.main.c < 0 ? 'hết giờ' : 'trả lời chưa đúng'}${v.star === v.qi ? ` • bị trừ ${pts}đ (Ngôi sao)` : ''}</span>`;
-    if (v.buzzer >= 0 && v.steal) s += `<br><span class="${v.steal.ok ? 'text-emerald-600' : 'text-rose-600'}">${esc(p.teams[v.buzzer].name)} giành quyền và trả lời ${v.steal.ok ? `ĐÚNG • +${pts}đ` : `SAI • −${pts / 2}đ`}</span>`;
-    else if (v.st === 'reveal') s += `<br><span class="text-slate-500">Không đội nào giành quyền trả lời</span>`;
-  }
-  return `<div class="mt-4 text-lg font-black leading-relaxed">${s}</div>`;
-}
-function r4Team(p, t, ctx) {
-  const v = p.view, isMain = t === v.active, act = p.teams[v.active], pts = v.pts[v.qi];
-  const head = r4Head(p);
-  if (v.st === 'pick') {
-    if (!isMain) return head + `<div class="mt-4">${waitBox(`${esc(act.name)} đang chọn gói câu hỏi`, 'Hãy theo dõi – khi đội bạn đang thi trả lời sai, đội bạn có thể bấm chuông giành quyền!')}</div>`;
-    const pk = ctx.pick || { pkg: 0, star: -1 };
-    return head + `<div class="card p-6 mt-4 pop"><div class="text-xl font-black mb-1">Chọn gói câu hỏi Về đích</div><div class="text-sm text-slate-500 mb-4">${roundRule(4)}</div>
-      <div class="grid sm:grid-cols-3 gap-3">${Object.entries(RULES.PACKAGES).map(([k, arr]) => `<button class="rounded-2xl p-5 border-2 text-left transition ${pk.pkg == k ? 'border-violet-600 bg-violet-50' : 'border-slate-200 hover:border-violet-300'}" data-a="pkg" data-pkg="${k}" ${ctx.ro ? 'disabled' : ''}>
-        <div class="text-3xl font-black">${k}<span class="text-base">đ</span></div><div class="text-xs font-bold text-slate-500 mt-1">${arr.join(' + ')} điểm</div></button>`).join('')}</div>
-      ${pk.pkg ? `<div class="mt-5"><div class="text-sm font-black mb-2">⭐ Ngôi sao hy vọng (tùy chọn): đặt vào câu nào?</div><div class="flex flex-wrap gap-2">
-        <button class="btn ${pk.star < 0 ? 'btn-dark' : 'btn-soft'}" data-a="star" data-s="-1" ${ctx.ro ? 'disabled' : ''}>Không dùng</button>
-        ${RULES.PACKAGES[pk.pkg].map((x, i) => `<button class="btn ${pk.star === i ? 'btn-dark' : 'btn-soft'}" data-a="star" data-s="${i}" ${ctx.ro ? 'disabled' : ''}>Câu ${i + 1} (${x}đ)</button>`).join('')}</div>
-        <button class="btn btn-pri w-full mt-5 py-4 text-base" data-a="pickGo" ${ctx.ro || ctx.pend ? 'disabled' : ''}><i class="fa-solid fa-check"></i> Chốt gói ${pk.pkg}đ</button></div>` : ''}</div>`;
-  }
-  if (v.st === 'ready') return head + `<div class="mt-4">${waitBox(`Chuẩn bị câu ${v.qi + 1} – ${pts} điểm${v.star === v.qi ? ' ⭐' : ''}`, 'Chờ giáo viên hiện câu hỏi…')}</div>`;
-  if (v.st !== 'reveal') rerenderAt(v.deadline);
-  let body = `<div class="text-xs font-black text-pink-600 uppercase mb-2">Câu ${v.qi + 1} • ${pts} điểm${v.star === v.qi ? ' • ⭐ Ngôi sao hy vọng' : ''}</div><div class="text-xl sm:text-2xl font-black mb-5">${esc(v.text)}</div>`;
-  const pend = ctx.pend && ['r4ans', 'r4steal', 'buzz'].includes(ctx.pend.type);
-  if (v.st === 'answer') {
-    body = timerHTML(v.deadline, v.total) + '<div class="mt-4"></div>' + body +
-      optsHTML(v.opts, { act: 'r4', disabled: ctx.ro || !isMain || pend, chosen: pend ? ctx.pend.c : -1 }) +
-      (isMain ? '' : `<div class="mt-4 text-center font-bold text-slate-500">${esc(act.name)} đang trả lời…</div>`);
-  } else if (v.st === 'buzz') {
-    body = timerHTML(v.deadline, RULES.BUZZ_TIME) + '<div class="mt-4"></div>' + body + optsHTML(v.opts, { disabled: true, wrong: v.main.c }) +
-      (isMain ? `<div class="mt-5 text-center font-black text-rose-600">Chưa đúng – các đội khác có ${RULES.BUZZ_TIME} giây bấm chuông</div>`
-        : `<div class="mt-6 grid place-items-center"><button class="bell grid place-items-center" data-a="buzz" ${ctx.ro || pend ? 'disabled' : ''}><i class="fa-solid fa-bell"></i></button><div class="mt-3 font-black text-amber-700">BẤM CHUÔNG GIÀNH QUYỀN!</div></div>`);
-  } else if (v.st === 'steal') {
-    const me = t === v.buzzer;
-    body = timerHTML(v.deadline, RULES.STEAL_TIME) + '<div class="mt-4"></div>' + body +
-      optsHTML(v.opts, { act: 'steal', disabled: ctx.ro || !me || pend, wrong: v.main.c, chosen: pend ? ctx.pend.c : -1 }) +
-      `<div class="mt-4 text-center font-black text-amber-700"><i class="fa-solid fa-bell"></i> ${me ? 'Đội bạn đã giành quyền – chọn đáp án!' : esc(p.teams[v.buzzer].name) + ' đã giành quyền trả lời'}</div>`;
-  } else {
-    body += optsHTML(v.opts, { disabled: true, correct: v.ans, chosen: v.main.c, wrong: v.steal ? v.steal.c : -1 }) + r4Outcome(p);
-  }
-  return head + `<div class="card qcard p-5 sm:p-7 mt-4 pop">${body}</div>`;
-}
-
-function reviewTeam(p, t) {
-  const rk = rankOf(p.teams), pos = rk.findIndex(x => x.i === t) + 1;
-  let extra = '';
-  if (p.round === 1 && p.view) { const pr = p.view.prog[t]; extra = `<div class="mt-2 text-slate-600 font-bold">Vòng Khởi động: đúng ${pr.filter(x => x.ok).length}/${p.view.sets[t].length} câu</div>`; }
-  if (p.round === 2 && p.view && p.view.cnv && p.view.cnv.ans >= 0) extra = `<div class="mt-2 text-slate-600 font-bold">Chướng ngại vật: <span class="text-emerald-700">${esc(p.view.cnv.opts[p.view.cnv.ans])}</span>${p.view.solved >= 0 ? ` – ${esc(p.teams[p.view.solved].name)} đoán đúng` : ''}</div>`;
-  return `<div class="card p-8 text-center pop"><div class="text-sm font-black text-violet-600 uppercase">Kết thúc vòng ${p.round}: ${ROUND_NAMES[p.round]}</div>
-    <div class="text-5xl font-black mt-3">${p.teams[t].score}<span class="text-xl"> điểm</span></div><div class="mt-1 font-bold text-slate-500">Đội bạn đang xếp hạng ${pos}/${p.teams.length}</div>${extra}
-    <div class="mt-6">${scoreStrip(p, t)}</div><div class="mt-4 text-sm text-slate-400 font-semibold">Chờ giáo viên chuyển sang vòng tiếp theo…</div></div>`;
-}
-function finalBoard(p, me = -1) {
-  const rk = rankOf(p.teams), medal = ['🥇', '🥈', '🥉', '🎖️', '🎖️', '🎖️'];
-  return `<div class="card p-6 sm:p-10 text-center pop"><div class="text-sm font-black text-violet-600 uppercase tracking-wider">Kết quả chung cuộc</div>
-    <div class="text-3xl sm:text-4xl font-black mt-2">🏆 ${esc(rk[0].name)} về nhất!</div>
-    <div class="mt-6 space-y-2 max-w-xl mx-auto">${rk.map((x, k) => `<div class="flex items-center justify-between rounded-2xl px-4 py-3 border-2 ${x.i === me ? 'bg-violet-50' : 'bg-white'}" style="border-color:${x.color}">
-      <div class="flex items-center gap-3 font-black"><span class="text-2xl">${medal[k]}</span>${esc(x.name)}</div><div class="text-2xl font-black tabular-nums">${x.score}</div></div>`).join('')}</div></div>`;
-}
-
-/* =====================================================================
-   PHẦN GIÁO VIÊN (MÁY CHỦ TRÒ)
-   ===================================================================== */
-let H = null; const UI = { tab: 'main', showPin: {}, confetti: false, msg: '', side: window.innerWidth >= 1024 };
-function hostDefault() {
-  return {
-    roomId: rid(), students: [],
-    teams: Array.from({ length: RULES.TEAM_COUNT }, (_, i) => ({ name: `Đội ${i + 1}`, color: COLORS[i], members: [], pin: '', dev: null, score: 0 })),
-    bankText: SAMPLE_BANK, bankName: 'Bộ câu hỏi mẫu – KHTN 8 (Chương I–II)', phase: 'setup', g: null, rejects: {}
-  };
-}
-function save() { try { localStorage.setItem('olp_host', JSON.stringify(H)); } catch (e) { } }
-function commit() { save(); if (H.phase !== 'setup') Net.publish(H.roomId, buildPub()); renderHost(); }
-let listening = false;
-function listen() { if (!listening) { listening = true; Net.listenActions(H.roomId, onAction); } }
-
-function hostInit() {
-  try { H = JSON.parse(localStorage.getItem('olp_host') || 'null'); } catch (e) { }
-  if (!H || !H.teams) H = hostDefault();
-  if (H.phase !== 'setup') { Net.registerPins(H.roomId, H.teams.map(t => t.pin)); listen(); }
-  setInterval(hostTick, 250);
-  commit();
-}
-
-function buildPub() {
-  const p = { roomId: H.roomId, phase: H.phase, teams: H.teams.map(t => ({ name: t.name, color: t.color, members: t.members, dev: t.dev, score: t.score })), rejects: H.rejects };
-  if (H.phase === 'game') { p.round = H.g.round; p.status = H.g.status; p.view = pubRound(H.g); }
-  return p;
-}
-function pubRound(g) {
-  const b = g.bank;
-  if (g.round === 1 && g.r1) {
-    const r = g.r1;
-    return { startAt: r.startAt, deadline: r.deadline, prog: r.prog,
-      sets: r.sets.map(s => s.map(x => { const q = b.r1[x.qi]; return { text: q.text, opts: x.perm.map(k => q.opts[k]) }; })) };
-  }
-  if (g.round === 2 && g.r2) {
-    const r = g.r2, rev = g.status === 'review';
-    return { row: r.row, rs: r.rs, start: r.start, deadline: r.deadline, finalDl: r.finalDl, solved: r.solved,
-      rows: b.r2.map((q, i) => { const show = i === r.row || r.opened[i] || rev, open = r.opened[i] || rev; return { text: show ? q.text : null, opts: show ? q.opts : null, ans: open ? q.ans : -1, key: open ? q.opts[q.ans] : null, open }; }),
-      ans: r.ans.map((row, i) => row.map(a => a ? { c: a.c, t: a.t, ok: (r.opened[i] || rev) ? a.ok : null } : null)),
-      cnv: b.cnv && (r.opened.some(Boolean) || g.status !== 'play') ? { text: b.cnv.text, opts: b.cnv.opts, ans: rev ? b.cnv.ans : -1 } : null,
-      hasCnv: !!b.cnv, cnvTry: r.cnv, opened: r.opened.filter(Boolean).length };
-  }
-  if (g.round === 3 && g.r3) {
-    const r = g.r3, cur = r.q >= 0 ? b.r3[r.q] : null, rev = r.qs === 'reveal';
-    return { q: r.q, n: b.r3.length, qs: r.qs, start: r.start, deadline: r.deadline, text: cur ? cur.text : null, opts: cur ? cur.opts : null, ans: rev ? cur.ans : -1,
-      answers: r.q >= 0 ? r.ans[r.q].map(a => a ? { c: a.c, t: a.t, ok: rev ? a.ok : null } : null) : [], award: r.q >= 0 ? r.award[r.q] : [] };
-  }
-  if (g.round === 4 && g.r4) {
-    const r = g.r4, cur = r.qs[r.qi], showQ = ['answer', 'buzz', 'steal', 'reveal'].includes(r.st);
-    return { order: r.order, turn: r.turn, active: r.order[r.turn], st: r.st, pkg: r.pkg, star: r.star, qi: r.qi, pts: r.qs.map(x => x.pts), hist: r.hist,
-      text: showQ ? cur.q.text : null, opts: showQ ? cur.q.opts : null, ans: r.st === 'reveal' ? cur.q.ans : -1,
-      deadline: r.deadline, total: r.total, main: r.main, buzzer: r.buzzer, steal: r.steal };
-  }
-  return null;
-}
-
-/* ---------- Xử lý thao tác từ các đội ---------- */
-function onAction(a) {
-  if (!a || !a.type) return;
-  if (a.type === 'join') { onJoin(a); return commit(); }
-  const t = a.team; if (!(t >= 0 && t < H.teams.length) || H.teams[t].dev !== a.dev || H.phase !== 'game') return;
-  const g = H.g;
-  if (a.type === 'r1' && g.round === 1) onR1(a);
-  else if (a.type === 'r2' && g.round === 2) onR2(a);
-  else if (a.type === 'cnv' && g.round === 2) onCnv(a);
-  else if (a.type === 'r3' && g.round === 3) onR3(a);
-  else if (g.round === 4 && g.r4 && g.status === 'play') {
-    const r = g.r4;
-    if (a.type === 'r4pick' && r.st === 'pick' && t === r.order[r.turn] && RULES.PACKAGES[a.pkg]) pickPkg(+a.pkg, +a.star);
-    else if (a.type === 'r4ans' && r.st === 'answer' && t === r.order[r.turn] && a.ts <= r.deadline + 300) mainAnswer(a.c);
-    else if (a.type === 'buzz' && r.st === 'buzz' && t !== r.order[r.turn] && a.ts <= r.deadline + 300) { r.buzzer = t; r.st = 'steal'; setDl(r, RULES.STEAL_TIME); }
-    else if (a.type === 'r4steal' && r.st === 'steal' && t === r.buzzer && a.ts <= r.deadline + 300) stealResult(a.c);
-  }
-  commit();
-}
-function onJoin(a) {
-  const reject = msg => { H.rejects[a.dev] = { msg, jid: a.jid }; };
-  if (H.phase !== 'lobby' && H.phase !== 'game') return reject('Phòng thi chưa mở hoặc đã đóng.');
-  const t = H.teams.findIndex(x => x.pin === String(a.pin).trim());
-  if (t < 0) return reject('Mã PIN không đúng. Kiểm tra lại với giáo viên.');
-  const other = H.teams.findIndex((x, i) => i !== t && x.dev === a.dev);
-  if (other >= 0) return reject(`Thiết bị này đã vào ${H.teams[other].name}.`);
-  if (H.teams[t].dev && H.teams[t].dev !== a.dev) return reject(`${H.teams[t].name} đã có người vào. Mỗi đội chỉ vào được 1 lần.`);
-  H.teams[t].dev = a.dev; delete H.rejects[a.dev];
-}
-function setDl(r, sec) { r.start = Net.now(); r.deadline = r.start + sec * 1000; r.total = sec; }
-
-/* ---------- Vòng 1: Khởi động ---------- */
-function startR1() {
-  const g = H.g, qs = g.bank.r1, now = Net.now();
-  g.round = 1; g.status = 'play';
-  g.r1 = { startAt: now + 3000, deadline: now + 3000 + RULES.R1_TIME * 1000,
-    sets: H.teams.map(() => shuffle(qs.map((_, i) => i)).map(qi => ({ qi, perm: shuffle(qs[qi].opts.map((_, k) => k)) }))),
-    prog: H.teams.map(() => []) };
-}
-function onR1(a) {
-  const g = H.g, r = g.r1; if (g.status !== 'play' || a.ts > r.deadline + 300) return;
-  const p = r.prog[a.team]; if (p.length !== a.idx) return;
-  const s = r.sets[a.team][a.idx], q = g.bank.r1[s.qi], ok = s.perm[a.c] === q.ans;
-  p.push({ c: a.c, ok, a: s.perm.indexOf(q.ans) }); if (ok) H.teams[a.team].score += RULES.R1_POINT;
-  if (r.prog.every((x, i) => x.length >= r.sets[i].length)) g.status = 'review';
-}
-
-/* ---------- Vòng 2: Vượt chướng ngại vật ---------- */
-function startR2() {
-  const g = H.g; g.status = 'play';
-  g.r2 = { row: -1, rs: 'idle', start: 0, deadline: 0, finalDl: 0, solved: -1,
-    ans: g.bank.r2.map(() => H.teams.map(() => null)), opened: g.bank.r2.map(() => false), cnv: H.teams.map(() => null) };
-}
-function h_openRow(i) { const r = H.g.r2; r.row = i; r.rs = 'play'; setDl(r, RULES.R2_ROW_TIME); commit(); }
-function revealRow() { const r = H.g.r2; r.rs = 'reveal'; r.opened[r.row] = true; }
-function onR2(a) {
-  const g = H.g, r = g.r2; if (g.status !== 'play' || r.rs !== 'play' || a.row !== r.row || r.ans[r.row][a.team] || a.ts > r.deadline + 300) return;
-  const ok = a.c === g.bank.r2[r.row].ans;
-  r.ans[r.row][a.team] = { c: a.c, ok, t: a.ts - r.start }; if (ok) H.teams[a.team].score += RULES.R2_POINT;
-  if (r.ans[r.row].every(Boolean)) revealRow();
-}
-function onCnv(a) {
-  const g = H.g, r = g.r2; if (!g.bank.cnv || r.cnv[a.team] || !['play', 'final'].includes(g.status)) return;
-  const opened = r.opened.filter(Boolean).length; if (g.status === 'play' && opened < 1) return;
-  if (g.status === 'final' && a.ts > r.finalDl + 300) return;
-  const ok = a.c === g.bank.cnv.ans, P = RULES.CNV_POINTS;
-  const pts = g.status === 'final' ? P[P.length - 1] : P[Math.min(opened, P.length) - 1];
-  r.cnv[a.team] = { c: a.c, ok, pts: ok ? pts : 0 }; if (ok) H.teams[a.team].score += pts;
-  if (ok && g.status === 'play') { r.solved = a.team; if (r.rs === 'play') revealRow(); g.status = 'review'; }
-  if (g.status === 'final' && r.cnv.every(Boolean)) g.status = 'review';
-}
-function h_finalCnv() { const g = H.g, r = g.r2; g.status = 'final'; r.finalDl = Net.now() + RULES.CNV_FINAL_TIME * 1000; commit(); }
-
-/* ---------- Vòng 3: Tăng tốc ---------- */
-function startR3() { const g = H.g; g.status = 'play'; g.r3 = { q: -1, qs: 'idle', start: 0, deadline: 0, ans: g.bank.r3.map(() => H.teams.map(() => null)), award: g.bank.r3.map(() => H.teams.map(() => 0)) }; }
-function h_openR3(i) { const r = H.g.r3; r.q = i; r.qs = 'play'; setDl(r, RULES.R3_TIME); commit(); }
-function onR3(a) {
-  const g = H.g, r = g.r3; if (r.qs !== 'play' || a.q !== r.q || r.ans[r.q][a.team] || a.ts > r.deadline + 300) return;
-  r.ans[r.q][a.team] = { c: a.c, ok: a.c === g.bank.r3[r.q].ans, t: a.ts - r.start };
-  if (r.ans[r.q].every(Boolean)) revealR3();
-}
-function revealR3() {
-  const r = H.g.r3; r.qs = 'reveal';
-  r.ans[r.q].map((x, i) => ({ x, i })).filter(o => o.x && o.x.ok).sort((a, b) => a.x.t - b.x.t)
-    .forEach((o, k) => { const pts = RULES.R3_POINTS[k] ?? RULES.R3_POINTS[RULES.R3_POINTS.length - 1]; r.award[r.q][o.i] = pts; H.teams[o.i].score += pts; });
-}
-
-/* ---------- Vòng 4: Về đích ---------- */
-function startR4() {
-  const g = H.g; g.status = 'play';
-  g.r4 = { order: H.teams.map((_, i) => i), turn: 0, st: 'pick', pkg: 0, star: -1, qs: [], qi: 0, hist: [], start: 0, deadline: 0, total: 0, main: null, buzzer: -1, steal: null,
-    left: { 20: shuffle(g.bank.v[20]), 30: shuffle(g.bank.v[30]), 40: shuffle(g.bank.v[40]) } };
-}
-function drawR4(pts) {
-  const g = H.g, l = g.r4.left;
-  if (l[pts].length) return l[pts].shift();
-  for (const k of [20, 30, 40]) if (l[k].length) return l[k].shift();
-  const all = [...g.bank.v[20], ...g.bank.v[30], ...g.bank.v[40], ...g.bank.r3, ...g.bank.r1];
-  return all[Math.floor(Math.random() * all.length)];
-}
-function pickPkg(pkg, star) {
-  const r = H.g.r4; r.pkg = pkg; r.star = star >= 0 && star < 3 ? star : -1;
-  r.qs = RULES.PACKAGES[pkg].map(pts => ({ q: drawR4(pts), pts })); r.qi = 0; r.hist = []; r.st = 'ready';
-}
-function h_showQ() { const r = H.g.r4; r.main = null; r.buzzer = -1; r.steal = null; r.st = 'answer'; setDl(r, RULES.R4_TIME[r.qs[r.qi].pts] || 20); commit(); }
-function mainAnswer(c) {
-  const r = H.g.r4, cur = r.qs[r.qi], act = r.order[r.turn], ok = c === cur.q.ans;
-  r.main = { c, ok };
-  if (ok) { H.teams[act].score += cur.pts * (r.star === r.qi ? 2 : 1); r.hist[r.qi] = 'ok'; r.st = 'reveal'; }
-  else { if (r.star === r.qi) H.teams[act].score -= cur.pts; r.hist[r.qi] = 'bad'; r.st = 'buzz'; setDl(r, RULES.BUZZ_TIME); }
-}
-function stealResult(c) {
-  const r = H.g.r4, cur = r.qs[r.qi], act = r.order[r.turn], ok = c === cur.q.ans;
-  r.steal = { c, ok };
-  if (ok) { H.teams[r.buzzer].score += cur.pts; if (RULES.STEAL_TAKES_FROM_MAIN) H.teams[act].score -= cur.pts; r.hist[r.qi] = 'steal'; }
-  else H.teams[r.buzzer].score -= cur.pts / 2;
-  r.st = 'reveal';
-}
-function h_nextQ() {
-  const g = H.g, r = g.r4;
-  if (r.qi < r.qs.length - 1) { r.qi++; r.st = 'ready'; r.main = null; r.buzzer = -1; r.steal = null; }
-  else if (r.turn < r.order.length - 1) { r.turn++; Object.assign(r, { st: 'pick', pkg: 0, star: -1, qs: [], qi: 0, hist: [], main: null, buzzer: -1, steal: null }); }
-  else { H.phase = 'end'; UI.confetti = false; }
-  commit();
-}
-function h_pickFor(pkg) { pickPkg(pkg, -1); commit(); }
-
-/* ---------- Đồng hồ máy chủ ---------- */
-function hostTick() {
-  if (H.phase !== 'game') return;
-  const g = H.g, now = Net.now(); let ch = false;
-  if (g.round === 1 && g.status === 'play' && g.r1 && now > g.r1.deadline) { g.status = 'review'; ch = true; }
-  if (g.round === 2 && g.r2) {
-    if (g.status === 'play' && g.r2.rs === 'play' && now > g.r2.deadline) { revealRow(); ch = true; }
-    if (g.status === 'final' && now > g.r2.finalDl) { g.status = 'review'; ch = true; }
-  }
-  if (g.round === 3 && g.r3 && g.r3.qs === 'play' && now > g.r3.deadline) { revealR3(); ch = true; }
-  if (g.round === 4 && g.r4 && g.status === 'play' && now > g.r4.deadline) {
-    const r = g.r4;
-    if (r.st === 'answer') { mainAnswer(-1); ch = true; }
-    else if (r.st === 'buzz') { r.st = 'reveal'; ch = true; }
-    else if (r.st === 'steal') { stealResult(-1); ch = true; }
-  }
-  if (ch) commit();
-}
-
-/* ---------- Nút điều khiển của GV ---------- */
-function h_tab(t) { UI.tab = t; renderHost(); }
-function h_openLobby() {
-  if (H.teams.some(t => !t.members.length) && !confirm('Có đội chưa có thành viên. Vẫn mở phòng chờ?')) return;
-  const old = H.teams.map(t => t.pin), pins = makePins(H.teams.length);
-  H.teams.forEach((t, i) => { t.pin = pins[i]; t.dev = null; t.score = 0; });
-  H.rejects = {}; H.g = null; H.phase = 'lobby'; UI.showPin = {};
-  Net.registerPins(H.roomId, pins, old); listen(); commit();
-}
-function h_regenPins() { if (confirm('Tạo mã PIN mới? Các đội đã vào sẽ phải nhập lại.')) h_openLobby(); }
-function h_unlock(t) { if (confirm(`Mở khóa ${H.teams[t].name}? Thiết bị đang vào sẽ bị thoát, đội có thể nhập lại PIN trên máy khác.`)) { H.teams[t].dev = null; commit(); } }
-function h_start() {
-  if (!H.teams.every(t => t.dev)) return;
-  const bank = buildBank(H.bankText);
-  if (!bank.r1.length) return alert('Bộ câu hỏi chưa có câu nào cho vòng Khởi động.');
-  H.teams.forEach(t => t.score = 0); H.phase = 'game'; H.g = { round: 1, status: 'intro', bank }; UI.tab = 'main';
-  startR1(); commit();
-}
-function h_startRound() {
-  const g = H.g;
-  if (g.round === 2) { if (!g.bank.r2.length) { g.round = 3; g.status = 'intro'; return commit(); } startR2(); }
-  else if (g.round === 3) startR3(); else if (g.round === 4) startR4();
-  commit();
-}
-function h_endRound() { const g = H.g; if (g.round === 2 && g.r2 && g.r2.rs === 'play') revealRow(); if (g.round === 3 && g.r3 && g.r3.qs === 'play') revealR3(); g.status = 'review'; commit(); }
-function h_revealNow() { const g = H.g; if (g.round === 2) revealRow(); if (g.round === 3) revealR3(); commit(); }
-function h_nextRound() { const g = H.g; if (g.round >= 4) { H.phase = 'end'; UI.confetti = false; } else { g.round++; g.status = 'intro'; } UI.tab = 'main'; commit(); }
-function h_replay() { H.teams.forEach(t => t.score = 0); H.g = null; H.phase = 'lobby'; commit(); }
-function closeRoom() { Net.publish(H.roomId, { roomId: H.roomId, phase: 'closed', teams: [], rejects: {} }); }
-function h_backSetup() { if (!confirm('Quay lại chia đội? Phòng hiện tại sẽ đóng, mã PIN cũ hết hiệu lực.')) return; closeRoom(); H.teams.forEach(t => { t.dev = null; t.score = 0; }); H.phase = 'setup'; H.g = null; commit(); }
-function h_resetAll() { if (!confirm('Xóa toàn bộ (danh sách, đội, bộ câu hỏi) và làm lại từ đầu?')) return; closeRoom(); H = hostDefault(); commit(); }
-function h_fullscreen() { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(() => { }); }
-
-/* ---------- Danh sách lớp & chia đội ---------- */
-async function h_rosterFile(file) {
-  if (!file) return;
-  try {
-    const wb = XLSX.read(await file.arrayBuffer(), { type: 'array' });
-    const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, defval: '' });
-    let start = 0, nameCol = -1, hoCol = -1, tenCol = -1;
-    for (let i = 0; i < Math.min(rows.length, 12); i++) {
-      const r = rows[i].map(c => norm(c));
-      tenCol = r.findIndex(c => c === 'TEN'); hoCol = r.findIndex(c => c.startsWith('HO') && !c.includes('TEN'));
-      nameCol = r.findIndex(c => c.includes('TEN') && c !== 'TEN');
-      if (nameCol >= 0 || tenCol >= 0) { start = i + 1; break; }
-    }
-    let list;
-    if (nameCol < 0 && tenCol >= 0 && hoCol >= 0) list = rows.slice(start).map(r => `${r[hoCol]} ${r[tenCol]}`.trim());
-    else {
-      if (nameCol < 0) nameCol = tenCol >= 0 ? tenCol : (rows[0] && /^\d+$/.test(String(rows[0][0]).trim()) ? 1 : 0);
-      list = rows.slice(start).map(r => String(r[nameCol] ?? '').trim());
-    }
-    list = list.filter(n => n && !/^\d+$/.test(n));
-    if (!list.length) return alert('Không tìm thấy cột tên học sinh. File cần có cột "Họ và tên".');
-    setStudents(list, `Đã nạp ${list.length} học sinh từ "${file.name}"`);
-  } catch (e) { alert('Không đọc được file: ' + e.message); }
-}
-function h_rosterPaste() {
-  const list = ($('#paste-names').value || '').split('\n').map(s => s.replace(/^\s*\d+[.)\t ]+/, '').split('\t')[0].trim()).filter(Boolean);
-  if (list.length) setStudents(list, `Đã nạp ${list.length} học sinh từ danh sách dán vào`);
-}
-function setStudents(list, msg) { H.students = list; H.teams.forEach(t => t.members = []); UI.msg = msg; divide('order', true); }
-function divide(mode, silent) {
-  if (!H.students.length) return alert('Chưa có danh sách lớp.');
-  const list = mode === 'random' ? shuffle(H.students) : [...H.students];
-  H.teams.forEach(t => t.members = []);
-  const n = H.teams.length, per = Math.ceil(list.length / n);
-  list.forEach((s, i) => H.teams[mode === 'block' ? Math.min(n - 1, Math.floor(i / per)) : i % n].members.push(s));
-  commit();
-}
-function h_drop(ev, to) {
-  ev.preventDefault(); ev.currentTarget.classList.remove('drop-hot');
-  try { const d = JSON.parse(ev.dataTransfer.getData('text/plain')); moveMember(d.f, d.i, to); } catch (e) { }
-}
-function moveMember(from, i, to) { if (from === to) return; const [m] = H.teams[from].members.splice(i, 1); if (m) H.teams[to].members.push(m); commit(); }
-function h_teamName(i, v) { H.teams[i].name = v.trim() || `Đội ${i + 1}`; commit(); }
-
-/* Tìm danh sách lớp đã nạp ở trang chủ (cùng trình duyệt) */
-const NAME_KEYS = ['name', 'fullName', 'fullname', 'hoTen', 'hoten', 'ho_ten', 'Họ và tên', 'Họ tên', 'studentName', 'ten'];
-function collectNames(v, out, depth = 0, listKey = false) {
-  if (depth > 5 || v == null) return;
-  if (Array.isArray(v)) { v.forEach(x => typeof x === 'string' ? (listKey && out.push(x)) : collectNames(x, out, depth + 1, listKey)); return; }
-  if (typeof v === 'object') for (const k in v) {
-    if (typeof v[k] === 'string' && NAME_KEYS.includes(k)) out.push(v[k]);
-    else collectNames(v[k], out, depth + 1, /student|member|roster|danh|hocsinh|names/i.test(k));
-  }
-}
-function findSavedRoster() {
-  let best = null;
-  for (let i = 0; i < localStorage.length; i++) {
-    const k = localStorage.key(i); if (k.startsWith('olp_')) continue;
-    let v; try { v = JSON.parse(localStorage.getItem(k)); } catch (e) { continue; }
-    const out = []; collectNames(v, out);
-    const names = [...new Set(out.map(s => String(s).trim()).filter(s => s.length > 1 && s.length < 50 && !/^(Đội|Tổ|Nhóm|Team|Lớp)\s*\d*/i.test(s)))];
-    if (names.length >= 4 && (!best || names.length > best.names.length)) best = { k, names };
-  }
-  return best;
-}
-function h_useSaved() { const r = findSavedRoster(); if (r) setStudents(r.names, `Đã lấy ${r.names.length} học sinh từ danh sách đã nạp ở trang chủ`); }
-
-/* ---------- Bộ câu hỏi ---------- */
-async function h_bankFile(file) {
-  if (!file) return;
-  try {
-    const text = /\.docx$/i.test(file.name) ? (await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() })).value : await file.text();
-    const b = buildBank(text);
-    if (!b.total) return alert('Không nhận được câu hỏi nào. Kiểm tra định dạng: "Câu 1: ...", "A. ...", "Đáp án: A".');
-    H.bankText = text; H.bankName = file.name; commit();
-  } catch (e) { alert('Không đọc được file: ' + e.message); }
-}
-function h_sampleBank() { H.bankText = SAMPLE_BANK; H.bankName = 'Bộ câu hỏi mẫu – KHTN 8 (Chương I–II)'; commit(); }
-function h_downloadTemplate() {
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob(['\ufeff' + SAMPLE_BANK], { type: 'text/plain;charset=utf-8' }));
-  a.download = 'Mau_de_Olympia.txt'; a.click();
-}
-
-/* ---------- Vẽ màn hình GV ---------- */
-function renderHost() {
-  RR = 0;
-  const body = H.phase === 'setup' ? setupHTML() : H.phase === 'lobby' ? lobbyHTML() : H.phase === 'game' ? gameHTML() : endHTML();
-  const crumb = { setup: 'Danh sách & Chia đội', lobby: 'Phòng chờ & Mã PIN', game: H.g ? `Vòng ${H.g.round}: ${ROUND_NAMES[H.g.round]}` : 'Thi đấu', end: 'Kết quả chung cuộc' }[H.phase];
-  $('#app').innerHTML = `
-  <div class="w-full min-h-screen flex">
-    ${sidebarHTML()}
-    <div id="side-backdrop" onclick="h_side()" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-30 lg:hidden ${UI.side ? '' : 'hidden'}"></div>
+    <!-- ==================== RIGHT MAIN CONTENT AREA ==================== -->
     <div class="flex-1 flex flex-col min-w-0">
-      <header class="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-slate-200/90 px-4 md:px-6 py-2.5 flex items-center justify-between shadow-sm gap-3">
-        <div class="flex items-center gap-3 min-w-0">
-          <button onclick="h_side()" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition flex-shrink-0"><i class="fa-solid fa-bars text-sm"></i></button>
-          <div class="flex items-center gap-2 text-xs font-semibold text-slate-500 min-w-0">
-            <a href="index.html" class="text-slate-900 font-bold flex items-center gap-1.5"><i class="fa-solid fa-gamepad text-purple-600"></i> EDU GAME</a>
-            <span>/</span><span class="text-rose-600 font-bold hidden sm:inline">Đường Lên Đỉnh Olympia</span><span class="hidden sm:inline">/</span>
-            <span class="text-slate-400 truncate">${crumb}</span>
-          </div>
+        
+        <!-- Top Header Bar -->
+        <header class="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-slate-200/90 px-4 md:px-6 py-2.5 flex items-center justify-between shadow-sm">
+            <!-- Left: Breadcrumb with Hamburger Menu -->
+            <div class="flex items-center gap-3">
+                <button onclick="window.app.toggleSidebar()" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition">
+                    <i class="fa-solid fa-bars text-sm"></i>
+                </button>
+                <div class="flex items-center gap-2 text-xs font-semibold text-slate-500">
+                    <span class="text-slate-900 font-bold flex items-center gap-1.5 cursor-pointer" onclick="window.app.showGameSelection()">
+                        <i class="fa-solid fa-gamepad text-purple-600"></i> EDU GAME
+                    </span>
+                    <span>/</span>
+                    <span class="text-slate-400" id="top-breadcrumb">Trang chủ</span>
+                </div>
+            </div>
+
+            <!-- Right Actions -->
+            <div class="flex items-center gap-2 md:gap-2.5">
+                <!-- Admin Auth Badge / Login Button Slot -->
+                <div id="admin-auth-header-slot"></div>
+
+                <!-- Enter Room Button (Purple gradient) -->
+                <button onclick="location.href='olympia.html'" class="px-3 md:px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition active:scale-95">
+                    <i class="fa-solid fa-arrow-right-to-bracket text-xs"></i>
+                    <span>Vào phòng</span>
+                </button>
+
+                <!-- Team Setup & PIN Button -->
+                <button onclick="window.roomManager.openClassDivideModal()" class="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-xs border border-purple-200 flex items-center gap-1.5 transition shadow-sm">
+                    <i class="fa-solid fa-users-gear text-purple-600"></i>
+                    <span class="hidden sm:inline">Chia Đội & PIN</span>
+                </button>
+
+                <!-- Guide Button -->
+                <button onclick="window.app.openGuideModal()" class="px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs border border-amber-200 flex items-center gap-1.5 transition shadow-sm" title="Hướng dẫn soạn câu hỏi & định dạng">
+                    <i class="fa-solid fa-book-open text-amber-600"></i>
+                    <span class="hidden sm:inline">Hướng Dẫn & Mẫu Đề</span>
+                </button>
+
+                <!-- Fullscreen button -->
+                <button onclick="window.app.toggleFullscreen()" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center text-xs transition hidden sm:flex" title="Chiếu máy chiếu">
+                    <i class="fa-solid fa-expand"></i>
+                </button>
+
+                <!-- Teacher Login / Manage Button -->
+                <button onclick="window.app.toggleTeacherDrawer()" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-200 flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-folder-open text-purple-600"></i>
+                    <span class="hidden sm:inline">Quản lý File</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Body Content -->
+        <main class="flex-1 px-4 sm:px-6 lg:px-8 py-5 space-y-6 w-full max-w-[1550px] mx-auto">
+            
+            <!-- Notice Banner (Matching reference image) -->
+            <div class="bg-amber-50/90 border border-amber-200 rounded-2xl px-4 py-2.5 flex flex-wrap items-center justify-between text-xs text-amber-900 font-medium shadow-sm gap-2">
+                <div class="flex items-center gap-2 truncate">
+                    <i class="fa-solid fa-bullhorn text-amber-600 flex-shrink-0"></i>
+                    <span class="truncate">
+                        <strong>Hỗ trợ giáo viên:</strong> Tải file Word (<code>.docx</code>) & danh sách lớp Excel (<code>.xlsx</code>) để tự động phân dạng bài tập và chia đội thi đấu!
+                    </span>
+                </div>
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <button onclick="window.app.openGuideModal()" class="px-2.5 py-1 rounded-lg bg-amber-200/90 hover:bg-amber-300 text-amber-950 font-bold transition flex items-center gap-1 shadow-xs">
+                        <i class="fa-solid fa-book-open"></i> Hướng dẫn soạn đề
+                    </button>
+                    <button onclick="window.app.toggleTeacherDrawer()" class="text-amber-800 hover:text-amber-950 font-bold underline">
+                        Nạp ngay
+                    </button>
+                </div>
+            </div>
+
+            <!-- Ô NHẬP MÃ PIN CHO HỌC SINH -->
+            <form onsubmit="event.preventDefault(); var v=this.pin.value.replace(/\D/g,''); if(v.length===6){location.href='olympia.html?pin='+v}else{this.pin.focus(); this.querySelector('.pin-err').classList.remove('hidden')}"
+                class="relative overflow-hidden rounded-3xl bg-white border-2 border-purple-200 shadow-sm p-5 sm:p-6 flex flex-col lg:flex-row lg:items-center gap-4">
+                <div class="flex items-center gap-4 flex-1 min-w-0">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center text-2xl shadow-md flex-shrink-0">
+                        <i class="fa-solid fa-key"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="text-lg sm:text-xl font-black text-slate-900 leading-tight">Học sinh vào thi – Nhập mã PIN của đội</div>
+                        <div class="text-xs text-slate-500 font-medium mt-0.5">Mỗi đội có 1 mã PIN riêng gồm 6 chữ số do giáo viên cấp • mỗi mã chỉ vào được 1 thiết bị</div>
+                    </div>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-2 lg:w-[460px]">
+                    <div class="flex-1">
+                        <input name="pin" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="• • • • • •"
+                            class="w-full text-center text-3xl font-black tracking-[.3em] rounded-2xl border-2 border-slate-200 focus:border-purple-500 focus:outline-none py-3 bg-slate-50 focus:bg-white">
+                        <div class="pin-err hidden text-[11px] font-bold text-rose-600 mt-1 text-center">Mã PIN gồm 6 chữ số</div>
+                    </div>
+                    <button class="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-base shadow-md flex items-center justify-center gap-2 h-[62px] whitespace-nowrap transition active:scale-95">
+                        <i class="fa-solid fa-right-to-bracket"></i> Vào phòng thi
+                    </button>
+                </div>
+            </form>
+
+            <!-- TEACHER DASHBOARD CONTAINER -->
+            <div id="teacher-dashboard" class="space-y-6">
+                
+                <!-- MASTER OLYMPIA HERO ARENA (Expansive Full-Width Banner) -->
+                <div class="relative overflow-hidden rounded-3xl hero-gradient p-6 sm:p-8 lg:p-10 shadow-xl text-white">
+                    <div class="relative z-10 space-y-6">
+                        
+                        <!-- Top Pill & Class Tag -->
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-bold text-white border border-white/30 shadow-sm">
+                                <span class="bg-white text-rose-700 px-2 py-0.5 rounded-full font-black text-[10px]">CHUYÊN DỤNG</span>
+                                <span>Tối ưu cho Máy chiếu, Smart TV & Bảng tương tác lớp học</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-xs">
+                                <span class="text-white/80">Lớp hiện tại:</span>
+                                <span class="font-bold text-slate-900 bg-white/90 px-3 py-1 rounded-xl shadow-xs" id="class-current-name">Lớp 10A1 (Mẫu)</span>
+                            </div>
+                        </div>
+
+                        <!-- Grand Title -->
+                        <div class="space-y-2">
+                            <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black font-heading tracking-tight drop-shadow-sm leading-tight">
+                                ĐẤU TRƯỜNG TRI THỨC • ĐƯỜNG LÊN ĐỈNH OLYMPIA
+                            </h1>
+                            <p class="text-white/95 text-xs sm:text-sm md:text-base leading-relaxed max-w-4xl font-medium">
+                                Biến tiết học ôn tập thành trận thi đấu sôi nổi cho toàn bộ học sinh với <strong>4 Vòng thi chính quy</strong>: Khởi Động (+10đ/câu • đề và đáp án đảo ngẫu nhiên chống nhìn bài), Tăng Tốc 1 & 2 (đua tốc độ sát nút mili-giây), Về Đích (gói 60đ - 80đ - 100đ, Ngôi sao hy vọng & Chuông cướp điểm).
+                            </p>
+                        </div>
+
+                        <!-- Hero Action Buttons Bar -->
+                        <div class="flex flex-wrap items-center gap-3 pt-1">
+                            <button onclick="location.href='olympia.html?gv'" 
+                                class="px-8 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-black text-sm shadow-xl flex items-center gap-2.5 transform active:scale-95 transition">
+                                <i class="fa-solid fa-play text-amber-400 text-base"></i>
+                                <span>Bắt Đầu Chiếu Olympia Ngay (Chia Đội & PIN)</span>
+                            </button>
+
+                            <button onclick="window.roomManager.openClassDivideModal()" 
+                                class="px-5 py-3.5 rounded-2xl bg-white/25 hover:bg-white/35 backdrop-blur-md text-white font-bold text-sm border border-white/40 shadow-sm flex items-center gap-2 transition">
+                                <i class="fa-solid fa-users-gear"></i>
+                                <span>Chia 4/6/8 Đội (Kéo Thả)</span>
+                            </button>
+
+                            <button onclick="window.roomManager.openJudgeSpectatorMode()" 
+                                class="px-5 py-3.5 rounded-2xl bg-indigo-600/90 hover:bg-indigo-600 text-white font-black text-sm border border-indigo-400/60 shadow-md flex items-center gap-2 transition"
+                                title="Chiếu góc nhìn của từng đội học sinh cho Ban Giám Khảo xem (Phím V)">
+                                <i class="fa-solid fa-users-viewfinder"></i>
+                                <span>Chiếu Màn Hình Đội (BGK)</span>
+                            </button>
+
+                            <button onclick="window.roomManager.openWaitingLobbyModal()" 
+                                class="px-5 py-3.5 rounded-2xl bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-bold text-sm border border-white/30 shadow-sm flex items-center gap-2 transition">
+                                <i class="fa-solid fa-door-open"></i>
+                                <span>Phòng Chờ Trực Tuyến</span>
+                            </button>
+
+                            <button onclick="window.app.openGuideModal()" 
+                                class="px-4 py-3.5 rounded-2xl bg-amber-400/90 hover:bg-amber-400 text-slate-950 font-black text-sm shadow-md flex items-center gap-2 transition">
+                                <i class="fa-solid fa-book-open"></i>
+                                <span>Hướng Dẫn & Mẫu Đề</span>
+                            </button>
+
+                            <button onclick="window.app.toggleTeacherDrawer()" 
+                                class="px-4 py-3.5 rounded-2xl bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-bold text-sm border border-white/30 shadow-sm flex items-center gap-2 transition">
+                                <i class="fa-solid fa-folder-open"></i>
+                                <span>Quản Lý File</span>
+                            </button>
+                        </div>
+
+                        <!-- 4 ROUNDS STRATEGY CARDS (Spacious Responsive 4-Column Grid) -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-3">
+                            <div class="bg-white/15 backdrop-blur-md p-3.5 rounded-2xl border border-white/25 shadow-sm text-left">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-xs font-black uppercase tracking-wider text-amber-300">1. Khởi Động</span>
+                                    <i class="fa-solid fa-bolt text-amber-300 text-xs"></i>
+                                </div>
+                                <div class="text-sm font-black text-white">+10 Điểm / Câu • 45s</div>
+                                <div class="text-[11px] text-white/85 mt-0.5 leading-snug">
+                                    7 câu hỏi. Đảo đề & đảo đáp án A, B, C, D độc lập từng đội chống nhìn bài.
+                                </div>
+                            </div>
+
+                            <div class="bg-white/15 backdrop-blur-md p-3.5 rounded-2xl border border-white/25 shadow-sm text-left">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-xs font-black uppercase tracking-wider text-emerald-300">2. Vượt Chướng Ngại Vật</span>
+                                    <i class="fa-solid fa-puzzle-piece text-emerald-300 text-xs"></i>
+                                </div>
+                                <div class="text-sm font-black text-white">4 Hàng Ngang + Đoán CNV</div>
+                                <div class="text-[11px] text-white/85 mt-0.5 leading-snug">
+                                    Mở hàng ngang +10đ. Chuông đoán CNV nhận 80đ - 60đ - 40đ - 20đ.
+                                </div>
+                            </div>
+
+                            <div class="bg-white/15 backdrop-blur-md p-3.5 rounded-2xl border border-white/25 shadow-sm text-left">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-xs font-black uppercase tracking-wider text-sky-300">3. Tăng Tốc</span>
+                                    <i class="fa-solid fa-gauge-high text-sky-300 text-xs"></i>
+                                </div>
+                                <div class="text-sm font-black text-white">40đ - 30đ - 20đ - 10đ</div>
+                                <div class="text-[11px] text-white/85 mt-0.5 leading-snug">
+                                    4 câu 30s. Xếp hạng tốc độ mili-giây trả lời đúng chuẩn VTV3.
+                                </div>
+                            </div>
+
+                            <div class="bg-white/15 backdrop-blur-md p-3.5 rounded-2xl border border-white/25 shadow-sm text-left">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-xs font-black uppercase tracking-wider text-pink-300">4. Về Đích</span>
+                                    <i class="fa-solid fa-star text-pink-300 text-xs"></i>
+                                </div>
+                                <div class="text-sm font-black text-white">Gói 60 - 80 - 100đ</div>
+                                <div class="text-[11px] text-white/85 mt-0.5 leading-snug">
+                                    Chọn gói điểm, Ngôi sao hy vọng (×2) & Chuông cướp điểm 5 giây.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- TEACHER DRAWER / CONTROLS (Word & Excel Uploaders) -->
+                <div id="teacher-files-drawer" class="bg-white border-2 border-slate-200 rounded-3xl p-6 shadow-sm space-y-6">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center text-lg font-bold">
+                                <i class="fa-solid fa-sliders"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-black text-slate-900">Khu Vực Quản Lý Của Giáo Viên</h3>
+                                <p class="text-xs text-slate-500">Nạp đề thi Word & danh sách lớp Excel - Tự động lưu vĩnh viễn trên trình duyệt</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="window.app.openGuideModal()" class="px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-black border border-amber-300 flex items-center gap-1.5 shadow-sm transition">
+                                <i class="fa-solid fa-book-open text-amber-600"></i>
+                                <span>Hướng dẫn soạn đề & Tải mẫu</span>
+                            </button>
+                            <button onclick="window.app.openQuestionsBankModal()" class="px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-800 text-xs font-bold border border-blue-200 flex items-center gap-1.5 transition">
+                                <i class="fa-solid fa-list-check text-blue-600"></i>
+                                <span>Quản lý JSON Đề Thi (<span id="q-total-count">15</span>)</span>
+                            </button>
+                            <button onclick="window.app.openClassJsonModal()" class="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-800 text-xs font-bold border border-purple-200 flex items-center gap-1.5 transition">
+                                <i class="fa-solid fa-code text-purple-600"></i>
+                                <span>Quản lý JSON Lớp & Chia Đội</span>
+                            </button>
+                            <button onclick="window.app.openClassListModal()" class="px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs font-bold border border-amber-200">
+                                <i class="fa-solid fa-trophy text-amber-600 mr-1"></i> Điểm lớp (<span id="class-student-count">20 HS</span>)
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Word Docx Box -->
+                        <div class="p-4 rounded-2xl bg-blue-50/50 border border-blue-200">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-xs font-bold text-blue-900 flex items-center gap-2">
+                                    <i class="fa-solid fa-file-word text-blue-600 text-lg"></i>
+                                    1. File Câu Hỏi Word (.docx)
+                                </span>
+                                <span class="text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded">Tự nhận dạng</span>
+                            </div>
+                            <div class="relative border-2 border-dashed border-blue-300 hover:border-blue-500 rounded-xl p-4 text-center bg-white cursor-pointer transition">
+                                <input type="file" id="docx-file-input" accept=".docx" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                                <i class="fa-solid fa-cloud-arrow-up text-blue-500 text-2xl mb-1"></i>
+                                <div class="text-xs font-bold text-slate-800">Kéo thả file .docx hoặc <span class="text-blue-600 underline">chọn từ máy tính</span></div>
+                                <div class="text-[10px] text-slate-500 mt-1">
+                                    Trắc nghiệm 4 đáp án (A,B,C,D) hoặc Đúng/Sai • Khuyến nghị 15 - 30 câu
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between text-[11px] mt-2 text-slate-500">
+                                <span>Ví dụ: <code>Câu 1: ... A. ... Đáp án: A</code></span>
+                                <button onclick="window.app.downloadSampleDocx()" class="text-blue-600 hover:underline font-bold flex items-center gap-1">
+                                    <i class="fa-solid fa-download"></i> Tải file Word mẫu
+                                </button>
+                            </div>
+                            <div id="docx-status" class="hidden mt-2 text-xs p-2 rounded-lg bg-blue-100 text-blue-900 font-medium"></div>
+                        </div>
+
+                        <!-- Excel Roster Box -->
+                        <div class="p-4 rounded-2xl bg-emerald-50/50 border border-emerald-200">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-xs font-bold text-emerald-900 flex items-center gap-2">
+                                    <i class="fa-solid fa-file-excel text-emerald-600 text-lg"></i>
+                                    2. Danh Sách Lớp Excel (.xlsx / .csv)
+                                </span>
+                                <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">Chia 4, 6, 8 đội</span>
+                            </div>
+                            <div class="relative border-2 border-dashed border-emerald-300 hover:border-emerald-500 rounded-xl p-4 text-center bg-white cursor-pointer transition">
+                                <input type="file" id="excel-file-input" accept=".xlsx, .xls, .csv" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                                <i class="fa-solid fa-cloud-arrow-up text-emerald-500 text-2xl mb-1"></i>
+                                <div class="text-xs font-bold text-slate-800">Kéo thả file Excel hoặc <span class="text-emerald-600 underline">chọn từ máy tính</span></div>
+                                <div class="text-[10px] text-slate-500 mt-1">Cột: STT, Họ và tên, Lớp • Tự động chia đội và cấp PIN</div>
+                            </div>
+                            <div class="flex items-center justify-between text-[11px] mt-2 text-slate-500">
+                                <span>Mẫu: <code>STT | Họ và tên | Lớp</code></span>
+                                <button onclick="window.app.downloadSampleExcel()" class="text-emerald-600 hover:underline font-bold flex items-center gap-1">
+                                    <i class="fa-solid fa-download"></i> Tải file Excel mẫu
+                                </button>
+                            </div>
+                            <div id="excel-status" class="hidden mt-2 text-xs p-2 rounded-lg bg-emerald-100 text-emerald-900 font-medium"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LIVE TEAMS OVERVIEW (Bảng Đấu Các Đội Olympia) -->
+                <div class="bg-white border-2 border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
+                    <div class="flex flex-wrap items-center justify-between border-b border-slate-100 pb-3 gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-lg font-black">
+                                <i class="fa-solid fa-trophy"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-black text-slate-900">Bảng Thi Đấu Các Đội Olympia</h3>
+                                <p class="text-xs text-slate-500">Mã PIN kết nối độc lập, điểm số trực tiếp và danh sách thành viên</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="window.roomManager.openClassDivideModal()" class="px-3.5 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-xs border border-purple-200 flex items-center gap-1.5 transition">
+                                <i class="fa-solid fa-users-gear text-purple-600"></i>
+                                <span>Chia lại đội</span>
+                            </button>
+                            <button onclick="window.roomManager.openJudgeSpectatorMode()" class="px-3.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs border border-indigo-200 flex items-center gap-1.5 transition">
+                                <i class="fa-solid fa-users-viewfinder text-indigo-600"></i>
+                                <span>Màn hình các đội (BGK)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Teams List Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="dashboard-teams-grid">
+                        <div class="p-4 rounded-2xl border-2 border-purple-200 bg-purple-50/40 text-left space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2.5 py-0.5 rounded-full bg-purple-600 text-white font-black text-xs">Đội 1 (Tổ 1)</span>
+                                <span class="text-xs font-mono font-bold text-slate-500">PIN: 1024</span>
+                            </div>
+                            <div class="text-2xl font-black text-slate-900 font-mono">0 <span class="text-xs font-sans text-slate-400 font-bold">điểm</span></div>
+                            <div class="text-[11px] text-slate-500">5 học sinh • Sẵn sàng</div>
+                        </div>
+                        <div class="p-4 rounded-2xl border-2 border-amber-200 bg-amber-50/40 text-left space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2.5 py-0.5 rounded-full bg-amber-600 text-white font-black text-xs">Đội 2 (Tổ 2)</span>
+                                <span class="text-xs font-mono font-bold text-slate-500">PIN: 2048</span>
+                            </div>
+                            <div class="text-2xl font-black text-slate-900 font-mono">0 <span class="text-xs font-sans text-slate-400 font-bold">điểm</span></div>
+                            <div class="text-[11px] text-slate-500">5 học sinh • Sẵn sàng</div>
+                        </div>
+                        <div class="p-4 rounded-2xl border-2 border-emerald-200 bg-emerald-50/40 text-left space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white font-black text-xs">Đội 3 (Tổ 3)</span>
+                                <span class="text-xs font-mono font-bold text-slate-500">PIN: 3072</span>
+                            </div>
+                            <div class="text-2xl font-black text-slate-900 font-mono">0 <span class="text-xs font-sans text-slate-400 font-bold">điểm</span></div>
+                            <div class="text-[11px] text-slate-500">5 học sinh • Sẵn sàng</div>
+                        </div>
+                        <div class="p-4 rounded-2xl border-2 border-rose-200 bg-rose-50/40 text-left space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2.5 py-0.5 rounded-full bg-rose-600 text-white font-black text-xs">Đội 4 (Tổ 4)</span>
+                                <span class="text-xs font-mono font-bold text-slate-500">PIN: 4096</span>
+                            </div>
+                            <div class="text-2xl font-black text-slate-900 font-mono">0 <span class="text-xs font-sans text-slate-400 font-bold">điểm</span></div>
+                            <div class="text-[11px] text-slate-500">5 học sinh • Sẵn sàng</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Main dashboard content end -->
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-auto border-t border-slate-200 bg-white py-4 px-6 text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <div>© 2026 <strong>EDU GAME</strong> - Tương thích máy chiếu & TV thông minh</div>
+            <div class="flex items-center gap-3">
+                <span>Hỗ trợ file Word .docx & Excel .xlsx</span>
+                <span>•</span>
+                <span>Công thức toán KaTeX</span>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- ==================== IMMERSIVE FULLSCREEN GAME ARENA (CHIẾU TOÀN MÀN HÌNH) ==================== -->
+    <div id="game-arena" class="fixed inset-0 z-50 bg-[#f8fafc] hidden flex-col overflow-y-auto">
+        <!-- Top HUD Bar for Projector / TV -->
+        <header class="bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 md:px-8 py-3 flex items-center justify-between shadow-sm sticky top-0 z-30">
+            <div class="flex items-center gap-3">
+                <div id="arena-game-icon" class="w-10 h-10 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center text-lg font-black shadow-sm">
+                    <i class="fa-solid fa-gamepad"></i>
+                </div>
+                <div>
+                    <h2 id="arena-game-title" class="text-base sm:text-lg font-black text-slate-900 leading-tight font-heading">
+                        Tên Trò Chơi
+                    </h2>
+                    <span id="arena-game-subtitle" class="text-[11px] text-slate-500 font-bold uppercase tracking-wider">
+                        Chế độ toàn màn hình máy chiếu
+                    </span>
+                </div>
+            </div>
+
+            <!-- Arena Controls -->
+            <div class="flex items-center gap-2 md:gap-3">
+                <button onclick="window.roomManager.openJudgeSpectatorMode(null, window.olympiaGame ? window.olympiaGame.currentRound : 1)" class="px-3.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-black text-xs flex items-center gap-2 transition shadow-sm" title="Chiếu màn hình của các đội học sinh cho Ban Giám Khảo xem">
+                    <i class="fa-solid fa-users-viewfinder text-indigo-600"></i>
+                    <span class="hidden md:inline">Màn Hình Các Đội (Chiếu BGK)</span>
+                    <span class="md:hidden">Chiếu BGK</span>
+                </button>
+
+                <button onclick="window.app.quickPickStudent()" class="px-3.5 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold text-xs flex items-center gap-2 transition shadow-sm" title="Gọi ngẫu nhiên học sinh">
+                    <i class="fa-solid fa-shuffle"></i>
+                    <span class="hidden sm:inline">Gọi Học Sinh</span>
+                </button>
+
+                <button onclick="window.app.toggleFullscreen()" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center text-sm transition border border-slate-200 shadow-sm" title="Phóng to toàn màn hình máy chiếu (F11)">
+                    <i class="fa-solid fa-expand"></i>
+                </button>
+
+                <button onclick="window.app.toggleSound()" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center text-sm transition border border-slate-200 shadow-sm" title="Bật/Tắt âm thanh">
+                    <i id="arena-sound-icon" class="fa-solid fa-volume-high text-blue-600"></i>
+                </button>
+
+                <button onclick="window.app.exitGameArena()" class="px-4 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs flex items-center gap-2 transition shadow-sm">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Thoát Trò Chơi</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Arena Main Stage (100% viewport width) -->
+        <div id="game-stage" class="flex-1 w-full max-w-7xl 2xl:max-w-[1600px] mx-auto p-4 sm:p-6 lg:p-8 flex flex-col justify-center">
+            <!-- Game Canvas & UI rendered here -->
         </div>
-        <div class="flex items-center gap-2">
-          <span class="hidden md:inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-lg border ${Net.mode === 'firebase' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-800 border-amber-200'}"><i class="fa-solid ${Net.mode === 'firebase' ? 'fa-wifi' : 'fa-laptop'}"></i>${Net.mode === 'firebase' ? 'Online nhiều máy' : 'Chế độ 1 máy (nhiều tab)'}</span>
-          ${H.phase === 'setup' ? '' : `<button onclick="h_backSetup()" class="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-xs border border-purple-200 flex items-center gap-1.5 transition shadow-sm"><i class="fa-solid fa-users-gear text-purple-600"></i><span class="hidden sm:inline">Chia lại đội</span></button>`}
-          <button onclick="h_fullscreen()" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 hidden sm:flex items-center justify-center text-xs transition" title="Chiếu máy chiếu"><i class="fa-solid fa-expand"></i></button>
-          <a href="index.html" class="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs flex items-center gap-1.5 transition shadow-sm"><i class="fa-solid fa-arrow-left"></i><span class="hidden sm:inline">Thoát trò chơi</span></a>
+    </div>
+
+    <!-- GLOBAL MODAL (Used for Pin Room, Question Bank, Class Roster, Logo Picker, Admin Login, Guides) -->
+    <div id="global-modal" onclick="if(event.target === this) window.app.closeAllModals()" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[80] hidden overflow-y-auto p-3 sm:p-6 flex items-start sm:items-center justify-center">
+        <div class="bg-white border border-slate-200 rounded-3xl max-w-3xl w-full my-auto shadow-2xl relative animate-scale-up text-slate-900 max-h-[92vh] flex flex-col overflow-hidden" id="global-modal-body">
+            <!-- Dynamic modal content -->
         </div>
-      </header>
-      <main class="flex-1 px-4 sm:px-6 lg:px-8 py-5 w-full max-w-[1550px] mx-auto">${body}</main>
-      <footer class="mt-auto border-t border-slate-200 bg-white py-4 px-6 text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2">
-        <div>© 2026 <strong>EDU GAME</strong> - Tương thích máy chiếu & TV thông minh</div>
-        <div class="flex items-center gap-3"><span>Hỗ trợ file Word .docx & Excel .xlsx</span><span>•</span><span>Mã PIN riêng từng đội</span></div>
-      </footer>
     </div>
-  </div>`;
-  updateTimers();
-}
-function h_side() { UI.side = !UI.side; renderHost(); }
-function sidebarHTML() {
-  const ph = H.phase, g = H.g;
-  const link = (icon, color, label, fn, active, sub = '', dis = false) => `
-    <button ${dis ? 'disabled' : ''} onclick="${fn}" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs text-left transition ${active ? 'bg-purple-50 text-purple-800 font-black' : 'font-semibold text-slate-600 hover:bg-slate-50'} ${dis ? 'opacity-40 cursor-not-allowed' : ''}">
-      <div class="w-7 h-7 rounded-lg bg-${color}-100 text-${color}-600 flex items-center justify-center text-sm flex-shrink-0"><i class="fa-solid ${icon}"></i></div>
-      <div class="min-w-0"><div class="truncate">${label}</div>${sub ? `<div class="text-[10px] text-slate-400 font-medium truncate">${sub}</div>` : ''}</div></button>`;
-  const joined = H.teams.filter(t => t.dev).length;
-  const rounds = [1, 2, 3, 4].map(r => {
-    const done = ph === 'end' || (ph === 'game' && (r < g.round || (r === g.round && g.status === 'review')));
-    const cur = ph === 'game' && r === g.round && g.status !== 'review';
-    return `<div class="flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-xs ${cur ? 'bg-rose-50 border border-rose-200 font-black text-rose-700' : done ? 'font-bold text-emerald-700' : 'font-semibold text-slate-400'}">
-      <div class="w-6 h-6 rounded-lg grid place-items-center ${cur ? 'bg-rose-600 text-white' : done ? 'bg-emerald-100 text-emerald-600' : 'bg-slate-100'}"><i class="fa-solid ${done ? 'fa-check' : ROUND_ICONS[r]} text-[10px]"></i></div>
-      <span class="truncate">${r}. ${ROUND_NAMES[r]}</span>${cur ? '<span class="ml-auto badge-live">LIVE</span>' : ''}</div>`; }).join('');
-  return `
-  <aside class="w-60 xl:w-64 flex-shrink-0 bg-white border-r border-slate-200/90 flex flex-col h-screen top-0 z-40 shadow-sm transition-all duration-300 fixed lg:sticky ${UI.side ? '' : '-translate-x-full lg:hidden'}">
-    <div class="p-4 border-b border-slate-100 flex items-center justify-between">
-      <a href="index.html" class="flex items-center gap-3">
-        <div class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-purple-500 via-pink-500 to-amber-400 p-0.5 shadow-sm"><div class="w-full h-full bg-white rounded-[14px] flex items-center justify-center text-purple-600 text-xl"><i class="fa-solid fa-gamepad"></i></div></div>
-        <div><div class="text-lg font-black tracking-tight text-slate-900 leading-tight">EDU GAME</div><span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">HỌC TẬP & TRÒ CHƠI</span></div>
-      </a>
-      <button onclick="h_side()" class="lg:hidden text-slate-400 hover:text-slate-700 p-1"><i class="fa-solid fa-xmark text-lg"></i></button>
-    </div>
-    <div class="flex-1 overflow-y-auto px-3 py-3 space-y-5">
-      <div>
-        <div class="text-[10px] font-black uppercase text-slate-400 tracking-wider px-3 mb-1.5">Khám phá</div>
-        <div class="space-y-1">
-          ${link('fa-house', 'purple', 'Trang chủ', "location.href='index.html'", false)}
-          ${link('fa-users-gear', 'purple', 'Danh sách & Chia đội', ph === 'setup' ? '' : 'h_backSetup()', ph === 'setup', `${H.students.length} HS • ${H.teams.length} đội`)}
-          ${link('fa-door-open', 'emerald', 'Phòng chờ & Mã PIN', '', ph === 'lobby', ph === 'setup' ? 'Chưa mở phòng' : `${joined}/${H.teams.length} đội đã vào`, ph === 'setup')}
-          ${link('fa-users-viewfinder', 'indigo', 'Màn hình các đội (BGK)', ph === 'game' ? 'h_tab(0)' : '', ph === 'game' && UI.tab !== 'main', 'Xem y hệt máy từng đội', ph !== 'game')}
-          ${link('fa-trophy', 'amber', 'Bảng điểm', ph === 'game' ? "h_tab('main')" : '', ph === 'end' || (ph === 'game' && UI.tab === 'main'), H.teams.map(t => t.score).join(' • '), ph === 'setup' || ph === 'lobby')}
+
+    <!-- DEDICATED JUDGE SPECTATOR THEATER (MÀN HÌNH HỌC SINH CHIẾU CHO BAN GIÁM KHẢO) -->
+    <div id="judge-spectator-modal" onclick="if(event.target === this) window.roomManager.closeJudgeSpectatorMode()" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[90] hidden overflow-y-auto p-2 sm:p-4 md:p-6 flex items-center justify-center">
+        <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-7xl max-h-[96vh] shadow-2xl relative flex flex-col overflow-hidden text-slate-900 animate-scale-up" id="judge-spectator-body">
+            <!-- Dynamic content rendered by roomManager.openJudgeSpectatorMode() -->
         </div>
-      </div>
-      <div>
-        <div class="text-[10px] font-black uppercase text-slate-400 tracking-wider px-3 mb-1.5 flex items-center justify-between"><span>Đấu trường học tập</span><span class="text-[9px] bg-rose-50 text-rose-600 px-1.5 py-0.5 rounded font-bold">Trọng tâm</span></div>
-        <div class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold bg-rose-50/70 border border-rose-200 mb-2">
-          <div class="flex items-center gap-2.5 min-w-0"><div class="w-8 h-8 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-sm flex-shrink-0"><i class="fa-solid fa-mountain"></i></div>
-          <div class="min-w-0"><div class="font-black text-rose-700 leading-tight">Đường Lên Đỉnh Olympia</div><div class="text-[10px] text-slate-500 font-normal">4 Vòng thi đấu kịch tính</div></div></div>
-          <span class="badge-live ml-1">${ph === 'game' ? 'Đang thi' : 'Trực tiếp'}</span></div>
-        <div class="space-y-1">${rounds}</div>
-      </div>
     </div>
-    <div class="p-3 border-t border-slate-100 bg-slate-50/60 flex items-center justify-between">
-      <button onclick="h_resetAll()" class="flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-purple-600"><i class="fa-solid fa-rotate text-purple-500"></i><span>Làm mới</span></button>
-      <button onclick="h_fullscreen()" class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-purple-600 flex items-center justify-center text-xs shadow-sm" title="Toàn màn hình"><i class="fa-solid fa-expand"></i></button>
-    </div>
-  </aside>`;
-}
 
-function heroHTML(title, desc, pill) {
-  const rc = [['1. Khởi Động', 'fa-bolt', 'text-amber-300', `+${RULES.R1_POINT} Điểm / Câu • ${RULES.R1_TIME}s`, `${RULES.R1_COUNT} câu, đảo đề & đáp án từng đội.`],
-    ['2. Vượt Chướng Ngại Vật', 'fa-puzzle-piece', 'text-emerald-300', '4 Hàng Ngang + Đoán CNV', `Đoán CNV ${RULES.CNV_POINTS.join(' - ')}đ.`],
-    ['3. Tăng Tốc', 'fa-gauge-high', 'text-sky-300', RULES.R3_POINTS.join('đ - ') + 'đ', `4 câu ${RULES.R3_TIME}s, xếp hạng tốc độ.`],
-    ['4. Về Đích', 'fa-star', 'text-pink-300', 'Gói 60 - 80 - 100đ', `Ngôi sao hy vọng & chuông ${RULES.BUZZ_TIME} giây.`]];
-  return `<div class="relative overflow-hidden rounded-3xl hero-gradient p-6 sm:p-8 shadow-xl text-white mb-6"><div class="relative z-10 space-y-5">
-    <div class="flex flex-wrap items-center justify-between gap-3">
-      <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-bold border border-white/30"><span class="bg-white text-rose-700 px-2 py-0.5 rounded-full font-black text-[10px]">${pill}</span><span>Tối ưu cho Máy chiếu, Smart TV & Bảng tương tác</span></div>
-      <div class="flex items-center gap-2 text-xs"><span class="text-white/80">Lớp hiện tại:</span><span class="font-bold text-slate-900 bg-white/90 px-3 py-1 rounded-xl">${H.students.length} học sinh • ${H.teams.length} đội</span></div></div>
-    <div class="space-y-2"><h1 class="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight leading-tight drop-shadow-sm">${title}</h1><p class="text-white/95 text-sm leading-relaxed max-w-4xl font-medium">${desc}</p></div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">${rc.map(([n, ic, col, big, sm]) => `<div class="bg-white/15 backdrop-blur-md p-3.5 rounded-2xl border border-white/25 text-left">
-      <div class="flex items-center justify-between mb-1"><span class="text-xs font-black uppercase tracking-wider ${col}">${n}</span><i class="fa-solid ${ic} ${col} text-xs"></i></div>
-      <div class="text-sm font-black">${big}</div><div class="text-[11px] text-white/85 mt-0.5 leading-snug">${sm}</div></div>`).join('')}</div>
-  </div></div>`;
-}
-function setupHTML() {
-  const b = buildBank(H.bankText), saved = !H.students.length ? findSavedRoster() : null;
-  const step = (n, title, icon, html) => `<section class="card p-5 sm:p-6"><div class="flex items-center gap-3 mb-4"><div class="w-9 h-9 rounded-xl bg-violet-600 text-white grid place-items-center font-black">${n}</div><div class="font-black text-lg"><i class="fa-solid ${icon} text-violet-500 mr-1"></i> ${title}</div></div>${html}</section>`;
-  const roster = `
-    ${saved ? `<div class="mb-3 p-3 rounded-xl bg-emerald-50 border border-emerald-200 flex flex-wrap items-center justify-between gap-2 text-sm"><span class="font-bold text-emerald-800"><i class="fa-solid fa-circle-check"></i> Tìm thấy danh sách ${saved.names.length} học sinh đã nạp ở trang chủ (${esc(saved.names.slice(0, 3).join(', '))}…)</span><button class="btn btn-ok" onclick="h_useSaved()">Dùng danh sách này</button></div>` : ''}
-    <div class="grid md:grid-cols-2 gap-3">
-      <label class="relative border-2 border-dashed border-emerald-300 hover:border-emerald-500 rounded-xl p-5 text-center cursor-pointer bg-emerald-50/40">
-        <input type="file" accept=".xlsx,.xls,.csv" class="absolute inset-0 opacity-0 cursor-pointer" onchange="h_rosterFile(this.files[0])">
-        <i class="fa-solid fa-file-excel text-emerald-600 text-2xl"></i><div class="font-bold text-sm mt-1">Chọn file Excel danh sách lớp</div><div class="text-[11px] text-slate-500">Cột: STT | Họ và tên | Lớp</div></label>
-      <div><textarea id="paste-names" rows="3" class="w-full rounded-xl border border-slate-200 p-3 text-sm" placeholder="Hoặc dán danh sách tên, mỗi dòng 1 học sinh"></textarea><button class="btn btn-soft mt-1" onclick="h_rosterPaste()"><i class="fa-solid fa-paste"></i> Nạp từ danh sách dán</button></div>
-    </div>
-    <div class="mt-3 text-sm font-bold ${H.students.length ? 'text-emerald-700' : 'text-slate-400'}">${UI.msg || (H.students.length ? `Đã có ${H.students.length} học sinh` : 'Chưa có danh sách lớp')}</div>`;
-  const teams = `
-    <div class="flex flex-wrap gap-2 mb-4">
-      <button class="btn btn-dark" onclick="divide('random')" ${H.students.length ? '' : 'disabled'}><i class="fa-solid fa-shuffle"></i> Chia ngẫu nhiên</button>
-      <button class="btn btn-soft" onclick="divide('order')" ${H.students.length ? '' : 'disabled'}><i class="fa-solid fa-list-ol"></i> Chia xen kẽ theo STT</button>
-      <button class="btn btn-soft" onclick="divide('block')" ${H.students.length ? '' : 'disabled'}><i class="fa-solid fa-layer-group"></i> Chia theo khối liên tiếp (tổ)</button>
-      <span class="text-xs text-slate-500 self-center">Kéo thả tên để đổi đội • bấm <i class="fa-solid fa-arrow-right"></i> để chuyển sang đội kế</span>
-    </div>
-    <div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-3">${H.teams.map((t, i) => `
-      <div class="rounded-2xl border-2 p-3 min-h-[160px] bg-white" style="border-color:${t.color}33" ondragover="event.preventDefault();this.classList.add('drop-hot')" ondragleave="this.classList.remove('drop-hot')" ondrop="h_drop(event,${i})">
-        <div class="flex items-center gap-2 mb-2"><span class="w-3 h-3 rounded-full" style="background:${t.color}"></span>
-          <input class="flex-1 min-w-0 font-black text-sm bg-transparent border-b border-dashed border-slate-300 focus:outline-none focus:border-violet-500" value="${esc(t.name)}" onchange="h_teamName(${i},this.value)">
-          <span class="text-[11px] font-black text-slate-500">${t.members.length} HS</span></div>
-        <div class="flex flex-wrap gap-1.5">${t.members.map((m, k) => `<span class="chip" draggable="true" ondragstart="event.dataTransfer.setData('text/plain','{&quot;f&quot;:${i},&quot;i&quot;:${k}}')">${esc(m)}<i class="fa-solid fa-arrow-right text-slate-400 hover:text-violet-600 cursor-pointer" onclick="moveMember(${i},${k},${(i + 1) % H.teams.length})"></i></span>`).join('') || '<span class="text-xs text-slate-400">Chưa có thành viên</span>'}</div>
-      </div>`).join('')}</div>`;
-  const cnt = b.count;
-  const bank = `
-    <div class="flex flex-wrap items-center justify-between gap-2 mb-3"><div class="font-bold text-sm"><i class="fa-solid fa-file-lines text-blue-600"></i> ${esc(H.bankName)} <span class="text-slate-400">(${b.total} câu)</span></div>
-      <div class="flex flex-wrap gap-2">
-        <label class="btn btn-soft cursor-pointer"><i class="fa-solid fa-file-word text-blue-600"></i> Nạp file Word / .txt<input type="file" accept=".docx,.txt" class="hidden" onchange="h_bankFile(this.files[0])"></label>
-        <button class="btn btn-soft" onclick="h_sampleBank()"><i class="fa-solid fa-flask"></i> Dùng bộ mẫu KHTN 8</button>
-        <button class="btn btn-soft" onclick="h_downloadTemplate()"><i class="fa-solid fa-download"></i> Tải file mẫu</button></div></div>
-    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 text-center">${[['Khởi động', cnt.r1, RULES.R1_COUNT], ['Hàng ngang', cnt.r2, 4], ['Từ khóa CNV', cnt.cnv, 1], ['Tăng tốc', cnt.r3, 4], ['Về đích 20đ', cnt.v20, 0], ['Về đích 30đ', cnt.v30, 0], ['Về đích 40đ', cnt.v40, 0]].map(([n, c, need]) =>
-      `<div class="rounded-xl p-2 border ${need && c < need ? 'border-rose-200 bg-rose-50' : 'border-slate-200 bg-slate-50'}"><div class="text-[11px] font-bold text-slate-500">${n}</div><div class="text-xl font-black">${c}${need ? `<span class="text-xs text-slate-400">/${need}</span>` : ''}</div></div>`).join('')}</div>
-    ${b.warn.length ? `<div class="mt-3 text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3">${b.warn.map(esc).join('<br>')}</div>` : ''}
-    <details class="mt-3 text-xs text-slate-600"><summary class="cursor-pointer font-bold">Cấu trúc file câu hỏi</summary><pre class="mt-2 bg-slate-50 rounded-xl p-3 whitespace-pre-wrap">[KHỞI ĐỘNG]  (7 câu)
-Câu 1: Nội dung câu hỏi
-A. ...
-B. ...
-C. ...
-D. ...
-Đáp án: C
-[VƯỢT CHƯỚNG NGẠI VẬT]  (4 câu hàng ngang)
-[CNV]  (1 câu đoán từ khóa)
-[TĂNG TỐC]  (4 câu)
-[VỀ ĐÍCH 20] / [VỀ ĐÍCH 30] / [VỀ ĐÍCH 40]  (nên ≥ 12 câu)
-Câu không nằm dưới mục nào sẽ được tự chia vào vòng còn thiếu.</pre></details>`;
-  const ready = H.students.length && H.teams.every(t => t.members.length);
-  return heroHTML('ĐẤU TRƯỜNG TRI THỨC • ĐƯỜNG LÊN ĐỈNH OLYMPIA', 'Bước 1–3: nạp danh sách lớp, chia đội và chọn bộ câu hỏi. Sau đó hệ thống cấp <strong>mã PIN riêng cho từng đội</strong> – mỗi mã chỉ vào được 1 thiết bị.', 'THIẾT LẬP') + `<div class="space-y-5">
-    ${step(1, 'Danh sách lớp', 'fa-users', roster)}
-    ${step(2, `Chia ${H.teams.length} đội`, 'fa-users-gear', teams)}
-    ${step(3, 'Bộ câu hỏi 4 vòng thi', 'fa-list-check', bank)}
-    <div class="card p-5 flex flex-wrap items-center justify-between gap-3 bg-gradient-to-r from-rose-50 to-violet-50">
-      <div class="text-sm font-semibold text-slate-600">Bước tiếp theo: hệ thống cấp <b>mã PIN riêng cho từng đội</b>. Mỗi mã chỉ vào được <b>1 thiết bị</b>.</div>
-      <button class="btn btn-pri py-3.5 px-6 text-base" onclick="h_openLobby()" ${ready ? '' : 'disabled'}><i class="fa-solid fa-key"></i> Tạo mã PIN & mở phòng chờ</button></div></div>`;
-}
-
-function lobbyHTML() {
-  const link = location.origin + location.pathname + '?team', n = H.teams.filter(t => t.dev).length, all = n === H.teams.length;
-  return heroHTML('PHÒNG CHỜ • CÁC ĐỘI NHẬP MÃ PIN', `Đã có <strong>${n}/${H.teams.length} đội</strong> vào phòng. Khi tất cả các đội sẵn sàng, nút <strong>BẮT ĐẦU</strong> sẽ mở – cả 4 đội cùng vào Vòng 1: Khởi Động.`, 'PHÒNG CHỜ') + `<div class="space-y-5">
-    <div class="card p-5 flex flex-wrap items-center justify-between gap-4">
-      <div><div class="text-lg font-black"><i class="fa-solid fa-link text-purple-600"></i> Đường dẫn cho các đội</div>
-        <div class="text-sm text-slate-500 mt-1">Học sinh mở đường dẫn: <code class="bg-slate-100 px-2 py-0.5 rounded font-bold text-violet-700">${esc(link)}</code>
-        <button class="btn btn-soft !py-1 !px-2 ml-1" onclick="navigator.clipboard.writeText('${esc(link)}');this.innerHTML='<i class=\\'fa-solid fa-check\\'></i>'"><i class="fa-regular fa-copy"></i></button></div>
-        ${Net.mode === 'local' ? `<div class="text-xs font-bold text-amber-700 mt-2"><i class="fa-solid fa-circle-info"></i> Đang ở chế độ 1 máy: mở mỗi đội 1 tab trên cùng trình duyệt này. Muốn mỗi đội 1 máy riêng → điền FIREBASE_CONFIG trong file.</div>` : ''}</div>
-      <div class="flex gap-2"><button class="btn btn-soft" onclick="h_regenPins()"><i class="fa-solid fa-key"></i> Tạo PIN mới</button></div></div>
-    <div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">${H.teams.map((t, i) => `
-      <div class="card p-5 border-t-8" style="border-top-color:${t.color}">
-        <div class="flex items-center justify-between"><div class="font-black text-lg">${esc(t.name)}</div>
-          ${t.dev ? `<span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-black"><i class="fa-solid fa-circle-check"></i> Sẵn sàng</span>` : `<span class="px-2.5 py-1 rounded-full bg-amber-100 text-amber-700 text-xs font-black pulse-soft"><i class="fa-solid fa-hourglass-half"></i> Đang chờ</span>`}</div>
-        <div class="mt-4 rounded-2xl bg-slate-900 text-white text-center py-4 cursor-pointer select-all" onclick="UI.showPin[${i}]=!UI.showPin[${i}];renderHost()" title="Bấm để ẩn/hiện">
-          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Mã PIN</div>
-          <div class="text-4xl font-black tracking-[.25em] tabular-nums">${UI.showPin[i] ? t.pin : '••••••'}</div></div>
-        <div class="mt-3 text-xs text-slate-500 line-clamp-2"><b>${t.members.length} HS:</b> ${esc(t.members.join(', '))}</div>
-        <div class="mt-3 flex gap-2">${t.dev ? `<button class="btn btn-soft flex-1" onclick="h_unlock(${i})"><i class="fa-solid fa-lock-open"></i> Mở khóa</button>` : `<a class="btn btn-soft flex-1" href="${esc(link)}" target="_blank"><i class="fa-solid fa-up-right-from-square"></i> Mở tab đội</a>`}</div>
-      </div>`).join('')}</div>
-    <div class="card p-6 text-center">
-      <div class="font-bold text-slate-500 mb-3">${all ? 'Tất cả các đội đã sẵn sàng!' : `Đang chờ ${H.teams.length - n} đội vào phòng…`}</div>
-      <button class="btn btn-pri text-xl py-5 px-14" onclick="h_start()" ${all ? '' : 'disabled'}><i class="fa-solid fa-play"></i> BẮT ĐẦU</button>
-      <div class="text-xs text-slate-400 mt-3">Bấm vào ô PIN để hiện mã. Nên phát mã riêng cho từng đội, không chiếu cả 4 mã lên máy chiếu.</div></div></div>`;
-}
-
-function roundStepper(g) {
-  const colors = ['', '#fbbf24', '#34d399', '#38bdf8', '#f472b6'];
-  return `<div class="stage rounded-3xl p-5 sm:p-6 text-white shadow-xl flex flex-wrap items-center justify-between gap-4">
-    <div class="flex items-center gap-4 min-w-0">
-      <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/15 border border-white/25 backdrop-blur grid place-items-center text-2xl sm:text-3xl flex-shrink-0" style="color:${colors[g.round]}"><i class="fa-solid ${ROUND_ICONS[g.round]}"></i></div>
-      <div class="min-w-0"><div class="text-[11px] font-black uppercase tracking-[.2em] text-white/60">Đường lên đỉnh Olympia • Vòng ${g.round}/4</div>
-        <div class="text-2xl sm:text-4xl font-black tracking-tight leading-tight">${ROUND_NAMES[g.round].toUpperCase()}</div>
-        <div class="text-xs text-white/75 mt-1 max-w-2xl hidden md:block">${roundRule(g.round)}</div></div></div>
-    <div class="flex gap-1.5">${[1, 2, 3, 4].map(r => `<div title="${ROUND_NAMES[r]}" class="w-10 h-10 rounded-xl grid place-items-center text-sm font-black border ${r === g.round ? 'bg-white text-slate-900 border-white' : r < g.round ? 'bg-emerald-400/90 text-white border-emerald-300' : 'bg-white/10 text-white/50 border-white/20'}">${r < g.round ? '<i class="fa-solid fa-check"></i>' : r}</div>`).join('')}</div>
-  </div>`;
-}
-function roundStepperOld(g) {
-  return `<div class="grid grid-cols-4 gap-2">${[1, 2, 3, 4].map(r => `<div class="rounded-xl px-3 py-2 text-xs font-black flex items-center gap-2 ${r === g.round ? 'bg-slate-900 text-white' : r < g.round ? 'bg-emerald-50 text-emerald-700' : 'bg-white text-slate-400 border border-slate-200'}">
-    <i class="fa-solid ${r < g.round ? 'fa-circle-check' : ROUND_ICONS[r]}"></i><span class="truncate">${r}. ${ROUND_NAMES[r]}</span></div>`).join('')}</div>`;
-}
-function scoreCards(p, extra) {
-  const rk = rankOf(p.teams).map(x => x.i), medal = ['🥇', '🥈', '🥉', ''], anyScore = p.teams.some(t => t.score);
-  return `<div class="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">${p.teams.map((t, i) => { const r = rk.indexOf(i); return `
-    <button class="relative overflow-hidden rounded-3xl p-5 text-left border-2 bg-white hover:-translate-y-0.5 hover:shadow-xl transition shadow-sm" style="border-color:${t.color}55;background:linear-gradient(160deg,${t.color}1f 0%,#ffffff 55%)" onclick="h_tab(${i})" title="Xem màn hình ${esc(t.name)}">
-      <div class="absolute -right-6 -top-6 w-24 h-24 rounded-full opacity-10" style="background:${t.color}"></div>
-      <div class="flex items-center justify-between relative"><span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-white text-xs font-black shadow-sm" style="background:${t.color}">${esc(t.name)}</span>
-        <span class="text-[11px] font-black text-slate-500">${anyScore && medal[r] ? `<span class="text-lg">${medal[r]}</span>` : `Hạng ${r + 1}`}</span></div>
-      <div class="flex items-end gap-1 mt-3 relative"><div class="text-6xl xl:text-7xl font-black tabular-nums leading-none" style="color:${t.color}">${t.score}</div><div class="text-sm font-black text-slate-400 mb-1">điểm</div></div>
-      <div class="text-[11px] text-slate-500 font-semibold mt-1 truncate relative"><i class="fa-solid fa-users"></i> ${esc(t.members.join(', '))}</div>
-      ${extra ? extra(i) : ''}
-      ${t.dev ? '' : '<div class="mt-2 text-[11px] font-black text-rose-600"><i class="fa-solid fa-plug-circle-xmark"></i> Mất kết nối – cần nhập lại PIN</div>'}</button>`; }).join('')}</div>`;
-}
-const okBadge = a => !a ? '<span class="text-slate-400">Chưa trả lời</span>' : a.ok == null ? `<span class="text-violet-600"><i class="fa-solid fa-lock"></i> Đã chốt • ${fmtT(a.t)}</span>` : a.ok ? `<span class="text-emerald-600">✓ Đúng • ${fmtT(a.t)}</span>` : `<span class="text-rose-600">✗ Sai • ${fmtT(a.t)}</span>`;
-
-function hostControls(p) {
-  const g = H.g, v = p.view, B = (txt, fn, cls = 'btn-dark', dis = false) => `<button class="btn ${cls}" onclick="${fn}" ${dis ? 'disabled' : ''}>${txt}</button>`;
-  if (g.status === 'intro') return B(`<i class="fa-solid fa-play"></i> Bắt đầu vòng ${g.round}: ${ROUND_NAMES[g.round]}`, 'h_startRound()', 'btn-pri');
-  if (g.status === 'review') return B(g.round < 4 ? `Sang vòng ${g.round + 1}: ${ROUND_NAMES[g.round + 1]} <i class="fa-solid fa-arrow-right"></i>` : 'Xem kết quả chung cuộc', 'h_nextRound()', 'btn-pri');
-  if (g.round === 1) return `<div class="flex-1 min-w-[220px]">${timerHTML(v.deadline, RULES.R1_TIME)}</div>` + B('<i class="fa-solid fa-flag-checkered"></i> Kết thúc vòng sớm', "if(confirm('Kết thúc vòng 1 ngay?'))h_endRound()", 'btn-soft');
-  if (g.round === 2) {
-    if (g.status === 'final') return `<div class="flex-1 min-w-[220px]">${timerHTML(v.finalDl, RULES.CNV_FINAL_TIME)}</div>` + B('Kết thúc vòng 2', 'h_endRound()', 'btn-soft');
-    if (v.rs === 'play') return `<div class="flex-1 min-w-[220px]">${timerHTML(v.deadline, RULES.R2_ROW_TIME)}</div>` + B('<i class="fa-solid fa-eye"></i> Dừng & công bố đáp án', 'h_revealNow()', 'btn-soft');
-    const next = v.row + 1;
-    return (next < v.rows.length ? B(`<i class="fa-solid fa-unlock"></i> Mở hàng ngang ${next + 1}`, `h_openRow(${next})`, 'btn-pri')
-      : v.hasCnv && v.cnvTry.some(x => !x) ? B(`<i class="fa-solid fa-bell"></i> Cơ hội cuối đoán CNV (${RULES.CNV_FINAL_TIME}s)`, 'h_finalCnv()', 'btn-pri') : '') + B('Kết thúc vòng 2', 'h_endRound()', 'btn-soft');
-  }
-  if (g.round === 3) {
-    if (v.qs === 'play') return `<div class="flex-1 min-w-[220px]">${timerHTML(v.deadline, RULES.R3_TIME)}</div>` + B('<i class="fa-solid fa-eye"></i> Dừng & công bố', 'h_revealNow()', 'btn-soft');
-    return v.q + 1 < v.n ? B(`<i class="fa-solid fa-forward"></i> Câu Tăng tốc ${v.q + 2}/${v.n}`, `h_openR3(${v.q + 1})`, 'btn-pri') : B('Kết thúc vòng 3 <i class="fa-solid fa-arrow-right"></i>', 'h_endRound()', 'btn-pri');
-  }
-  if (g.round === 4) {
-    const act = p.teams[v.active];
-    if (v.st === 'pick') return `<span class="text-sm font-bold">${esc(act.name)} đang chọn gói trên máy đội • hoặc chọn hộ:</span>` + Object.keys(RULES.PACKAGES).map(k => B(`Gói ${k}`, `h_pickFor(${k})`, 'btn-soft')).join('');
-    if (v.st === 'ready') return B(`<i class="fa-solid fa-eye"></i> Hiện câu ${v.qi + 1} (${v.pts[v.qi]}đ)`, 'h_showQ()', 'btn-pri');
-    if (v.st === 'reveal') {
-      const last = v.qi >= v.pts.length - 1, lastTeam = v.turn >= v.order.length - 1;
-      return B(!last ? `Câu tiếp theo <i class="fa-solid fa-arrow-right"></i>` : !lastTeam ? `Sang lượt ${esc(p.teams[v.order[v.turn + 1]].name)} <i class="fa-solid fa-arrow-right"></i>` : '<i class="fa-solid fa-trophy"></i> Kết thúc & trao giải', 'h_nextQ()', 'btn-pri');
-    }
-    const lab = v.st === 'answer' ? `${esc(act.name)} đang trả lời` : v.st === 'buzz' ? 'Chờ các đội bấm chuông' : `${esc(p.teams[v.buzzer].name)} đang trả lời`;
-    return `<span class="text-sm font-black">${lab}</span><div class="flex-1 min-w-[220px]">${timerHTML(v.deadline, v.st === 'answer' ? v.total : v.st === 'buzz' ? RULES.BUZZ_TIME : RULES.STEAL_TIME)}</div>`;
-  }
-  return '';
-}
-function hostMain(p) {
-  const g = H.g, v = p.view;
-  if (g.status === 'intro') return `<div class="card p-8 text-center"><div class="text-sm font-black text-violet-600 uppercase">Vòng ${g.round}</div><div class="text-4xl font-black mt-1">${ROUND_NAMES[g.round]}</div><p class="mt-3 text-slate-600 max-w-2xl mx-auto">${roundRule(g.round)}</p></div>` + `<div class="mt-5">${scoreCards(p)}</div>`;
-  if (g.round === 1) {
-    return scoreCards(p, i => {
-      const pr = v.prog[i], n = v.sets[i].length, c = pr.filter(x => x.ok).length;
-      return `<div class="text-xs font-bold text-slate-500 mt-2">Đã làm ${pr.length}/${n} câu • Đúng ${c}</div><div class="h-2 mt-1 rounded-full bg-slate-100 overflow-hidden"><div class="h-full" style="width:${pr.length / n * 100}%;background:${p.teams[i].color}"></div></div>`;
-    }) + (g.status === 'review' ? `<div class="card p-4 mt-5 text-center font-black text-emerald-700">Kết thúc vòng Khởi động!</div>` : '');
-  }
-  if (g.round === 2) {
-    const cur = v.rs !== 'idle' && v.row >= 0 ? v.rows[v.row] : null;
-    return `<div class="grid lg:grid-cols-[1fr_320px] gap-5 mb-5">
-      <div class="card qcard p-6 big">${cur ? `<div class="text-xs font-black text-violet-600 uppercase mb-2">Hàng ngang ${v.row + 1}</div><div class="text-2xl sm:text-3xl font-black mb-5">${esc(cur.text)}</div>${optsHTML(cur.opts, { disabled: true, correct: v.rs === 'reveal' ? cur.ans : -1 })}`
-        : g.status === 'final' || g.status === 'review' ? `<div class="text-xs font-black text-amber-600 uppercase mb-2">Chướng ngại vật</div><div class="text-2xl font-black mb-5">${esc(v.cnv ? v.cnv.text : '')}</div>${v.cnv ? optsHTML(v.cnv.opts, { disabled: true, correct: v.cnv.ans }) : ''}` : '<div class="text-center text-slate-400 font-bold py-10">Bấm “Mở hàng ngang 1” để bắt đầu</div>'}</div>
-      <div class="card p-4 space-y-3 h-fit">${rowsBoard(v)}<div class="rounded-xl bg-slate-900 text-white p-3 text-center"><div class="text-[10px] uppercase font-bold text-slate-400">Chướng ngại vật</div><div class="text-lg font-black">${g.status === 'review' && v.cnv ? esc(v.cnv.opts[v.cnv.ans]) : '? ? ?'}</div><div class="text-[11px] text-amber-300 font-bold">${v.opened && g.status === 'play' ? `Đoán ngay: +${RULES.CNV_POINTS[Math.min(v.opened, 4) - 1]}đ` : ''}</div></div></div></div>` +
-      scoreCards(p, i => { const a = v.row >= 0 ? v.ans[v.row][i] : null, c = v.cnvTry[i];
-        return `<div class="text-xs font-bold mt-2">${v.row >= 0 ? `Hàng ${v.row + 1}: ${okBadge(a)}` : ''}</div>${c ? `<div class="text-xs font-black mt-1 ${c.ok ? 'text-emerald-600' : 'text-rose-600'}">CNV: ${c.ok ? 'đúng +' + c.pts : 'sai – mất quyền'}</div>` : ''}`; });
-  }
-  if (g.round === 3) {
-    return (v.q >= 0 ? `<div class="card qcard p-6 big mb-5"><div class="text-xs font-black text-sky-600 uppercase mb-2">Tăng tốc • Câu ${v.q + 1}/${v.n}</div><div class="text-2xl sm:text-3xl font-black mb-5">${esc(v.text)}</div>${optsHTML(v.opts, { disabled: true, correct: v.ans })}</div>` : '') +
-      scoreCards(p, i => `<div class="text-xs font-bold mt-2">${v.q >= 0 ? okBadge(v.answers[i]) : ''}${v.award[i] ? ` <span class="text-emerald-700 font-black">+${v.award[i]}đ</span>` : ''}</div>`);
-  }
-  if (g.round === 4) {
-    const act = p.teams[v.active];
-    let center;
-    if (v.st === 'pick') center = `<div class="text-center py-10"><div class="text-slate-500 font-bold">Lượt thi của</div><div class="text-4xl font-black mt-1" style="color:${act.color}">${esc(act.name)}</div><div class="mt-3 text-slate-500 font-bold pulse-soft">Đang chọn gói câu hỏi…</div></div>`;
-    else if (v.st === 'ready') center = `<div class="text-center py-10"><div class="text-3xl font-black">Câu ${v.qi + 1} – ${v.pts[v.qi]} điểm ${v.star === v.qi ? '⭐' : ''}</div><div class="text-slate-500 font-bold mt-2">Bấm “Hiện câu” khi sẵn sàng</div></div>`;
-    else center = `<div class="text-xs font-black text-pink-600 uppercase mb-2">Câu ${v.qi + 1} • ${v.pts[v.qi]} điểm${v.star === v.qi ? ' • ⭐ Ngôi sao hy vọng' : ''}</div><div class="text-2xl sm:text-4xl font-black mb-6 leading-snug">${esc(v.text)}</div>
-      ${optsHTML(v.opts, { disabled: true, correct: v.ans, chosen: v.main ? v.main.c : -1, wrong: v.st === 'reveal' && v.steal ? v.steal.c : (v.main && !v.main.ok ? v.main.c : -1) })}
-      ${v.st === 'buzz' ? `<div class="mt-5 text-center text-2xl font-black text-amber-600 pulse-soft"><i class="fa-solid fa-bell"></i> Các đội bấm chuông giành quyền!</div>` : ''}
-      ${v.st === 'steal' ? `<div class="mt-5 text-center text-2xl font-black" style="color:${p.teams[v.buzzer].color}"><i class="fa-solid fa-bell"></i> ${esc(p.teams[v.buzzer].name)} giành quyền trả lời!</div>` : ''}${r4Outcome(p)}`;
-    return r4Head(p) + `<div class="card qcard p-6 sm:p-8 big my-5">${center}</div>` + scoreCards(p, i => i === v.active ? '<div class="text-xs font-black mt-2 text-violet-600"><i class="fa-solid fa-microphone"></i> Đang thi</div>' : '');
-  }
-  return '';
-}
-function gameHTML() {
-  const p = buildPub(), g = H.g;
-  const tabs = `<div class="flex flex-wrap gap-2">
-    <button class="btn ${UI.tab === 'main' ? 'btn-dark' : 'btn-soft'}" onclick="h_tab('main')"><i class="fa-solid fa-display"></i> Màn hình chính</button>
-    ${p.teams.map((t, i) => `<button class="btn ${UI.tab === i ? '' : 'btn-soft'}" style="${UI.tab === i ? `background:${t.color};color:#fff` : ''}" onclick="h_tab(${i})"><i class="fa-solid fa-mobile-screen"></i> ${esc(t.name)} <span class="w-2 h-2 rounded-full ${t.dev ? 'bg-emerald-400' : 'bg-rose-400'}"></span></button>`).join('')}</div>`;
-  const content = UI.tab === 'main' ? hostMain(p)
-    : `<div class="rounded-3xl border-4 p-3 sm:p-5 bg-slate-50" style="border-color:${p.teams[UI.tab].color}">
-        <div class="flex flex-wrap items-center justify-between gap-2 mb-4"><div class="flex items-center gap-2">${badge(p.teams[UI.tab])}<span class="text-xs font-bold text-slate-500">Đang xem y hệt màn hình của đội (chỉ xem)</span></div>
-        <div class="flex items-center gap-2"><span class="text-2xl font-black tabular-nums">${p.teams[UI.tab].score}đ</span>${p.teams[UI.tab].dev ? `<button class="btn btn-soft !py-1" onclick="h_unlock(${UI.tab})" title="Cho đội nhập lại PIN trên máy khác"><i class="fa-solid fa-lock-open"></i></button>` : ''}</div></div>
-        ${teamScreen(p, UI.tab, { ro: true })}</div>`;
-  return `<div class="space-y-4">${roundStepper(g)}
-    <div class="card p-3 space-y-3"><div class="flex flex-wrap items-center justify-between gap-3">${tabs}<span class="text-[11px] font-bold text-slate-400 hidden lg:inline"><i class="fa-solid fa-circle-info"></i> Bấm thẻ đội để xem màn hình phụ</span></div>
-      <div class="rounded-2xl bg-slate-50 border border-slate-200 p-3 flex flex-wrap items-center gap-3">${hostControls(p)}</div></div>
-    ${content}</div>`;
-}
-function endHTML() {
-  const p = buildPub();
-  if (!UI.confetti && window.confetti) { UI.confetti = true; setTimeout(() => { confetti({ particleCount: 180, spread: 100, origin: { y: .6 } }); }, 200); }
-  return `<div class="max-w-3xl mx-auto space-y-4">${finalBoard(p)}
-    <div class="flex flex-wrap justify-center gap-3"><button class="btn btn-pri" onclick="h_replay()"><i class="fa-solid fa-rotate-right"></i> Chơi lại (giữ đội & mã PIN)</button><button class="btn btn-soft" onclick="h_backSetup()"><i class="fa-solid fa-users-gear"></i> Chia đội mới</button></div></div>`;
-}
-
-/* =====================================================================
-   PHẦN MÁY CỦA ĐỘI (?team)
-   ===================================================================== */
-const T = { dev: null, room: null, pin: null, jid: null, p: null, t: -1, err: '', wasIn: false, pend: null, cnvOpen: false, pick: { pkg: 0, star: -1 }, listenRoom: null, joinTimer: null, lastKey: '' };
-function teamInit() {
-  T.dev = sessionStorage.getItem('olp_dev'); if (!T.dev) { T.dev = 'd' + rid() + rid(); sessionStorage.setItem('olp_dev', T.dev); }
-  const pin = sessionStorage.getItem('olp_pin');
-  renderTeam(); if (pin) teamJoin(pin);
-}
-async function teamJoin(pin) {
-  pin = String(pin || '').replace(/\D/g, '');
-  if (pin.length !== 6) { T.err = 'Mã PIN gồm 6 chữ số.'; return renderTeam(); }
-  T.err = ''; T.pin = pin; T.connecting = true; renderTeam();
-  let room = null; try { room = await Net.resolvePin(pin); } catch (e) { }
-  if (!room) { T.connecting = false; T.err = Net.mode === 'local' ? 'Không tìm thấy phòng thi. Giáo viên cần mở phòng chờ trên cùng trình duyệt này.' : 'Mã PIN không đúng hoặc phòng chưa mở.'; sessionStorage.removeItem('olp_pin'); return renderTeam(); }
-  T.room = room; sessionStorage.setItem('olp_pin', pin);
-  if (T.listenRoom !== room) { T.listenRoom = room; Net.listenPub(room, teamOnPub); }
-  T.jid = rid(); Net.send(room, { type: 'join', pin, dev: T.dev, jid: T.jid });
-  clearTimeout(T.joinTimer);
-  T.joinTimer = setTimeout(() => { if (T.t < 0 && T.connecting) { T.connecting = false; T.room = null; T.err = 'Máy giáo viên chưa phản hồi. Kiểm tra giáo viên đã mở phòng chờ chưa rồi thử lại.'; renderTeam(); } }, 8000);
-}
-function teamLeave(msg) { T.room = null; T.t = -1; T.wasIn = false; T.connecting = false; T.err = msg; sessionStorage.removeItem('olp_pin'); renderTeam(); }
-function teamOnPub(p) {
-  if (!T.room || p.roomId !== T.room) return;
-  T.p = p;
-  const t = (p.teams || []).findIndex(x => x.dev === T.dev);
-  if (t < 0) {
-    const rj = p.rejects && p.rejects[T.dev];
-    if (p.phase === 'closed') return teamLeave(T.wasIn ? 'Giáo viên đã đóng phòng thi.' : 'Phòng thi đã đóng.');
-    if (rj && rj.jid === T.jid) return teamLeave(rj.msg);
-    if (T.wasIn) return teamLeave('Giáo viên đã mở khóa đội của bạn. Hãy nhập lại mã PIN nếu cần.');
-    return renderTeam();
-  }
-  T.t = t; T.wasIn = true; T.connecting = false; clearTimeout(T.joinTimer);
-  // xóa trạng thái tạm khi chuyển bước
-  const key = [p.phase, p.round, p.status, p.view && (p.view.row ?? p.view.q ?? (p.view.turn + '-' + p.view.st + '-' + p.view.qi))].join('|');
-  if (key !== T.lastKey) { T.lastKey = key; T.cnvOpen = false; if (!(p.round === 4 && p.view && p.view.st === 'pick')) T.pick = { pkg: 0, star: -1 }; }
-  T.pend = null; renderTeam();
-}
-function tsend(a) { if (T.t < 0 || T.pend) return; a.team = T.t; a.dev = T.dev; T.pend = a; Net.send(T.room, a); renderTeam(); setTimeout(() => { if (T.pend === a) { T.pend = null; renderTeam(); } }, 4000); }
-const TACT = {
-  r1: d => tsend({ type: 'r1', idx: +d.i, c: +d.c }),
-  r2: d => tsend({ type: 'r2', row: +d.row, c: +d.c }),
-  cnvOpen: () => { T.cnvOpen = true; renderTeam(); },
-  cnvClose: () => { T.cnvOpen = false; renderTeam(); },
-  cnv: d => tsend({ type: 'cnv', c: +d.c }),
-  r3: d => tsend({ type: 'r3', q: +d.q, c: +d.c }),
-  pkg: d => { T.pick = { pkg: +d.pkg, star: -1 }; renderTeam(); },
-  star: d => { T.pick.star = +d.s; renderTeam(); },
-  pickGo: () => T.pick.pkg && tsend({ type: 'r4pick', pkg: T.pick.pkg, star: T.pick.star }),
-  r4: d => tsend({ type: 'r4ans', c: +d.c }),
-  buzz: () => tsend({ type: 'buzz' }),
-  steal: d => tsend({ type: 'r4steal', c: +d.c })
-};
-function renderTeam() {
-  RR = 0;
-  const root = $('#app');
-  if (T.t < 0 || !T.p) {
-    root.innerHTML = `<div class="min-h-screen grid place-items-center p-4 bg-gradient-to-br from-rose-50 via-violet-50 to-amber-50">
-      <div class="card p-7 sm:p-9 w-full max-w-md text-center pop">
-        <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-rose-500 via-violet-600 to-amber-400 grid place-items-center text-white text-2xl"><i class="fa-solid fa-mountain"></i></div>
-        <div class="text-2xl font-black mt-4">Đường Lên Đỉnh Olympia</div><div class="text-sm text-slate-500 font-semibold">Nhập mã PIN của đội bạn</div>
-        ${T.connecting ? `<div class="mt-8 text-violet-600 font-black"><i class="fa-solid fa-spinner fa-spin"></i> Đang xác nhận mã PIN…</div>` : `
-        <form onsubmit="event.preventDefault();teamJoin(this.pin.value)" class="mt-6 space-y-3">
-          <input name="pin" inputmode="numeric" autocomplete="off" maxlength="6" value="${esc(T.pin || '')}" placeholder="••••••" class="w-full text-center text-4xl font-black tracking-[.3em] rounded-2xl border-2 border-slate-200 focus:border-violet-500 focus:outline-none py-4 tabular-nums" autofocus>
-          ${T.err ? `<div class="text-sm font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3">${esc(T.err)}</div>` : ''}
-          <button class="btn btn-pri w-full py-4 text-base"><i class="fa-solid fa-right-to-bracket"></i> Vào phòng thi</button></form>`}
-      </div></div>`;
-    return;
-  }
-  const p = T.p, me = p.teams[T.t];
-  root.innerHTML = `
-    <header class="sticky top-0 z-10 text-white px-4 pt-3 pb-4 shadow-lg rounded-b-3xl" style="background:radial-gradient(circle at 90% -40%,rgba(255,255,255,.35),transparent 50%),linear-gradient(135deg,${me.color},#1e1b4b 140%)">
-      <div class="max-w-4xl mx-auto flex items-center justify-between gap-3">
-        <div class="flex items-center gap-3 min-w-0"><div class="w-11 h-11 rounded-2xl bg-white/20 border border-white/30 grid place-items-center text-lg flex-shrink-0"><i class="fa-solid ${p.phase === 'game' ? ROUND_ICONS[p.round] : p.phase === 'end' ? 'fa-trophy' : 'fa-mountain'}"></i></div>
-          <div class="min-w-0"><div class="font-black text-lg leading-tight truncate">${esc(me.name)}</div>
-          <div class="text-[11px] font-bold opacity-85 truncate">${p.phase === 'game' ? `Vòng ${p.round}: ${ROUND_NAMES[p.round]}` : p.phase === 'end' ? 'Kết thúc' : 'Phòng chờ'}</div></div></div>
-        <div class="text-right bg-white/15 border border-white/25 rounded-2xl px-3 py-1.5"><div class="text-[9px] font-black opacity-80 uppercase tracking-wider">Điểm</div><div class="text-2xl font-black tabular-nums leading-none">${me.score}</div></div></div>
-      <div class="max-w-4xl mx-auto text-[11px] font-semibold opacity-80 mt-2 truncate"><i class="fa-solid fa-users"></i> ${esc(me.members.join(', '))}</div>
-    </header>
-    <main class="max-w-4xl mx-auto p-3 sm:p-6 pb-10">${teamScreen(p, T.t, { ro: false, pend: T.pend, cnvOpen: T.cnvOpen, pick: T.pick })}</main>`;
-  updateTimers();
-}
-
-/* ============================ KHỞI CHẠY ============================ */
-const IS_TEAM = new URLSearchParams(location.search).has('team') || location.hash === '#team';
-document.addEventListener('click', e => {
-  const b = e.target.closest('[data-a]'); if (!b || b.disabled || !IS_TEAM) return;
-  const f = TACT[b.dataset.a]; if (f) f(b.dataset);
-});
-Net.init();
-setInterval(updateTimers, 200);
-IS_TEAM ? teamInit() : hostInit();
-</script>
+    <!-- Core App Scripts (Exclusively Olympia) -->
+    <script src="js/audio.js"></script>
+    <script src="js/docx-parser.js"></script>
+    <script src="js/excel-parser.js"></script>
+    <script src="js/room-manager.js"></script>
+    <script src="js/games/olympia.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
