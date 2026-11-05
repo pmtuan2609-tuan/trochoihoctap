@@ -49,23 +49,6 @@
 </head>
 <body class="w-full min-h-screen flex flex-col lg:flex-row bg-[#f8fafc] text-slate-800 antialiased selection:bg-purple-200 selection:text-purple-900 overflow-x-hidden">
 
-    <!-- ==================== SPLASH SCREEN / PRELOADER (Instant Dismiss & Non-blocking) ==================== -->
-    <div id="page-preloader" class="fixed inset-0 z-50 bg-white/95 backdrop-blur-md flex flex-col items-center justify-center transition-all duration-300 ease-out pointer-events-none opacity-0 hidden">
-        <div class="flex flex-col items-center text-center p-6 max-w-sm">
-            <div class="text-xs font-black tracking-widest uppercase text-purple-600 mb-1">EDU GAME</div>
-            <p class="text-sm text-slate-500 font-semibold tracking-wide">Đang khởi động...</p>
-        </div>
-    </div>
-    <script>
-        (function() {
-            var pl = document.getElementById('page-preloader');
-            if (pl) {
-                pl.classList.add('opacity-0', 'pointer-events-none');
-                setTimeout(function() { if (pl && pl.parentNode) pl.parentNode.removeChild(pl); }, 200);
-            }
-        })();
-    </script>
-
     <!-- ==================== LEFT SIDEBAR (GIAO DIỆN CỘT DỌC) ==================== -->
     <aside id="sidebar" class="w-60 xl:w-64 flex-shrink-0 bg-white border-r border-slate-200/90 flex flex-col justify-between h-screen sticky top-0 z-40 transition-all duration-300 shadow-sm -translate-x-full lg:translate-x-0 fixed lg:static">
         
@@ -625,14 +608,14 @@
     </div>
 
     <!-- GLOBAL MODAL (Used for Pin Room, Question Bank, Class Roster, Logo Picker, Admin Login, Guides) -->
-    <div id="global-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[80] hidden overflow-y-auto p-3 sm:p-6 flex items-start sm:items-center justify-center">
+    <div id="global-modal" onclick="if(event.target === this) window.app.closeAllModals()" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[80] hidden overflow-y-auto p-3 sm:p-6 flex items-start sm:items-center justify-center">
         <div class="bg-white border border-slate-200 rounded-3xl max-w-3xl w-full my-auto shadow-2xl relative animate-scale-up text-slate-900 max-h-[92vh] flex flex-col overflow-hidden" id="global-modal-body">
             <!-- Dynamic modal content -->
         </div>
     </div>
 
     <!-- DEDICATED JUDGE SPECTATOR THEATER (MÀN HÌNH HỌC SINH CHIẾU CHO BAN GIÁM KHẢO) -->
-    <div id="judge-spectator-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[90] hidden overflow-y-auto p-2 sm:p-4 md:p-6 flex items-center justify-center">
+    <div id="judge-spectator-modal" onclick="if(event.target === this) window.roomManager.closeJudgeSpectatorMode()" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[90] hidden overflow-y-auto p-2 sm:p-4 md:p-6 flex items-center justify-center">
         <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-7xl max-h-[96vh] shadow-2xl relative flex flex-col overflow-hidden text-slate-900 animate-scale-up" id="judge-spectator-body">
             <!-- Dynamic content rendered by roomManager.openJudgeSpectatorMode() -->
         </div>
