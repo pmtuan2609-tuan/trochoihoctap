@@ -1,4 +1,4 @@
-/* Styles for Sân Chơi Tri Thức - Sidebar & Modern Classroom UI */
+/* Styles for EDU GAME - Sidebar & Modern Classroom UI */
 @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Be+Vietnam+Pro:ital,wght@0,400;0,500;0,600;0,700;0,900;1,400&family=Montserrat:wght@700;800;900&display=swap');
 
 :root {
@@ -122,4 +122,21 @@ h1, h2, h3, .font-heading {
 .animate-indeterminate {
     width: 60%;
     animation: indeterminate 1.4s infinite ease-in-out;
+}
+
+/* Bouncing / Jumping Dots Animation */
+@keyframes dotJump {
+    0%, 100% {
+        transform: translateY(0);
+        opacity: 0.35;
+    }
+    40% {
+        transform: translateY(-10px);
+        opacity: 1;
+        color: #a855f7;
+    }
+}
+.dot-jump {
+    display: inline-block;
+    animation: dotJump 1.2s infinite ease-in-out;
 }

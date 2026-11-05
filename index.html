@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sân Chơi Tri Thức - Học Mà Chơi, Chơi Mà Học</title>
-    <meta name="description" content="Sân Chơi Tri Thức - Nền tảng trò chơi học tập tương tác cho giáo viên: Olympia, Ai là triệu phú, Đào vàng, Vòng quay may mắn">
+    <title>EDU GAME - Học Tập & Trò Chơi</title>
+    <meta name="description" content="EDU GAME - Nền tảng trò chơi học tập tương tác cho giáo viên: Olympia, Ai là triệu phú, Đào vàng, Vòng quay may mắn">
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -53,7 +53,7 @@
     <div id="page-preloader" class="fixed inset-0 z-50 bg-white/95 backdrop-blur-md flex flex-col items-center justify-center transition-all duration-500 ease-out">
         <div class="flex flex-col items-center text-center p-6 max-w-sm">
             <!-- Animated Glowing Logo -->
-            <div class="relative w-24 h-24 mb-5">
+            <div class="relative w-24 h-24 mb-4">
                 <div class="absolute inset-0 rounded-3xl bg-gradient-to-tr from-purple-500 via-pink-500 to-amber-400 blur-xl opacity-60 animate-pulse"></div>
                 <div class="relative w-full h-full rounded-3xl bg-gradient-to-tr from-purple-600 via-pink-500 to-amber-400 p-1 shadow-xl animate-bounce">
                     <div class="w-full h-full bg-white rounded-[22px] flex items-center justify-center text-purple-600 text-4xl font-black shadow-inner">
@@ -62,13 +62,19 @@
                 </div>
             </div>
 
-            <!-- "Đang tải" Heading -->
-            <div class="flex items-center gap-2 mb-1.5">
-                <span class="text-2xl font-black text-slate-900 tracking-tight font-heading">Đang tải</span>
-                <span class="flex gap-1 items-center mt-1">
-                    <span class="w-2 h-2 rounded-full bg-purple-600 animate-ping"></span>
-                    <span class="w-2 h-2 rounded-full bg-pink-500 animate-ping" style="animation-delay: 0.2s"></span>
-                    <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping" style="animation-delay: 0.4s"></span>
+            <!-- Brand Title in Preloader -->
+            <div class="text-xs font-black tracking-widest uppercase text-purple-600 mb-1">
+                EDU GAME
+            </div>
+
+            <!-- "Đang tải" Heading with 4 jumping bouncing dots -->
+            <div class="flex items-baseline justify-center gap-0.5 mb-1.5">
+                <span class="text-3xl font-black text-slate-900 tracking-tight font-heading">Đang tải</span>
+                <span class="inline-flex items-baseline text-purple-600 font-black text-4xl leading-none select-none ml-1">
+                    <span class="dot-jump" style="animation-delay: 0s;">.</span>
+                    <span class="dot-jump" style="animation-delay: 0.18s;">.</span>
+                    <span class="dot-jump" style="animation-delay: 0.36s;">.</span>
+                    <span class="dot-jump" style="animation-delay: 0.54s;">.</span>
                 </span>
             </div>
 
@@ -89,16 +95,16 @@
             <!-- Brand Logo Top Header -->
             <div class="p-4 border-b border-slate-100 flex items-center justify-between">
                 <div class="flex items-center gap-3 cursor-pointer" onclick="window.app.showGameSelection()">
-                    <div id="app-logo-badge" class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-purple-500 via-pink-500 to-amber-400 p-0.5 shadow-sm">
-                        <div class="w-full h-full bg-white rounded-[14px] flex items-center justify-center text-purple-600 text-lg font-black overflow-hidden">
+                    <div id="app-logo-badge" class="w-11 h-11 rounded-2xl bg-gradient-to-tr from-purple-500 via-pink-500 to-amber-400 p-0.5 shadow-sm">
+                        <div class="w-full h-full bg-white rounded-[14px] flex items-center justify-center text-purple-600 text-xl font-black overflow-hidden">
                             <i class="fa-solid fa-gamepad"></i>
                         </div>
                     </div>
                     <div>
-                        <h2 class="text-base font-black tracking-tight text-slate-900 leading-tight font-heading">
-                            Sân Chơi Tri Thức
+                        <h2 class="text-lg font-black tracking-tight text-slate-900 leading-tight font-heading">
+                            EDU GAME
                         </h2>
-                        <span class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Học tập & Trò chơi</span>
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">HỌC TẬP & TRÒ CHƠI</span>
                     </div>
                 </div>
                 <!-- Mobile Close Button -->
@@ -276,7 +282,7 @@
                 </button>
                 <div class="flex items-center gap-2 text-xs font-semibold text-slate-500">
                     <span class="text-slate-900 font-bold flex items-center gap-1.5 cursor-pointer" onclick="window.app.showGameSelection()">
-                        <i class="fa-solid fa-gamepad text-purple-600"></i> Sân Chơi Tri Thức
+                        <i class="fa-solid fa-gamepad text-purple-600"></i> EDU GAME
                     </span>
                     <span>/</span>
                     <span class="text-slate-400" id="top-breadcrumb">Trang chủ</span>
@@ -348,7 +354,7 @@
 
                             <!-- Subtitle -->
                             <p class="text-white/90 text-sm md:text-base leading-relaxed max-w-xl font-medium">
-                                Sân Chơi Tri Thức biến bài ôn tập thành những trận thi đấu sôi động: <strong>Ai là triệu phú, Đào vàng, Olympia, Kéo co, Đua xe...</strong> Câu hỏi trắc nghiệm, đúng/sai, phân dạng Dễ/Khó — giáo viên soạn một lần, chơi được mọi game.
+                                EDU GAME biến bài ôn tập thành những trận thi đấu sôi động: <strong>Ai là triệu phú, Đào vàng, Olympia, Kéo co, Đua xe...</strong> Câu hỏi trắc nghiệm, đúng/sai, phân dạng Dễ/Khó — giáo viên soạn một lần, chơi được mọi game.
                             </p>
 
                             <!-- Hero Action Buttons -->
@@ -633,7 +639,7 @@
 
         <!-- Footer -->
         <footer class="mt-auto border-t border-slate-200 bg-white py-4 px-6 text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2">
-            <div>© 2026 <strong>Sân Chơi Tri Thức</strong> - Tương thích máy chiếu & TV thông minh</div>
+            <div>© 2026 <strong>EDU GAME</strong> - Tương thích máy chiếu & TV thông minh</div>
             <div class="flex items-center gap-3">
                 <span>Hỗ trợ file Word .docx & Excel .xlsx</span>
                 <span>•</span>
