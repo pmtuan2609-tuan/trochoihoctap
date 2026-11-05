@@ -1066,7 +1066,7 @@ function renderHost() {
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <span class="hidden md:inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-1 rounded-lg border ${Net.mode !== 'local' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-800 border-amber-200'}"><i class="fa-solid ${Net.mode !== 'local' ? 'fa-wifi' : 'fa-laptop'}"></i>${Net.mode === 'local' ? 'Chế độ 1 máy (nhiều tab)' : 'Online nhiều máy'}</span>
+          <!-- (tạm ẩn nhãn chế độ kết nối) --><button onclick="h_help('start')" class="px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs border border-amber-200 flex items-center gap-1.5 transition shadow-sm"><i class="fa-solid fa-book-open text-amber-600"></i><span class="hidden sm:inline">Hướng dẫn sử dụng</span></button>
           ${H.phase === 'setup' ? '' : `<button onclick="h_backSetup()" class="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-xs border border-purple-200 flex items-center gap-1.5 transition shadow-sm"><i class="fa-solid fa-users-gear text-purple-600"></i><span class="hidden sm:inline">Chia lại đội</span></button>`}
           <button onclick="h_fullscreen()" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 hidden sm:flex items-center justify-center text-xs transition" title="Chiếu máy chiếu"><i class="fa-solid fa-expand"></i></button>
           <span class="hidden lg:inline-flex items-center gap-1.5 text-[11px] font-black px-2.5 py-1 rounded-lg bg-slate-900 text-white"><i class="fa-solid fa-user-shield text-amber-300"></i>${esc(authUser())}</span>
@@ -1075,6 +1075,7 @@ function renderHost() {
       </header>
       <main class="flex-1 px-4 sm:px-6 lg:px-8 py-5 w-full max-w-[1550px] mx-auto">${body}</main>
       ${UI.preview ? previewHTML() : ''}
+      ${UI.help ? helpHTML() : ''}
       <footer class="mt-auto border-t border-slate-200 bg-white py-4 px-6 text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2">
         <div>© 2026 <strong>EDU GAME</strong> - Tương thích máy chiếu & TV thông minh</div>
         <div class="flex items-center gap-3"><span>Hỗ trợ file Word .docx & Excel .xlsx</span><span>•</span><span>Mã PIN riêng từng đội</span></div>
@@ -1114,6 +1115,7 @@ function sidebarHTML() {
           ${link('fa-users-gear', 'purple', 'Danh sách & Chia đội', ph === 'setup' ? '' : 'h_backSetup()', ph === 'setup', `${H.students.length} HS • ${H.teams.length} đội`)}
           ${link('fa-door-open', 'emerald', 'Phòng chờ & Mã PIN', '', ph === 'lobby', ph === 'setup' ? 'Chưa mở phòng' : `${joined}/${H.teams.length} đội đã vào`, ph === 'setup')}
           ${link('fa-users-viewfinder', 'indigo', 'Màn hình các đội (BGK)', ph === 'game' ? 'h_tab(0)' : '', ph === 'game' && UI.tab !== 'main', 'Xem y hệt máy từng đội', ph !== 'game')}
+          ${link('fa-book-open', 'amber', 'Hướng dẫn sử dụng', "h_help('start')", !!UI.help, 'Word, Excel, luật thi, tùy chỉnh')}
           ${link('fa-eye', 'pink', 'Xem trước giao diện', "h_preview('lobby')", !!UI.preview, 'Màn hình đội & GV từng vòng')}
           ${link('fa-trophy', 'amber', 'Bảng điểm', ph === 'game' ? "h_tab('main')" : '', ph === 'end' || (ph === 'game' && UI.tab === 'main'), H.teams.map(t => t.score).join(' • '), ph === 'setup' || ph === 'lobby')}
         </div>
@@ -1159,7 +1161,9 @@ function setupHTML() {
       <label class="relative border-2 border-dashed border-emerald-300 hover:border-emerald-500 rounded-xl p-5 text-center cursor-pointer bg-emerald-50/40">
         <input type="file" accept=".xlsx,.xls,.csv" class="absolute inset-0 opacity-0 cursor-pointer" onchange="h_rosterFile(this.files[0])">
         <i class="fa-solid fa-file-excel text-emerald-600 text-2xl"></i><div class="font-bold text-sm mt-1">Chọn file Excel danh sách lớp</div><div class="text-[11px] text-slate-500">Cột: STT | Họ và tên | Lớp</div></label>
-      <div><textarea id="paste-names" rows="3" class="w-full rounded-xl border border-slate-200 p-3 text-sm" placeholder="Hoặc dán danh sách tên, mỗi dòng 1 học sinh"></textarea><button class="btn btn-soft mt-1" onclick="h_rosterPaste()"><i class="fa-solid fa-paste"></i> Nạp từ danh sách dán</button></div>
+      <div><textarea id="paste-names" rows="3" class="w-full rounded-xl border border-slate-200 p-3 text-sm" placeholder="Hoặc dán danh sách tên, mỗi dòng 1 học sinh"></textarea><div class="flex flex-wrap gap-2 mt-1"><button class="btn btn-soft" onclick="h_rosterPaste()"><i class="fa-solid fa-paste"></i> Nạp từ danh sách dán</button>
+        <button class="btn btn-soft" onclick="h_sampleExcel()"><i class="fa-solid fa-file-excel text-emerald-600"></i> Tải Excel mẫu</button>
+        <button class="btn btn-soft" onclick="h_help('excel')"><i class="fa-solid fa-circle-question text-amber-600"></i> Cấu trúc Excel</button></div></div>
     </div>
     <div class="mt-3 text-sm font-bold ${H.students.length ? 'text-emerald-700' : 'text-slate-400'}">${UI.msg || (H.students.length ? `Đã có ${H.students.length} học sinh` : 'Chưa có danh sách lớp')}</div>`;
   const teams = `
@@ -1182,7 +1186,8 @@ function setupHTML() {
       <div class="flex flex-wrap gap-2">
         <label class="btn btn-soft cursor-pointer"><i class="fa-solid fa-file-word text-blue-600"></i> Nạp file Word / .txt<input type="file" accept=".docx,.txt" class="hidden" onchange="h_bankFile(this.files[0])"></label>
         <button class="btn btn-soft" onclick="h_sampleBank()"><i class="fa-solid fa-flask"></i> Dùng bộ mẫu KHTN 8</button>
-        <button class="btn btn-soft" onclick="h_downloadTemplate()"><i class="fa-solid fa-download"></i> Tải file mẫu</button></div></div>
+        <button class="btn btn-soft" onclick="h_sampleDocx()"><i class="fa-solid fa-file-word text-blue-600"></i> Tải file Word mẫu</button>
+        <button class="btn btn-soft" onclick="h_help('word')"><i class="fa-solid fa-circle-question text-amber-600"></i> Cách soạn đề</button></div></div>
     <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2 text-center">${[['Khởi động', cnt.r1, RULES.R1_COUNT], ['Hàng ngang', cnt.r2, 4], ['Từ khóa CNV', cnt.cnv, 1], ['Tăng tốc', cnt.r3, 4], ['Về đích 20đ', cnt.v20, 0], ['Về đích 30đ', cnt.v30, 0], ['Về đích 40đ', cnt.v40, 0]].map(([n, c, need]) =>
       `<div class="rounded-xl p-2 border ${need && c < need ? 'border-rose-200 bg-rose-50' : 'border-slate-200 bg-slate-50'}"><div class="text-[11px] font-bold text-slate-500">${n}</div><div class="text-xl font-black">${c}${need ? `<span class="text-xs text-slate-400">/${need}</span>` : ''}</div></div>`).join('')}</div>
     ${b.warn.length ? `<div class="mt-3 text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3">${b.warn.map(esc).join('<br>')}</div>` : ''}
@@ -1204,7 +1209,7 @@ CÔNG THỨC (LaTeX) – viết trong cặp dấu $ ... $ :
   $\\dfrac{m}{M}$ → phân số   $\\sqrt{2}$ → căn bậc hai
   $\\ce{H2SO4}$ → công thức hóa học (tự hạ chỉ số)
   $\\ce{2H2 + O2 -> 2H2O}$ → phương trình phản ứng
-  $25\\,^\\circ C$ → độ C     $\\Delta$, $\\alpha$ → kí hiệu Hy Lạp
+  $25^\\circ C$ → độ C     $\\Delta$, $\\alpha$ → kí hiệu Hy Lạp
 Dùng được cả trong câu hỏi lẫn đáp án A, B, C, D.</pre></details>`;
   const ready = H.students.length && H.teams.every(t => t.members.length);
   return heroHTML('ĐẤU TRƯỜNG TRI THỨC • ĐƯỜNG LÊN ĐỈNH OLYMPIA', 'Bước 1–3: nạp danh sách lớp, chia đội và chọn bộ câu hỏi. Sau đó hệ thống cấp <strong>mã PIN riêng cho từng đội</strong> – mỗi mã chỉ vào được 1 thiết bị.', 'THIẾT LẬP') + `<div class="space-y-5">
@@ -1479,6 +1484,145 @@ function teamHeaderHTML(p, me, sticky = true) {
     </header>`;
 }
 
+
+
+/* ===================== HƯỚNG DẪN SỬ DỤNG (popup) ===================== */
+function h_help(k) { UI.help = k; renderHost(); const b = document.getElementById('help-body'); b && (b.scrollTop = 0); }
+function dl(blob, name) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); }
+function h_sampleExcel() {
+  if (!window.XLSX) return alert('Chưa tải được thư viện Excel. Kiểm tra Internet rồi thử lại.');
+  const names = ['Nguyễn Văn An', 'Trần Thị Bình', 'Lê Minh Châu', 'Phạm Gia Huy', 'Võ Ngọc Lan', 'Đỗ Quốc Bảo', 'Hồ Thanh Tâm', 'Bùi Khánh Linh', 'Huỳnh Đức Phát', 'Ngô Mỹ Duyên', 'Phan Nhật Nam', 'Dương Bảo Ngọc'];
+  const ws = XLSX.utils.aoa_to_sheet([['STT', 'Họ và tên', 'Lớp'], ...names.map((n, i) => [i + 1, n, '8A4'])]);
+  ws['!cols'] = [{ wch: 6 }, { wch: 28 }, { wch: 8 }];
+  const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Danh sách lớp'); XLSX.writeFile(wb, 'Mau_danh_sach_lop.xlsx');
+}
+function h_sampleDocx() {
+  if (!window.XLSX || !XLSX.CFB) return h_downloadTemplate();
+  const x = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const head = ['ĐỀ THI ĐƯỜNG LÊN ĐỈNH OLYMPIA – MẪU', 'Giữ nguyên các dòng [TÊN VÒNG]. Mỗi câu: "Câu n: …", 4 dòng A. B. C. D. và dòng "Đáp án: X". Công thức viết trong $…$, ví dụ $x^2$, $\\ce{H2SO4}$.', ''];
+  const para = l => {
+    const sec = /^\[.+\]$/.test(l.trim()), q = /^Câu\s*\d+/.test(l), ans = /^Đáp án/.test(l), title = l === head[0];
+    const rpr = title ? '<w:rPr><w:b/><w:color w:val="7C3AED"/><w:sz w:val="32"/></w:rPr>' : sec ? '<w:rPr><w:b/><w:color w:val="E11D48"/><w:sz w:val="28"/></w:rPr>' : q ? '<w:rPr><w:b/></w:rPr>' : ans ? '<w:rPr><w:i/><w:color w:val="059669"/></w:rPr>' : '';
+    const ppr = sec ? '<w:pPr><w:spacing w:before="240"/></w:pPr>' : '';
+    return `<w:p>${ppr}<w:r>${rpr}<w:t xml:space="preserve">${x(l)}</w:t></w:r></w:p>`;
+  };
+  const body = [...head, ...SAMPLE_BANK.split('\n')].map(para).join('');
+  const doc = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${body}<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="0" w:footer="0" w:gutter="0"/></w:sectPr></w:body></w:document>`;
+  const styles = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" w:cs="Times New Roman"/><w:sz w:val="26"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="60"/></w:pPr></w:pPrDefault></w:docDefaults></w:styles>`;
+  const ct = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>`;
+  const rels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>`;
+  const drels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`;
+  try {
+    const CFB = XLSX.CFB, z = CFB.utils.cfb_new(), enc = t => new TextEncoder().encode(t);
+    CFB.utils.cfb_add(z, '[Content_Types].xml', enc(ct)); CFB.utils.cfb_add(z, '_rels/.rels', enc(rels));
+    CFB.utils.cfb_add(z, 'word/document.xml', enc(doc)); CFB.utils.cfb_add(z, 'word/styles.xml', enc(styles)); CFB.utils.cfb_add(z, 'word/_rels/document.xml.rels', enc(drels));
+    const out = CFB.write(z, { fileType: 'zip', type: 'array' });
+    dl(new Blob([new Uint8Array(out)], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }), 'Mau_de_Olympia.docx');
+  } catch (e) { h_downloadTemplate(); }
+}
+const HELP_SECTIONS = [
+  ['start', 'fa-rocket', 'Bắt đầu nhanh'], ['word', 'fa-file-word', 'File Word câu hỏi'], ['excel', 'fa-file-excel', 'File Excel danh sách lớp'],
+  ['teams', 'fa-users-gear', 'Chia đội & mã PIN'], ['rounds', 'fa-flag-checkered', 'Luật & điều khiển 4 vòng'], ['students', 'fa-mobile-screen', 'Học sinh vào thi'],
+  ['custom', 'fa-sliders', 'Tùy chỉnh'], ['trouble', 'fa-life-ring', 'Xử lý sự cố']];
+function helpContent(k) {
+  const H2 = t => `<h3 class="text-xl font-black text-slate-900 mb-1">${t}</h3>`;
+  const P = t => `<p class="text-sm text-slate-600 leading-relaxed mt-2">${t}</p>`;
+  const tip = (t, c = 'amber') => `<div class="mt-3 rounded-2xl border px-4 py-3 text-sm font-medium bg-${c}-50 border-${c}-200 text-${c}-900">${t}</div>`;
+  const step = (n, t, d) => `<div class="flex gap-3 mt-3"><div class="w-8 h-8 rounded-xl bg-purple-600 text-white grid place-items-center font-black flex-shrink-0">${n}</div><div><div class="font-black text-slate-900 text-sm">${t}</div><div class="text-sm text-slate-600 leading-relaxed">${d}</div></div></div>`;
+  const tbl = (head, rows) => `<div class="mt-3 overflow-x-auto rounded-2xl border border-slate-200"><table class="w-full text-sm"><thead><tr class="bg-slate-900 text-white">${head.map(h => `<th class="text-left px-3 py-2 font-black">${h}</th>`).join('')}</tr></thead><tbody>${rows.map((r, i) => `<tr class="${i % 2 ? 'bg-slate-50' : 'bg-white'}">${r.map(c => `<td class="px-3 py-2 align-top text-slate-700">${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+  const code = t => `<pre class="mt-3 rounded-2xl bg-slate-900 text-slate-100 text-[13px] leading-relaxed p-4 overflow-x-auto whitespace-pre-wrap">${esc(t)}</pre>`;
+  const btn = (fn, ic, t) => `<button class="btn btn-soft mt-3 mr-2" onclick="${fn}"><i class="fa-solid ${ic}"></i> ${t}</button>`;
+  switch (k) {
+    case 'start': return H2('Bắt đầu nhanh – 6 bước') + P('Trang này gồm 2 phần: <b>máy giáo viên</b> (trang bạn đang xem – chiếu lên máy chiếu/TV) và <b>máy của các đội</b> (điện thoại hoặc máy tính của học sinh).') +
+      step(1, 'Nạp danh sách lớp', 'Chọn file Excel (hoặc dán danh sách tên) ở bước 1 của trang chính.') +
+      step(2, 'Chia 4 đội', 'Bấm <b>Chia ngẫu nhiên</b>, <b>Chia xen kẽ</b> hoặc <b>Chia theo tổ</b>; kéo thả tên để đổi đội; bấm vào tên đội để đổi tên.') +
+      step(3, 'Chọn bộ câu hỏi', 'Nạp file Word theo mẫu, hoặc dùng bộ câu hỏi mẫu KHTN 8 có sẵn.') +
+      step(4, 'Tạo mã PIN & mở phòng chờ', 'Mỗi đội nhận 1 mã PIN 6 số riêng. Phát mã riêng cho từng đội.') +
+      step(5, 'Học sinh nhập PIN', 'Học sinh mở trang web → nhập PIN → đội hiện <b>SẴN SÀNG</b> trên màn hình giáo viên.') +
+      step(6, 'Bấm BẮT ĐẦU', 'Khi đủ 4 đội, nút BẮT ĐẦU sáng lên. Cả 4 đội cùng vào Vòng 1 – Khởi động.') +
+      tip('<i class="fa-solid fa-eye"></i> Muốn xem trước học sinh sẽ thấy gì? Bấm <b>Xem trước giao diện</b> ở menu trái – xem được cả màn hình điện thoại của đội và màn hình máy chiếu của giáo viên ở từng vòng.', 'purple') +
+      tip('<i class="fa-solid fa-triangle-exclamation"></i> Máy giáo viên phải <b>có Internet và giữ trang mở suốt buổi thi</b>. Đóng trang thì các đội mất kết nối.', 'rose');
+    case 'word': return H2('Cấu trúc file Word câu hỏi') + P('File <b>.docx</b> (hoặc .txt) gồm các <b>mục vòng thi</b> viết trong ngoặc vuông, dưới mỗi mục là các câu hỏi trắc nghiệm 4 đáp án.') +
+      btn('h_sampleDocx()', 'fa-file-word text-blue-600', 'Tải file Word mẫu') + btn('h_downloadTemplate()', 'fa-file-lines', 'Tải bản .txt') +
+      tbl(['Mục (gõ đúng như sau)', 'Dùng cho', 'Số câu cần'], [
+        ['<code>[KHỞI ĐỘNG]</code>', 'Vòng 1', `${RULES.R1_COUNT} câu`], ['<code>[VƯỢT CHƯỚNG NGẠI VẬT]</code>', 'Vòng 2 – 4 hàng ngang', '4 câu'],
+        ['<code>[CNV]</code>', 'Vòng 2 – câu đoán từ khóa chướng ngại vật', '1 câu'], ['<code>[TĂNG TỐC]</code>', 'Vòng 3', '4 câu'],
+        ['<code>[VỀ ĐÍCH 20]</code> <code>[VỀ ĐÍCH 30]</code> <code>[VỀ ĐÍCH 40]</code>', 'Vòng 4 – câu 20, 30, 40 điểm', 'nên ≥ 12 câu tổng cộng']]) +
+      P('<b>Mỗi câu hỏi viết như sau:</b>') +
+      code('Câu 1: Chất nào sau đây là base?\nA. HCl\nB. NaOH\nC. NaCl\nD. CO2\nĐáp án: B') +
+      P('Các đáp án ngắn có thể viết chung 1 dòng: <code>A. đỏ  B. xanh  C. tím  D. vàng</code>. Cũng có thể đánh dấu đáp án đúng bằng dấu <code>*</code> trước nội dung: <code>B. *NaOH</code>.') +
+      P('<b>Công thức (LaTeX)</b> – viết trong cặp dấu <code>$ … $</code>, dùng được cả ở câu hỏi và đáp án:') +
+      tbl(['Gõ trong Word', 'Hiển thị'], [['<code>$x^2$</code>', '$x^2$'], ['<code>$H_2O$</code>', '$H_2O$'], ['<code>$\\dfrac{m}{M}$</code>', '$\\dfrac{m}{M}$'], ['<code>$\\sqrt{16}$</code>', '$\\sqrt{16}$'],
+        ['<code>$\\ce{H2SO4}$</code> (hóa học, tự hạ chỉ số)', '$\\ce{H2SO4}$'], ['<code>$\\ce{2H2 + O2 -> 2H2O}$</code>', '$\\ce{2H2 + O2 -> 2H2O}$'], ['<code>$25^\\circ C$</code>', '$25^\\circ C$']]) +
+      tip('<b>Lưu ý:</b> Công thức tạo bằng <i>Insert → Equation</i> của Word sẽ bị mất khi nạp – hãy gõ dạng <code>$…$</code>. Câu không nằm dưới mục nào sẽ được tự chia vào vòng còn thiếu. Sau khi nạp, ô đếm số câu từng vòng hiện đỏ nếu còn thiếu.');
+    case 'excel': return H2('Cấu trúc file Excel danh sách lớp') + P('File <b>.xlsx</b>, <b>.xls</b> hoặc <b>.csv</b>, lấy <b>trang tính đầu tiên</b>. Hàng đầu là tiêu đề cột.') +
+      btn('h_sampleExcel()', 'fa-file-excel text-emerald-600', 'Tải file Excel mẫu') +
+      tbl(['STT', 'Họ và tên', 'Lớp'], [['1', 'Nguyễn Văn An', '8A4'], ['2', 'Trần Thị Bình', '8A4'], ['3', 'Lê Minh Châu', '8A4'], ['…', '…', '…']]) +
+      P('<b>Trang tự nhận cột tên</b> theo tiêu đề có chữ “tên”: <i>Họ và tên</i>, <i>Họ tên</i>, <i>Tên học sinh</i>… Nếu file tách 2 cột <b>Họ</b> (hoặc Họ đệm) và <b>Tên</b>, trang sẽ tự ghép lại. Dòng trống và dòng chỉ có số sẽ được bỏ qua.') +
+      P('<b>Không có file Excel?</b> Dán danh sách vào ô bên cạnh, mỗi dòng 1 học sinh (có thể dán thẳng từ cột trong Excel/Word; số thứ tự đầu dòng tự được bỏ).') +
+      tip('Nếu đã nạp danh sách lớp ở trang chủ EDU GAME trên cùng trình duyệt, trang sẽ hiện nút <b>“Dùng danh sách này”</b> để lấy lại, không cần nạp lần nữa.', 'emerald');
+    case 'teams': return H2('Chia đội & mã PIN') +
+      tbl(['Cách chia', 'Kết quả'], [['<b>Chia ngẫu nhiên</b>', 'Xáo trộn cả lớp rồi chia đều 4 đội.'], ['<b>Chia xen kẽ theo STT</b>', 'HS 1 → Đội 1, HS 2 → Đội 2, … lặp lại.'], ['<b>Chia theo khối liên tiếp</b>', 'Chia danh sách thành 4 khúc liền nhau (giống chia theo tổ).']]) +
+      P('Sau khi chia: <b>kéo thả</b> tên học sinh sang cột đội khác, hoặc bấm mũi tên <i class="fa-solid fa-arrow-right"></i> cạnh tên để chuyển sang đội kế. Bấm vào <b>tên đội</b> để đổi tên (vd. “Đội Nguyên tử”).') +
+      P('<b>Mã PIN:</b> bấm <b>Tạo mã PIN & mở phòng chờ</b> – mỗi đội nhận 1 mã 6 số khác nhau. Mã mặc định bị che (••••••), bấm vào ô để hiện. Nên phát mã riêng cho từng đội, không chiếu cả 4 mã lên máy chiếu.') +
+      tbl(['Tình huống', 'Cách xử lý'], [['Máy thứ 2 nhập PIN của đội đã vào', 'Bị chặn: “Đội đã có người vào. Mỗi đội chỉ vào được 1 lần.”'],
+        ['Máy của đội bị hỏng, hết pin, lỡ đóng trang', 'Bấm <b>Mở khóa</b> ở thẻ đội → đội nhập lại PIN trên máy khác (điểm giữ nguyên).'], ['Muốn đổi toàn bộ mã', 'Bấm <b>Tạo PIN mới</b> (các đội phải nhập lại).']]);
+    case 'rounds': return H2('Luật & điều khiển 4 vòng thi') + tbl(['Vòng', 'Luật', 'Giáo viên bấm'], [
+      [`<b>1. Khởi động</b>`, `${RULES.R1_COUNT} câu trong ${RULES.R1_TIME} giây cho cả vòng. Đúng +${RULES.R1_POINT}đ. Mỗi đội có thứ tự câu và vị trí A–D khác nhau.`, 'Tự chạy sau khi bấm BẮT ĐẦU. Có nút <i>Kết thúc vòng sớm</i>.'],
+      [`<b>2. Vượt chướng ngại vật</b>`, `4 hàng ngang, ${RULES.R2_ROW_TIME}s/câu, đúng +${RULES.R2_POINT}đ. Đoán CNV càng sớm càng nhiều điểm: ${RULES.CNV_POINTS.join(' – ')}đ. Đoán sai mất quyền.`, '<i>Mở hàng ngang 1…4</i>, <i>Dừng & công bố</i>, <i>Cơ hội cuối đoán CNV</i>.'],
+      [`<b>3. Tăng tốc</b>`, `4 câu, ${RULES.R3_TIME}s/câu. Đúng nhanh nhất +${RULES.R3_POINTS[0]}đ, tiếp theo ${RULES.R3_POINTS.slice(1).join(' – ')}đ.`, '<i>Câu Tăng tốc 1…4</i>, <i>Dừng & công bố</i>.'],
+      [`<b>4. Về đích</b>`, `Lần lượt từng đội chọn gói 60/80/100đ, có thể đặt Ngôi sao hy vọng (đúng ×2, sai bị trừ). Đội thi sai → 3 đội còn lại có ${RULES.BUZZ_TIME}s bấm chuông; đúng được cộng điểm${RULES.STEAL_TAKES_FROM_MAIN ? ' (lấy từ đội đang thi)' : ''}, sai bị trừ một nửa.`, '<i>Hiện câu</i>, <i>Câu tiếp theo</i>, <i>Sang lượt đội kế</i>; có thể <i>chọn gói hộ</i> đội.']]) +
+      P('<b>Màn hình phụ:</b> trong khi thi, bấm nút <b>Đội 1…4</b> (hoặc thẻ điểm của đội) để xem y hệt màn hình của đội đó. Bấm <b>Màn hình chính</b> để quay lại bảng điểm.') +
+      tip('<i class="fa-solid fa-expand"></i> Bấm nút toàn màn hình (hoặc F11) khi chiếu. Bấm ☰ để ẩn menu trái cho rộng màn hình.', 'purple');
+    case 'students': return H2('Học sinh vào thi') +
+      step(1, 'Mở trang web', 'Trên điện thoại/máy tính có Internet, mở địa chỉ trang web (giáo viên ghi lên bảng). Học sinh có thể nhập PIN ngay ở trang chủ EDU GAME, hoặc mở thẳng trang <code>olympia.html</code>.') +
+      step(2, 'Nhập mã PIN 6 số của đội', 'Bấm <b>Vào phòng thi</b>. Màn hình hiện tên đội, các thành viên và trạng thái chờ.') +
+      step(3, 'Thi đấu', 'Bấm vào đáp án A/B/C/D. Ở vòng 4, đội thi chọn gói ngay trên máy; các đội khác bấm <b>chuông</b> khi được giành quyền.') +
+      tip('Mỗi đội chỉ nên dùng <b>1 máy</b>. Nếu học sinh tải lại trang, máy tự vào lại đúng đội. Nếu mất mạng, trang tự kết nối lại.', 'emerald');
+    case 'custom': return H2('Tùy chỉnh') + P('Mở file <code>olympia.html</code> bằng Notepad (hoặc trình soạn thảo trên GitHub), tìm khối <code>const RULES = {</code> ở đầu file và sửa số:') +
+      tbl(['Dòng trong file', 'Ý nghĩa', 'Hiện tại'], [
+        ['<code>R1_TIME</code> / <code>R1_COUNT</code> / <code>R1_POINT</code>', 'Vòng 1: số giây cả vòng / số câu / điểm mỗi câu', `${RULES.R1_TIME}s / ${RULES.R1_COUNT} câu / ${RULES.R1_POINT}đ`],
+        ['<code>R2_ROW_TIME</code> / <code>R2_POINT</code>', 'Vòng 2: giây mỗi hàng ngang / điểm', `${RULES.R2_ROW_TIME}s / ${RULES.R2_POINT}đ`],
+        ['<code>CNV_POINTS</code>', 'Điểm đoán CNV theo số hàng đã mở', RULES.CNV_POINTS.join(', ')],
+        ['<code>R3_TIME</code> / <code>R3_POINTS</code>', 'Vòng 3: giây mỗi câu / điểm theo thứ hạng tốc độ', `${RULES.R3_TIME}s / ${RULES.R3_POINTS.join(', ')}`],
+        ['<code>R4_TIME</code>', 'Vòng 4: giây trả lời theo loại câu 20/30/40đ', Object.entries(RULES.R4_TIME).map(([a, b]) => `${a}đ: ${b}s`).join(', ')],
+        ['<code>PACKAGES</code>', 'Các gói Về đích', Object.entries(RULES.PACKAGES).map(([a, b]) => `${a} = ${b.join('+')}`).join('; ')],
+        ['<code>BUZZ_TIME</code> / <code>STEAL_TIME</code>', 'Giây bấm chuông / giây trả lời khi cướp', `${RULES.BUZZ_TIME}s / ${RULES.STEAL_TIME}s`],
+        ['<code>STEAL_TAKES_FROM_MAIN</code>', '<code>true</code>: cướp đúng thì trừ điểm đội đang thi', String(RULES.STEAL_TAKES_FROM_MAIN)],
+        ['<code>TEAM_COUNT</code>', 'Số đội', RULES.TEAM_COUNT]]) +
+      P('<b>Không cần sửa file:</b> tên đội (bấm vào tên đội ở bước chia đội), bộ câu hỏi (nạp file Word), danh sách lớp (nạp Excel).') +
+      tip('Sửa xong nhớ tải lại file lên web (Vercel/GitHub) và bấm <b>Ctrl + F5</b> trên các máy.', 'amber');
+    case 'trouble': return H2('Xử lý sự cố') + tbl(['Hiện tượng', 'Nguyên nhân & cách xử lý'], [
+      ['HS báo “Không tìm thấy phòng thi”', 'Kiểm tra: GV đã bấm <b>Tạo mã PIN & mở phòng chờ</b> chưa; thẻ đội có dòng xanh <b>“Cổng kết nối đã mở”</b> chưa; HS nhập đúng 6 số; cả 2 máy có Internet.'],
+      ['HS vẫn thấy giao diện/lỗi cũ sau khi cập nhật web', 'Trang web chưa cập nhật bản mới: chờ Vercel báo <b>Ready</b>, rồi đóng hẳn tab và mở lại (máy tính bấm <b>Ctrl + F5</b>).'],
+      ['Đội báo “Đội đã có người vào”', 'Mã PIN đó đã được 1 máy dùng. Nếu đúng là máy của đội bị hỏng: GV bấm <b>Mở khóa</b> ở thẻ đội.'],
+      ['Thẻ đội hiện “Mất kết nối – cần nhập lại PIN”', 'Máy đội đã thoát. Cho đội nhập lại PIN (nếu bị chặn thì bấm Mở khóa trước).'],
+      ['Giáo viên lỡ tải lại trang', 'Trận đấu được giữ nguyên; các đội tự kết nối lại sau vài giây.'],
+      ['Mạng trường chặn kết nối', 'Thử cho máy GV và HS dùng 4G/hotspot, hoặc liên hệ người quản trị web để chuyển sang Firebase.'],
+      ['Nạp Word báo không nhận câu nào', 'Kiểm tra mỗi câu có “Câu n:”, các dòng “A.” “B.”… và dòng “Đáp án: X”. Tải file Word mẫu để đối chiếu.']]);
+  }
+  return '';
+}
+function helpHTML() {
+  const k = UI.help;
+  return `<div class="fixed inset-0 z-[95] bg-slate-950/70 backdrop-blur-sm p-3 sm:p-6 overflow-y-auto" onclick="if(event.target===this)h_help(null)">
+    <div class="max-w-5xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden pop">
+      <div class="hero-gradient text-white px-5 sm:px-7 py-5 flex items-center justify-between gap-3"><div class="relative z-10 flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-white/20 border border-white/30 grid place-items-center text-xl"><i class="fa-solid fa-book-open"></i></div>
+          <div><div class="text-xl sm:text-2xl font-black">Hướng dẫn sử dụng</div><div class="text-xs text-white/80">EDU GAME • Đường lên đỉnh Olympia • thi đấu theo đội</div></div></div>
+        <button class="relative z-10 w-10 h-10 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30" onclick="h_help(null)" title="Đóng"><i class="fa-solid fa-xmark"></i></button></div>
+      <div class="grid md:grid-cols-[240px_1fr]">
+        <nav class="p-3 border-b md:border-b-0 md:border-r border-slate-100 bg-slate-50/70 flex md:flex-col gap-1.5 overflow-x-auto">
+          ${HELP_SECTIONS.map(([key, ic, name]) => `<button onclick="h_help('${key}')" class="flex-shrink-0 flex items-center gap-2.5 px-3 py-2.5 rounded-2xl text-left text-sm font-black transition ${key === k ? 'bg-slate-900 text-white shadow' : 'text-slate-600 hover:bg-white'}">
+            <i class="fa-solid ${ic} w-5 text-center ${key === k ? 'text-amber-300' : 'text-purple-500'}"></i><span class="whitespace-nowrap">${name}</span></button>`).join('')}
+        </nav>
+        <div id="help-body" class="p-5 sm:p-7 md:max-h-[72vh] overflow-y-auto">${helpContent(k)}
+          <div class="mt-6 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2">
+            ${(() => { const i = HELP_SECTIONS.findIndex(x => x[0] === k), pv = HELP_SECTIONS[i - 1], nx = HELP_SECTIONS[i + 1];
+              return `${pv ? `<button class="btn btn-soft" onclick="h_help('${pv[0]}')"><i class="fa-solid fa-arrow-left"></i> ${pv[2]}</button>` : '<span></span>'}${nx ? `<button class="btn btn-pri" onclick="h_help('${nx[0]}')">${nx[2]} <i class="fa-solid fa-arrow-right"></i></button>` : `<button class="btn btn-pri" onclick="h_help(null)"><i class="fa-solid fa-check"></i> Đã hiểu</button>`}`; })()}
+          </div></div>
+      </div></div></div>`;
+}
 
 /* ===================== XEM TRƯỚC GIAO DIỆN (GV) ===================== */
 const PREVIEWS = [
