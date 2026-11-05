@@ -243,6 +243,40 @@ class MillionaireGame {
         const grid = document.getElementById('mil-options-grid');
         if (!grid) return;
 
+        // If True / False question
+        if (q.type === 'true_false') {
+            const isAHidden = this.hiddenOptions.includes('A');
+            const isBHidden = this.hiddenOptions.includes('B');
+
+            grid.innerHTML = `
+                <button id="mil-opt-A" 
+                    onclick="window.millionaireGame.selectAnswer('A')"
+                    class="mil-option group relative p-6 rounded-3xl bg-white hover:bg-emerald-50 border-3 border-emerald-300 hover:border-emerald-500 text-left transition-all duration-200 flex items-center gap-4 shadow-md ${isAHidden ? 'invisible pointer-events-none' : ''}">
+                    <span class="w-14 h-14 rounded-2xl bg-emerald-100 border-2 border-emerald-300 flex items-center justify-center font-black text-emerald-700 text-2xl group-hover:bg-emerald-600 group-hover:text-white transition shadow-sm">
+                        <i class="fa-solid fa-check"></i>
+                    </span>
+                    <div class="flex-1">
+                        <div class="text-xs font-bold text-emerald-700 uppercase tracking-wider">Khẳng định này</div>
+                        <div class="text-2xl font-black text-emerald-800">ĐÚNG</div>
+                    </div>
+                </button>
+
+                <button id="mil-opt-B" 
+                    onclick="window.millionaireGame.selectAnswer('B')"
+                    class="mil-option group relative p-6 rounded-3xl bg-white hover:bg-rose-50 border-3 border-rose-300 hover:border-rose-500 text-left transition-all duration-200 flex items-center gap-4 shadow-md ${isBHidden ? 'invisible pointer-events-none' : ''}">
+                    <span class="w-14 h-14 rounded-2xl bg-rose-100 border-2 border-rose-300 flex items-center justify-center font-black text-rose-700 text-2xl group-hover:bg-rose-600 group-hover:text-white transition shadow-sm">
+                        <i class="fa-solid fa-xmark"></i>
+                    </span>
+                    <div class="flex-1">
+                        <div class="text-xs font-bold text-rose-700 uppercase tracking-wider">Khẳng định này</div>
+                        <div class="text-2xl font-black text-rose-800">SAI</div>
+                    </div>
+                </button>
+            `;
+            return;
+        }
+
+        // Standard 4 choices multiple choice (A, B, C, D)
         const letters = ['A', 'B', 'C', 'D'];
         grid.innerHTML = letters.map(letter => {
             const optText = q.options[letter] || '';
@@ -250,7 +284,7 @@ class MillionaireGame {
             return `
                 <button id="mil-opt-${letter}" 
                     onclick="window.millionaireGame.selectAnswer('${letter}')"
-                    class="mil-option group relative p-4 rounded-2xl bg-white hover:bg-blue-50/60 border-2 border-slate-200 hover:border-blue-500 text-left transition-all duration-200 flex items-center gap-3.5 shadow-sm ${
+                    class="mil-option group relative p-4 md:p-5 rounded-2xl bg-white hover:bg-blue-50/60 border-2 border-slate-200 hover:border-blue-500 text-left transition-all duration-200 flex items-center gap-3.5 shadow-sm ${
                         isHidden ? 'invisible pointer-events-none' : ''
                     }">
                     <span class="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center font-black text-blue-700 text-base group-hover:bg-blue-600 group-hover:text-white transition">

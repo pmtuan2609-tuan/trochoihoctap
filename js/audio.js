@@ -78,6 +78,15 @@ class SoundEffects {
         this.playTone(1174.66, 'triangle', 0.08, 0.2, 0);
     }
 
+    playBuzzer() {
+        if (this.muted) return;
+        this.init();
+        // High impact game-show bell/buzzer with resonant harmonics
+        this.playTone(880, 'sine', 0.6, 0.35, 0);
+        this.playTone(1760, 'sine', 0.5, 0.25, 0);
+        this.playTone(440, 'triangle', 0.7, 0.3, 0.02);
+    }
+
     playClick() {
         if (this.muted) return;
         this.init();

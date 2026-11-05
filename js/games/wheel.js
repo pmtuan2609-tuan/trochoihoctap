@@ -315,14 +315,37 @@ class FunGames {
                 <h3 class="text-xl font-bold text-slate-900 mt-4 leading-relaxed">${q.question}</h3>
             </div>
 
-            <div class="grid grid-cols-1 gap-3 mb-6">
-                ${['A', 'B', 'C', 'D'].map(l => `
-                    <button onclick="window.funGames.checkAnswerBox(${box.id}, '${l}')" class="p-4 rounded-2xl bg-white hover:bg-slate-50 border-2 border-slate-200 hover:border-purple-400 text-left transition flex items-center gap-3 shadow-sm">
-                        <span class="w-9 h-9 rounded-xl bg-purple-50 text-purple-700 font-black flex items-center justify-center text-sm border border-purple-200">${l}</span>
-                        <span class="text-slate-800 text-sm md:text-base font-semibold flex-1">${q.options[l]}</span>
+            ${q.type === 'true_false' ? `
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                    <button onclick="window.funGames.checkAnswerBox(${box.id}, 'A')" class="p-5 rounded-2xl bg-white hover:bg-emerald-50 border-3 border-emerald-300 hover:border-emerald-500 text-left transition flex items-center gap-4 shadow-sm group">
+                        <span class="w-12 h-12 rounded-xl bg-emerald-100 border border-emerald-300 text-emerald-700 font-black flex items-center justify-center text-xl group-hover:bg-emerald-600 group-hover:text-white transition">
+                            <i class="fa-solid fa-check"></i>
+                        </span>
+                        <div>
+                            <div class="text-[11px] font-bold text-emerald-700 uppercase">Khẳng định này</div>
+                            <div class="text-xl font-black text-emerald-800">ĐÚNG</div>
+                        </div>
                     </button>
-                `).join('')}
-            </div>
+                    <button onclick="window.funGames.checkAnswerBox(${box.id}, 'B')" class="p-5 rounded-2xl bg-white hover:bg-rose-50 border-3 border-rose-300 hover:border-rose-500 text-left transition flex items-center gap-4 shadow-sm group">
+                        <span class="w-12 h-12 rounded-xl bg-rose-100 border border-rose-300 text-rose-700 font-black flex items-center justify-center text-xl group-hover:bg-rose-600 group-hover:text-white transition">
+                            <i class="fa-solid fa-xmark"></i>
+                        </span>
+                        <div>
+                            <div class="text-[11px] font-bold text-rose-700 uppercase">Khẳng định này</div>
+                            <div class="text-xl font-black text-rose-800">SAI</div>
+                        </div>
+                    </button>
+                </div>
+            ` : `
+                <div class="grid grid-cols-1 gap-3 mb-6">
+                    ${['A', 'B', 'C', 'D'].map(l => `
+                        <button onclick="window.funGames.checkAnswerBox(${box.id}, '${l}')" class="p-4 rounded-2xl bg-white hover:bg-slate-50 border-2 border-slate-200 hover:border-purple-400 text-left transition flex items-center gap-3 shadow-sm">
+                            <span class="w-9 h-9 rounded-xl bg-purple-50 text-purple-700 font-black flex items-center justify-center text-sm border border-purple-200">${l}</span>
+                            <span class="text-slate-800 text-sm md:text-base font-semibold flex-1">${q.options[l] || ''}</span>
+                        </button>
+                    `).join('')}
+                </div>
+            `}
         `;
 
         modal.classList.remove('hidden');

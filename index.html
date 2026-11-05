@@ -143,6 +143,13 @@
                             <span>Vào phòng bằng PIN</span>
                         </button>
 
+                        <button onclick="window.roomManager.openTeamSetupModal(); window.app.setActiveSidebar(this)" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 text-left">
+                            <div class="w-7 h-7 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-sm">
+                                <i class="fa-solid fa-users-gear"></i>
+                            </div>
+                            <span>Chia Đội & Mã PIN (4, 6, 8 đội)</span>
+                        </button>
+
                         <button onclick="window.app.openClassListModal(); window.app.setActiveSidebar(this)" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 text-left">
                             <div class="w-7 h-7 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center text-sm">
                                 <i class="fa-solid fa-trophy"></i>
@@ -295,6 +302,12 @@
                 <button onclick="window.app.openPinRoomModal()" class="px-3 md:px-4 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs shadow-sm flex items-center gap-2 transition active:scale-95">
                     <i class="fa-solid fa-arrow-right-to-bracket text-xs"></i>
                     <span>Vào phòng</span>
+                </button>
+
+                <!-- Team Setup & PIN Button -->
+                <button onclick="window.roomManager.openTeamSetupModal()" class="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-xs border border-purple-200 flex items-center gap-1.5 transition shadow-sm">
+                    <i class="fa-solid fa-users-gear text-purple-600"></i>
+                    <span class="hidden sm:inline">Chia Đội & PIN</span>
                 </button>
 
                 <!-- Fullscreen button -->
@@ -628,12 +641,7 @@
 
             </div>
 
-            <!-- ACTIVE GAME ARENA CONTAINER -->
-            <div id="game-arena" class="hidden">
-                <div id="game-stage">
-                    <!-- Rendered dynamically by active game script -->
-                </div>
-            </div>
+            <!-- Main dashboard content end -->
 
         </main>
 
@@ -649,9 +657,55 @@
 
     </div>
 
-    <!-- GLOBAL MODAL (Used for Pin Room, Question Bank, Class Roster, Logo Picker) -->
-    <div id="global-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full p-6 md:p-8 shadow-2xl relative animate-scale-up text-slate-900" id="global-modal-body">
+    <!-- ==================== IMMERSIVE FULLSCREEN GAME ARENA (CHIẾU TOÀN MÀN HÌNH) ==================== -->
+    <div id="game-arena" class="fixed inset-0 z-50 bg-[#f8fafc] hidden flex-col overflow-y-auto">
+        <!-- Top HUD Bar for Projector / TV -->
+        <header class="bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 md:px-8 py-3 flex items-center justify-between shadow-sm sticky top-0 z-30">
+            <div class="flex items-center gap-3">
+                <div id="arena-game-icon" class="w-10 h-10 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center text-lg font-black shadow-sm">
+                    <i class="fa-solid fa-gamepad"></i>
+                </div>
+                <div>
+                    <h2 id="arena-game-title" class="text-base sm:text-lg font-black text-slate-900 leading-tight font-heading">
+                        Tên Trò Chơi
+                    </h2>
+                    <span id="arena-game-subtitle" class="text-[11px] text-slate-500 font-bold uppercase tracking-wider">
+                        Chế độ toàn màn hình máy chiếu
+                    </span>
+                </div>
+            </div>
+
+            <!-- Arena Controls -->
+            <div class="flex items-center gap-2 md:gap-3">
+                <button onclick="window.app.quickPickStudent()" class="px-3.5 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold text-xs flex items-center gap-2 transition shadow-sm" title="Gọi ngẫu nhiên học sinh">
+                    <i class="fa-solid fa-shuffle"></i>
+                    <span class="hidden sm:inline">Gọi Học Sinh</span>
+                </button>
+
+                <button onclick="window.app.toggleFullscreen()" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center text-sm transition border border-slate-200 shadow-sm" title="Phóng to toàn màn hình máy chiếu (F11)">
+                    <i class="fa-solid fa-expand"></i>
+                </button>
+
+                <button onclick="window.app.toggleSound()" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center text-sm transition border border-slate-200 shadow-sm" title="Bật/Tắt âm thanh">
+                    <i id="arena-sound-icon" class="fa-solid fa-volume-high text-blue-600"></i>
+                </button>
+
+                <button onclick="window.app.exitGameArena()" class="px-4 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs flex items-center gap-2 transition shadow-sm">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Thoát Trò Chơi</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Arena Main Stage (100% viewport width) -->
+        <div id="game-stage" class="flex-1 w-full max-w-7xl 2xl:max-w-[1600px] mx-auto p-4 sm:p-6 lg:p-8 flex flex-col justify-center">
+            <!-- Game Canvas & UI rendered here -->
+        </div>
+    </div>
+
+    <!-- GLOBAL MODAL (Used for Pin Room, Question Bank, Class Roster, Logo Picker, Game Intro) -->
+    <div id="global-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden overflow-y-auto p-3 sm:p-6 flex items-start sm:items-center justify-center">
+        <div class="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full my-auto shadow-2xl relative animate-scale-up text-slate-900 max-h-[90vh] flex flex-col overflow-hidden" id="global-modal-body">
             <!-- Dynamic modal content -->
         </div>
     </div>
@@ -660,6 +714,7 @@
     <script src="js/audio.js"></script>
     <script src="js/docx-parser.js"></script>
     <script src="js/excel-parser.js"></script>
+    <script src="js/room-manager.js"></script>
     <script src="js/games/millionaire.js"></script>
     <script src="js/games/goldminer.js"></script>
     <script src="js/games/olympia.js"></script>

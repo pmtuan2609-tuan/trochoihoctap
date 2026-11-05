@@ -211,19 +211,44 @@ class GoldMinerGame {
             </div>
 
             <!-- Options Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="gold-options-container">
-                ${['A', 'B', 'C', 'D'].map(l => `
-                    <button onclick="window.goldMinerGame.checkAnswer('${l}')" id="gold-opt-${l}"
-                        class="p-4 rounded-2xl bg-white hover:bg-slate-50 border-2 border-slate-200 hover:border-amber-400 text-left transition flex items-center gap-3 shadow-sm">
-                        <span class="w-9 h-9 rounded-xl bg-amber-50 text-amber-800 font-black flex items-center justify-center text-sm border border-amber-300">
-                            ${l}
+            ${q.type === 'true_false' ? `
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="gold-options-container">
+                    <button onclick="window.goldMinerGame.checkAnswer('A')" id="gold-opt-A"
+                        class="p-5 rounded-2xl bg-white hover:bg-emerald-50 border-2 border-emerald-300 hover:border-emerald-500 text-left transition flex items-center gap-4 shadow-sm group">
+                        <span class="w-12 h-12 rounded-xl bg-emerald-100 border border-emerald-300 text-emerald-700 font-black flex items-center justify-center text-xl group-hover:bg-emerald-600 group-hover:text-white transition">
+                            <i class="fa-solid fa-check"></i>
                         </span>
-                        <span class="text-slate-800 font-semibold text-sm md:text-base flex-1">
-                            ${q.options[l] || ''}
-                        </span>
+                        <div>
+                            <div class="text-[11px] font-bold text-emerald-700 uppercase">Khẳng định này</div>
+                            <div class="text-xl font-black text-emerald-800">ĐÚNG</div>
+                        </div>
                     </button>
-                `).join('')}
-            </div>
+                    <button onclick="window.goldMinerGame.checkAnswer('B')" id="gold-opt-B"
+                        class="p-5 rounded-2xl bg-white hover:bg-rose-50 border-2 border-rose-300 hover:border-rose-500 text-left transition flex items-center gap-4 shadow-sm group">
+                        <span class="w-12 h-12 rounded-xl bg-rose-100 border border-rose-300 text-rose-700 font-black flex items-center justify-center text-xl group-hover:bg-rose-600 group-hover:text-white transition">
+                            <i class="fa-solid fa-xmark"></i>
+                        </span>
+                        <div>
+                            <div class="text-[11px] font-bold text-rose-700 uppercase">Khẳng định này</div>
+                            <div class="text-xl font-black text-rose-800">SAI</div>
+                        </div>
+                    </button>
+                </div>
+            ` : `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="gold-options-container">
+                    ${['A', 'B', 'C', 'D'].map(l => `
+                        <button onclick="window.goldMinerGame.checkAnswer('${l}')" id="gold-opt-${l}"
+                            class="p-4 rounded-2xl bg-white hover:bg-slate-50 border-2 border-slate-200 hover:border-amber-400 text-left transition flex items-center gap-3 shadow-sm">
+                            <span class="w-9 h-9 rounded-xl bg-amber-50 text-amber-800 font-black flex items-center justify-center text-sm border border-amber-300">
+                                ${l}
+                            </span>
+                            <span class="text-slate-800 font-semibold text-sm md:text-base flex-1">
+                                ${q.options[l] || ''}
+                            </span>
+                        </button>
+                    `).join('')}
+                </div>
+            `}
 
             <!-- Explanation & Feedback -->
             <div id="gold-feedback" class="hidden mt-4 p-4 rounded-2xl shadow-sm"></div>

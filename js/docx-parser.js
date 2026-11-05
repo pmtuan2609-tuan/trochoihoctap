@@ -1,7 +1,8 @@
 /**
  * Docx & Text Question Parser for Educational Games
- * Supports .docx via Mammoth.js and raw text formats
- * Detects questions, 4 options (A,B,C,D), answers, and LaTeX math
+ * Specializes in:
+ * 1. Multiple Choice 4 Options (A, B, C, D)
+ * 2. True / False Questions (Đúng / Sai)
  */
 class QuestionParser {
     constructor() {
@@ -16,7 +17,6 @@ class QuestionParser {
             throw new Error("Mammoth library is not loaded.");
         }
 
-        // Convert to both HTML (for detecting bold/underlined answers) and plain text
         const htmlResult = await window.mammoth.convertToHtml({ arrayBuffer });
         const rawResult = await window.mammoth.extractRawText({ arrayBuffer });
 
@@ -30,7 +30,6 @@ class QuestionParser {
         const questions = [];
         if (!plainText || !plainText.trim()) return questions;
 
-        // Split text by Question delimiters (Câu 1, Câu 2, Question 1, Bài 1, etc.)
         const questionRegex = /(?:^|\n)\s*(?:câu|cau|question|bài|bai)\s*(\d+)[\s.:-]/gi;
         const matches = [...plainText.matchAll(questionRegex)];
 
@@ -47,7 +46,6 @@ class QuestionParser {
                 }
             }
         } else {
-            // Fallback: Try splitting by double newline or numbered items like "1. ", "2. "
             const fallbackRegex = /(?:^|\n)\s*(\d+)[\s.)-]\s*/g;
             const numMatches = [...plainText.matchAll(fallbackRegex)];
             if (numMatches.length >= 2) {
@@ -60,7 +58,6 @@ class QuestionParser {
                     if (parsed) questions.push(parsed);
                 }
             } else {
-                // Single question chunk or unstructured
                 const parsed = this.parseQuestionChunk(plainText, 1);
                 if (parsed) questions.push(parsed);
             }
@@ -71,7 +68,7 @@ class QuestionParser {
     }
 
     /**
-     * Extract question title, options A/B/C/D, answer, and explanation from a single text block
+     * Extract question, options, answer, and detect whether it is Multiple Choice (4 choices) or True/False
      */
     parseQuestionChunk(chunk, defaultNum = 1) {
         if (!chunk) return null;
@@ -80,12 +77,13 @@ class QuestionParser {
         let options = { A: "", B: "", C: "", D: "" };
         let answer = "";
         let explanation = "";
-        let difficulty = "Trung bình"; // Dễ, Trung bình, Khó
+        let difficulty = "Trung bình";
+        let type = "multiple_choice"; // 'multiple_choice' or 'true_false'
 
         // Check for difficulty tag [Dễ], [Khó], [VD], [VDC], [NB], [TH]
         if (/\[(dễ|nhận biết|nb|easy)\]/i.test(chunk)) difficulty = "Dễ";
         else if (/\[(khó|vận dụng|vd|vdc|hard)\]/i.test(chunk)) difficulty = "Khó";
-        else if (defaultNum <= 5) difficulty = "Dễ";
+        else if (defaultNum <= 4) difficulty = "Dễ";
         else if (defaultNum > 10) difficulty = "Khó";
 
         // Extract explanation if any
@@ -95,31 +93,48 @@ class QuestionParser {
             chunk = chunk.substring(0, expMatch.index).trim();
         }
 
-        // Extract explicit answer: "Đáp án: A" or "Đ/A: B" or "Chọn C" or "Answer: D"
+        // Check if question is explicit True/False
+        const isExplicitTF = /\[(đúng\s*\/\s*sai|đ\/s|t\/f|true\s*\/\s*false)\]/i.test(chunk) ||
+                             /(?:đúng hay sai|chọn đúng hoặc sai|khẳng định sau đúng hay sai)/i.test(chunk);
+
+        // Check for answer: "Đáp án: Đúng" / "Đáp án: Sai" or "Đáp án: A/B/C/D"
+        const tfAnsMatch = chunk.match(/(?:đáp án|đáp số|dap an|answer|key|chọn|đ\/a)[\s.:-]*(đúng|sai|true|false|đ|s)/i);
         const ansMatch = chunk.match(/(?:đáp án|đáp số|dap an|answer|key|chọn|đ\/a)[\s.:-]*([A-D])/i);
-        if (ansMatch) {
+
+        if (tfAnsMatch && !ansMatch) {
+            type = "true_false";
+            const val = tfAnsMatch[1].toLowerCase();
+            answer = (val === 'đúng' || val === 'true' || val === 'đ') ? 'A' : 'B';
+            chunk = chunk.replace(/(?:đáp án|đáp số|dap an|answer|key|chọn|đ\/a)[\s.:-]*(đúng|sai|true|false|đ|s)/i, '').trim();
+        } else if (ansMatch) {
             answer = ansMatch[1].toUpperCase();
         }
 
         // Extract options: A. ... B. ... C. ... D. ...
-        // Handle inline and multi-line options
         const optionRegex = /(?:^|\s|\n)([A-D])[\s.)-]\s*([\s\S]*?)(?=(?:(?:^|\s|\n)[A-D][\s.)-]|(?:đáp án|dap an|answer|key|chọn)|$))/gi;
         const optMatches = [...chunk.matchAll(optionRegex)];
 
         if (optMatches.length >= 2) {
-            // First find where options start
             const firstOptIdx = optMatches[0].index;
             questionText = chunk.substring(0, firstOptIdx).trim();
 
             optMatches.forEach(m => {
                 const optLetter = m[1].toUpperCase();
                 let optText = m[2].trim();
-                // Remove trailing dots or answer lines if leaked
                 optText = optText.replace(/(?:đáp án|dap an|answer)[\s\S]*$/i, '').trim();
                 options[optLetter] = optText;
             });
+
+            // Detect if options are A. Đúng, B. Sai
+            const optAText = options.A.toLowerCase().trim();
+            const optBText = options.B.toLowerCase().trim();
+            if ((optAText === 'đúng' || optAText.startsWith('đúng')) &&
+                (optBText === 'sai' || optBText.startsWith('sai')) &&
+                !options.C && !options.D) {
+                type = "true_false";
+            }
         } else {
-            // If options not detected with standard regex, check line by line
+            // Check line by line
             const lines = chunk.split('\n').map(l => l.trim()).filter(Boolean);
             const qLines = [];
             lines.forEach(l => {
@@ -133,32 +148,35 @@ class QuestionParser {
             questionText = qLines.join(' ');
         }
 
-        // Clean question title: remove "Câu 1:", "Question 1.", etc.
+        // Clean question title
         questionText = questionText.replace(/^(?:câu|cau|question|bài|bai)\s*\d+[\s.:-]\s*/i, '');
         questionText = questionText.replace(/^\d+[\s.)-]\s*/, '').trim();
 
-        // Default answer to A if not found
-        if (!answer || !['A', 'B', 'C', 'D'].includes(answer)) {
-            // Look for marked answer in options (e.g. *A or (A))
-            for (const key of ['A', 'B', 'C', 'D']) {
-                if (options[key].includes('*') || options[key].startsWith('✓')) {
-                    answer = key;
-                    options[key] = options[key].replace(/[*✓]/g, '').trim();
-                    break;
-                }
+        // If explicitly True/False or detected as True/False
+        if (isExplicitTF || type === "true_false") {
+            type = "true_false";
+            options.A = "Đúng";
+            options.B = "Sai";
+            options.C = "";
+            options.D = "";
+            if (!answer || (answer !== 'A' && answer !== 'B')) {
+                answer = 'A';
             }
-            if (!answer) answer = 'A';
+        } else {
+            // Default 4 choices multiple choice
+            if (!answer || !['A', 'B', 'C', 'D'].includes(answer)) {
+                answer = 'A';
+            }
+            if (!options.A) options.A = "Lựa chọn A";
+            if (!options.B) options.B = "Lựa chọn B";
+            if (!options.C) options.C = "Lựa chọn C";
+            if (!options.D) options.D = "Lựa chọn D";
         }
-
-        // Ensure all options have some placeholder text if blank
-        if (!options.A) options.A = "Lựa chọn A";
-        if (!options.B) options.B = "Lựa chọn B";
-        if (!options.C) options.C = "Lựa chọn C";
-        if (!options.D) options.D = "Lựa chọn D";
 
         return {
             id: `q_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`,
             number: defaultNum,
+            type: type, // 'multiple_choice' or 'true_false'
             question: questionText || `Câu hỏi số ${defaultNum}`,
             options: options,
             answer: answer,
@@ -168,13 +186,14 @@ class QuestionParser {
     }
 
     /**
-     * Get default sample questions for immediate demonstration
+     * Get default sample questions containing both 4-choice Multiple Choice & True/False questions
      */
     static getSampleBank(category = 'chung') {
         const banks = {
             chung: [
                 {
                     number: 1,
+                    type: "multiple_choice",
                     question: "Thủ đô của nước Cộng hòa Xã hội Chủ nghĩa Việt Nam là thành phố nào?",
                     options: { A: "Hà Nội", B: "TP. Hồ Chí Minh", C: "Đà Nẵng", D: "Hải Phòng" },
                     answer: "A",
@@ -183,51 +202,70 @@ class QuestionParser {
                 },
                 {
                     number: 2,
-                    question: "Hành tinh nào gần Mặt Trời nhất trong Hệ Mặt Trời?",
-                    options: { A: "Sao Kim (Venus)", B: "Sao Thủy (Mercury)", C: "Sao Hỏa (Mars)", D: "Trái Đất" },
-                    answer: "B",
-                    explanation: "Sao Thủy (Mercury) là hành tinh nằm gần Mặt Trời nhất.",
+                    type: "true_false",
+                    question: "Trong tam giác vuông, bình phương cạnh huyền bằng tổng bình phương hai cạnh góc vuông ($c^2 = a^2 + b^2$). Đúng hay Sai?",
+                    options: { A: "Đúng", B: "Sai", C: "", D: "" },
+                    answer: "A",
+                    explanation: "Chính xác! Đây là định lý Pythagoras trong hình học Euclid.",
                     difficulty: "Dễ"
                 },
                 {
                     number: 3,
-                    question: "Trong tam giác vuông, bình phương cạnh huyền bằng gì?",
-                    options: {
-                        A: "Tổng bình phương hai cạnh góc vuông: $c^2 = a^2 + b^2$",
-                        B: "Hiệu bình phương hai cạnh góc vuông",
-                        C: "Tích hai cạnh góc vuông",
-                        D: "Gấp đôi cạnh góc vuông nhỏ hơn"
-                    },
-                    answer: "A",
-                    explanation: "Đây là định lý Pythagoras nổi tiếng trong hình học: $c^2 = a^2 + b^2$.",
+                    type: "multiple_choice",
+                    question: "Hành tinh nào nằm ở vị trí gần Mặt Trời nhất trong Hệ Mặt Trời?",
+                    options: { A: "Sao Kim (Venus)", B: "Sao Thủy (Mercury)", C: "Sao Hỏa (Mars)", D: "Trái Đất" },
+                    answer: "B",
+                    explanation: "Sao Thủy (Mercury) là hành tinh có quỹ đạo gần Mặt Trời nhất.",
                     difficulty: "Dễ"
                 },
                 {
                     number: 4,
-                    question: "Ai là tác giả của tác phẩm văn học nổi tiếng 'Truyện Kiều'?",
+                    type: "true_false",
+                    question: "Mặt Trời quay quanh Trái Đất theo quỹ đạo tròn hoàn hảo. Đúng hay Sai?",
+                    options: { A: "Đúng", B: "Sai", C: "", D: "" },
+                    answer: "B",
+                    explanation: "Sai! Theo thuyết nhật tâm của Copernicus và định luật Kepler, Trái Đất quay quanh Mặt Trời theo quỹ đạo elip.",
+                    difficulty: "Dễ"
+                },
+                {
+                    number: 5,
+                    type: "multiple_choice",
+                    question: "Ai là đại thi hào tác giả của kiệt tác văn học 'Truyện Kiều'?",
                     options: { A: "Nguyễn Trãi", B: "Nguyễn Du", C: "Hồ Xuân Hương", D: "Đoàn Thị Điểm" },
                     answer: "B",
                     explanation: "Đại thi hào Nguyễn Du (1765 - 1820) là tác giả của Truyện Kiều.",
                     difficulty: "Dễ"
                 },
                 {
-                    number: 5,
-                    question: "Khí nào chiếm tỉ lệ thể tích lớn nhất trong bầu khí quyển Trái Đất?",
-                    options: { A: "Khí Oxy ($O_2$)", B: "Khí Nitơ ($N_2$)", C: "Khí Carbonic ($CO_2$)", D: "Khí Argon" },
-                    answer: "B",
-                    explanation: "Khí Nitơ chiếm khoảng 78% thể tích không khí.",
-                    difficulty: "Trung bình"
-                },
-                {
                     number: 6,
-                    question: "Phương trình bậc hai $ax^2 + bx + c = 0$ ($a \\ne 0$) có nghiệm kép khi biệt thức $\\Delta$ bằng bao nhiêu?",
-                    options: { A: "$\\Delta > 0$", B: "$\\Delta < 0$", C: "$\\Delta = 0$", D: "$\\Delta \\le 0$" },
-                    answer: "C",
-                    explanation: "Phương trình có nghiệm kép $x_1 = x_2 = -\\frac{b}{2a}$ khi $\\Delta = b^2 - 4ac = 0$.",
+                    type: "true_false",
+                    question: "Số 2 là số nguyên tố chẵn duy nhất trong tập hợp các số nguyên tố. Đúng hay Sai?",
+                    options: { A: "Đúng", B: "Sai", C: "", D: "" },
+                    answer: "A",
+                    explanation: "Đúng! Mọi số chẵn lớn hơn 2 đều chia hết cho 2 nên đều là hợp số.",
                     difficulty: "Trung bình"
                 },
                 {
                     number: 7,
+                    type: "multiple_choice",
+                    question: "Phương trình bậc hai $ax^2 + bx + c = 0$ ($a \\ne 0$) có nghiệm kép khi biệt thức $\\Delta$ bằng bao nhiêu?",
+                    options: { A: "$\\Delta > 0$", B: "$\\Delta < 0$", C: "$\\Delta = 0$", D: "$\\Delta \\le 0$" },
+                    answer: "C",
+                    explanation: "Phương trình có nghiệm kép khi $\\Delta = b^2 - 4ac = 0$.",
+                    difficulty: "Trung bình"
+                },
+                {
+                    number: 8,
+                    type: "true_false",
+                    question: "Khí Oxy chiếm tỉ lệ phần trăm thể tích lớn nhất trong bầu khí quyển Trái Đất. Đúng hay Sai?",
+                    options: { A: "Đúng", B: "Sai", C: "", D: "" },
+                    answer: "B",
+                    explanation: "Sai! Khí Nitơ chiếm khoảng 78% thể tích không khí, trong khi Oxy chỉ chiếm khoảng 21%.",
+                    difficulty: "Trung bình"
+                },
+                {
+                    number: 9,
+                    type: "multiple_choice",
                     question: "Chiến thắng Điện Biên Phủ 'lừng lẫy năm châu, chấn động địa cầu' diễn ra vào năm nào?",
                     options: { A: "1945", B: "1954", C: "1975", D: "1968" },
                     answer: "B",
@@ -235,7 +273,17 @@ class QuestionParser {
                     difficulty: "Trung bình"
                 },
                 {
-                    number: 8,
+                    number: 10,
+                    type: "true_false",
+                    question: "Đạo hàm của hàm số $f(x) = \\sin(x)$ là hàm số $f'(x) = \\cos(x)$. Đúng hay Sai?",
+                    options: { A: "Đúng", B: "Sai", C: "", D: "" },
+                    answer: "A",
+                    explanation: "Đúng! Theo công thức đạo hàm cơ bản, $(\\sin x)' = \\cos x$.",
+                    difficulty: "Trung bình"
+                },
+                {
+                    number: 11,
+                    type: "multiple_choice",
                     question: "Nguyên tố hóa học nào có ký hiệu là 'Au' trong bảng tuần hoàn?",
                     options: { A: "Bạc", B: "Đồng", C: "Vàng", D: "Nhôm" },
                     answer: "C",
@@ -243,23 +291,17 @@ class QuestionParser {
                     difficulty: "Trung bình"
                 },
                 {
-                    number: 9,
-                    question: "Đỉnh núi nào được mệnh danh là 'Nóc nhà của Đông Dương'?",
-                    options: { A: "Fansipan (Việt Nam)", B: "Phou Bia (Lào)", C: "Aural (Campuchia)", D: "Bạch Mộc Lương Tử" },
+                    number: 12,
+                    type: "true_false",
+                    question: "Nước đóng băng ở 0°C và sôi ở 100°C ở áp suất khí quyển tiêu chuẩn 1 atm. Đúng hay Sai?",
+                    options: { A: "Đúng", B: "Sai", C: "", D: "" },
                     answer: "A",
-                    explanation: "Fansipan cao 3.143m tại Sa Pa, Lào Cai, là đỉnh núi cao nhất bán đảo Đông Dương.",
+                    explanation: "Đúng! Đây là hai điểm chuẩn trong thang nhiệt độ Celsius.",
                     difficulty: "Trung bình"
                 },
                 {
-                    number: 10,
-                    question: "Đạo hàm của hàm số $f(x) = \\sin(x)$ là hàm số nào sau đây?",
-                    options: { A: "$-\\cos(x)$", B: "$\\cos(x)$", C: "$\\tan(x)$", D: "$-\\sin(x)$" },
-                    answer: "B",
-                    explanation: "Theo bảng đạo hàm cơ bản, $(\\sin x)' = \\cos x$.",
-                    difficulty: "Trung bình"
-                },
-                {
-                    number: 11,
+                    number: 13,
+                    type: "multiple_choice",
                     question: "Đơn vị đo cường độ dòng điện trong hệ đo lường quốc tế SI là gì?",
                     options: { A: "Volt (V)", B: "Ohm ($\\Omega$)", C: "Ampe (A)", D: "Watt (W)" },
                     answer: "C",
@@ -267,36 +309,17 @@ class QuestionParser {
                     difficulty: "Khó"
                 },
                 {
-                    number: 12,
-                    question: "Tập hợp các số thực $\\mathbb{R}$ bao gồm các tập số nào?",
-                    options: {
-                        A: "Số hữu tỉ $\\mathbb{Q}$ và số vô tỉ $\\mathbb{I}$",
-                        B: "Chỉ số nguyên $\\mathbb{Z}$ và số tự nhiên $\\mathbb{N}$",
-                        C: "Chỉ số nguyên tố",
-                        D: "Chỉ các phân số dương"
-                    },
-                    answer: "A",
-                    explanation: "Tập số thực $\\mathbb{R} = \\mathbb{Q} \\cup \\mathbb{I}$.",
-                    difficulty: "Khó"
-                },
-                {
-                    number: 13,
-                    question: "Tổ chức Liên Hợp Quốc (UN) chính thức được thành lập vào năm nào?",
-                    options: { A: "1919", B: "1945", C: "1950", D: "1977" },
-                    answer: "B",
-                    explanation: "Hiến chương Liên Hợp Quốc có hiệu lực vào ngày 24/10/1945.",
-                    difficulty: "Khó"
-                },
-                {
                     number: 14,
-                    question: "Đại dương nào có diện tích và độ sâu trung bình lớn nhất trên Trái Đất?",
-                    options: { A: "Đại Tây Dương", B: "Ấn Độ Dương", C: "Thái Bình Dương", D: "Bắc Băng Dương" },
-                    answer: "C",
-                    explanation: "Thái Bình Dương chiếm hơn 30% diện tích bề mặt Trái Đất.",
+                    type: "true_false",
+                    question: "Thái Bình Dương là đại dương có diện tích nhỏ nhất trên Trái Đất. Đúng hay Sai?",
+                    options: { A: "Đúng", B: "Sai", C: "", D: "" },
+                    answer: "B",
+                    explanation: "Sai! Thái Bình Dương là đại dương lớn nhất và sâu nhất trên Trái Đất (Bắc Băng Dương mới là nhỏ nhất).",
                     difficulty: "Khó"
                 },
                 {
                     number: 15,
+                    type: "multiple_choice",
                     question: "Cầu thủ bóng đá nào đã giành được nhiều Quả bóng Vàng (Ballon d'Or) nhất lịch sử?",
                     options: { A: "Cristiano Ronaldo", B: "Lionel Messi", C: "Pelé", D: "Diego Maradona" },
                     answer: "B",
