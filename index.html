@@ -140,10 +140,11 @@ const RULES = {
   R4_TIME: { 20: 15, 30: 20, 40: 20 },
   PACKAGES: { 60: [20, 20, 20], 80: [20, 30, 30], 100: [20, 40, 40] },
   BUZZ_TIME: 5, STEAL_TIME: 10,
+  TB_BUZZ_TIME: 15, TB_ANSWER_TIME: 10,   // Câu hỏi phụ (khi bằng điểm): giây bấm chuông / giây trả lời
   STEAL_TAKES_FROM_MAIN: true   // true: đội cướp đúng lấy điểm của đội đang thi (luật VTV3)
 };
-const ROUND_NAMES = ['', 'Khởi Động', 'Vượt Chướng Ngại Vật', 'Tăng Tốc', 'Về Đích'];
-const ROUND_ICONS = ['', 'fa-bolt', 'fa-puzzle-piece', 'fa-gauge-high', 'fa-flag-checkered'];
+const ROUND_NAMES = ['', 'Khởi Động', 'Vượt Chướng Ngại Vật', 'Tăng Tốc', 'Về Đích', 'Câu Hỏi Phụ'];
+const ROUND_ICONS = ['', 'fa-bolt', 'fa-puzzle-piece', 'fa-gauge-high', 'fa-flag-checkered', 'fa-scale-balanced'];
 const COLORS = ['#e11d48', '#2563eb', '#059669', '#d97706', '#7c3aed', '#0891b2'];
 const L = 'ABCD';
 
@@ -289,6 +290,42 @@ B. xanh
 C. vàng
 D. tím
 Đáp án: A
+Câu 7: Muối ăn có công thức hóa học là
+A. NaCl
+B. KCl
+C. $\ce{CaCl2}$
+D. NaOH
+Đáp án: A
+Câu 8: Dung dịch nào làm quỳ tím hóa xanh?
+A. HCl
+B. NaOH
+C. NaCl
+D. $\ce{H2SO4}$
+Đáp án: B
+Câu 9: Dung dịch có pH = 7 có môi trường
+A. acid
+B. base
+C. trung tính
+D. không xác định
+Đáp án: C
+Câu 10: Đơn vị của khối lượng mol là
+A. g
+B. mol
+C. g/mol
+D. L
+Đáp án: C
+Câu 11: Oxide của kim loại như CaO, $\ce{Na2O}$ thường là
+A. oxide acid
+B. oxide base
+C. muối
+D. acid
+Đáp án: B
+Câu 12: Quá trình nào sau đây là biến đổi vật lí?
+A. Đốt than
+B. Sắt bị gỉ
+C. Nước đá tan
+D. Thức ăn bị ôi thiu
+Đáp án: C
 
 [VỀ ĐÍCH 30]
 Câu 1: Phản ứng trung hòa giữa acid và base tạo ra
@@ -315,6 +352,30 @@ B. phân đạm
 C. muối ăn
 D. đường
 Đáp án: A
+Câu 5: Hòa tan 20 g NaCl vào 80 g nước. Nồng độ phần trăm của dung dịch là
+A. 25%
+B. 20%
+C. 16%
+D. 80%
+Đáp án: B
+Câu 6: Số mol có trong 11,2 g Fe là (Fe = 56)
+A. 0,1 mol
+B. 0,2 mol
+C. 0,5 mol
+D. 2 mol
+Đáp án: B
+Câu 7: Khối lượng của 0,5 mol $\ce{CO2}$ là (C = 12, O = 16)
+A. 22 g
+B. 44 g
+C. 11 g
+D. 88 g
+Đáp án: A
+Câu 8: Dung dịch HCl tác dụng với đá vôi $\ce{CaCO3}$ giải phóng khí
+A. $\ce{H2}$
+B. $\ce{O2}$
+C. $\ce{CO2}$
+D. $\ce{Cl2}$
+Đáp án: C
 
 [VỀ ĐÍCH 40]
 Câu 1: Đốt 2,4 g Mg trong oxygen thu được 4 g MgO. Khối lượng oxygen đã phản ứng là
@@ -341,6 +402,50 @@ B. SO2
 C. O2
 D. N2
 Đáp án: A
+Câu 5: Hòa tan 4 g NaOH vào nước được 500 mL dung dịch. Nồng độ mol của dung dịch là (NaOH = 40)
+A. 0,1 M
+B. 0,2 M
+C. 0,4 M
+D. 2 M
+Đáp án: B
+Câu 6: Khí X có tỉ khối so với không khí bằng 2. Khối lượng mol của X là (M không khí = 29)
+A. 29 g/mol
+B. 58 g/mol
+C. 14,5 g/mol
+D. 31 g/mol
+Đáp án: B
+Câu 7: Cho 5,6 g Fe vào dung dịch HCl dư. Thể tích khí $\ce{H2}$ thu được ở điều kiện chuẩn là (Fe = 56)
+A. 2,479 L
+B. 1,2395 L
+C. 4,958 L
+D. 24,79 L
+Đáp án: A
+Câu 8: Trộn 100 g dung dịch NaCl 10% với 100 g dung dịch NaCl 20%. Nồng độ phần trăm của dung dịch thu được là
+A. 30%
+B. 15%
+C. 10%
+D. 20%
+Đáp án: B
+
+[CÂU HỎI PHỤ]
+Câu 1: Kí hiệu hóa học của nguyên tố sodium là
+A. S
+B. Na
+C. N
+D. So
+Đáp án: B
+Câu 2: Công thức hóa học của nước là
+A. $\ce{H2O2}$
+B. $\ce{H2O}$
+C. HO
+D. OH
+Đáp án: B
+Câu 3: Chất nào sau đây là acid?
+A. NaOH
+B. NaCl
+C. HCl
+D. CaO
+Đáp án: C
 `;
 
 /* ============================ TIỆN ÍCH ============================ */
@@ -567,7 +672,7 @@ function texInline(src, libs) {   // src đã bỏ chú thích %
   for (let r = 0; r < 3 && /⟦K\d+⟧/.test(s); r++) s = s.replace(/⟦K(\d+)⟧/g, (m0, k) => keep[+k] ?? m0);
   return s.trim();
 }
-const SEC_LABEL = { r1: '[KHỞI ĐỘNG]', r2: '[VƯỢT CHƯỚNG NGẠI VẬT]', cnv: '[CNV]', r3: '[TĂNG TỐC]', v20: '[VỀ ĐÍCH 20]', v30: '[VỀ ĐÍCH 30]', v40: '[VỀ ĐÍCH 40]', pool: '[CÂU CHUNG]' };
+const SEC_LABEL = { r1: '[KHỞI ĐỘNG]', r2: '[VƯỢT CHƯỚNG NGẠI VẬT]', cnv: '[CNV]', r3: '[TĂNG TỐC]', v20: '[VỀ ĐÍCH 20]', v30: '[VỀ ĐÍCH 30]', v40: '[VỀ ĐÍCH 40]', tb: '[CÂU HỎI PHỤ]', pool: '[CÂU CHUNG]' };
 function texToBank(tex) {
   let s = String(tex).replace(/\r/g, '');
   const libs = (texNoComments(s).match(/\\usetikzlibrary\{[^}]*\}/g) || []).join('');
@@ -618,6 +723,8 @@ const SAMPLE_TEX = String.raw`\documentclass[12pt,a4paper]{article}
 %   [KD]   Khởi động (7 câu)            [VCNV] Vượt CNV – 4 hàng ngang
 %   [CNV]  Câu đoán từ khóa CNV (1 câu)  [TT]   Tăng tốc (4 câu)
 %   [VD20] [VD30] [VD40]  Về đích – câu 20 / 30 / 40 điểm
+%   [PHU]  Câu hỏi phụ – dùng khi các đội bằng điểm
+% ĐỀ ĐẦY ĐỦ (thoáng): 7 KD + 4 VCNV + 1 CNV + 4 TT + 12 VD20 + 8 VD30 + 8 VD40 + 3 PHU = 47 câu
 % Hoặc ghi 1 lần cho cả nhóm câu:  \section{KD}  /  %[TT]  (đứng riêng 1 dòng)
 % Câu KHÔNG có mã sẽ không được dùng. Đáp án đúng đánh dấu \True.
 %==========================================================================
@@ -702,6 +809,15 @@ Cân bằng phương trình $\ce{?Fe + ?O2 -> ?Fe3O4}$, hệ số lần lượt 
 {$3, 4, 1$}
 \end{ex}
 
+\begin{ex}%[PHU]
+Kí hiệu hóa học của nguyên tố sodium là
+\choice
+{S}
+{\True Na}
+{N}
+{So}
+\end{ex}
+
 \begin{ex}%[VD40]
 Đốt 2,4 g Mg trong oxygen thu được 4 g MgO. Khối lượng oxygen đã phản ứng là
 \choice
@@ -722,7 +838,7 @@ function h_sampleTex() { dl(new Blob([SAMPLE_TEX], { type: 'text/x-tex;charset=u
 /* Mã vòng thi (viết trong [ ] ở Word, hoặc %[ ] / \section{ } ở LaTeX):
    KD = Khởi động · VCNV = Vượt chướng ngại vật (hàng ngang) · CNV = câu từ khóa chướng ngại vật
    TT = Tăng tốc · VD20 / VD30 / VD40 = Về đích câu 20 / 30 / 40 điểm */
-const ROUND_CODES = { KD: 'r1', KHOIDONG: 'r1', VCNV: 'r2', HN: 'r2', HANGNGANG: 'r2', CNV: 'cnv', TUKHOA: 'cnv', TT: 'r3', TANGTOC: 'r3', VD20: 'v20', VD30: 'v30', VD40: 'v40', VD: 'v20' };
+const ROUND_CODES = { KD: 'r1', KHOIDONG: 'r1', VCNV: 'r2', HN: 'r2', HANGNGANG: 'r2', CNV: 'cnv', TUKHOA: 'cnv', TT: 'r3', TANGTOC: 'r3', PHU: 'tb', CHP: 'tb', CAUHOIPHU: 'tb', VD20: 'v20', VD30: 'v30', VD40: 'v40', VD: 'v20' };
 function secKey(s) {
   const n = norm(s), c = n.replace(/[^A-Z0-9]/g, '');
   if (ROUND_CODES[c]) return ROUND_CODES[c];
@@ -730,11 +846,12 @@ function secKey(s) {
   if (n.includes('VUOT') || /\bVCNV\b/.test(n) || n.includes('HANG NGANG')) return 'r2';
   if (/\bCNV\b/.test(n) || n.includes('CHUONG NGAI') || n.includes('TU KHOA')) return 'cnv';
   if (n.includes('TANG TOC')) return 'r3';
+  if (n.includes('CAU HOI PHU') || n.includes('CAU PHU')) return 'tb';
   if (n.includes('VE DICH')) { if (n.includes('40')) return 'v40'; if (n.includes('30')) return 'v30'; return 'v20'; }
   return 'pool';
 }
 function parseQuestions(raw) {
-  const out = { r1: [], r2: [], cnv: [], r3: [], v20: [], v30: [], v40: [], pool: [] };
+  const out = { r1: [], r2: [], cnv: [], r3: [], v20: [], v30: [], v40: [], tb: [], pool: [] };
   let sec = 'pool', cur = null;
   const flush = () => {
     if (cur) {
@@ -773,13 +890,17 @@ function buildBank(text) {
     else if (arr.length > n) warn.push(`${label}: có ${arr.length} câu, chỉ dùng ${n} câu đầu`);
     return arr.slice(0, n);
   };
-  if (p.pool.length) warn.push(`${p.pool.length} câu chưa có mã vòng thi nên KHÔNG được dùng – hãy đặt dưới mục [KD], [VCNV], [CNV], [TT], [VD20], [VD30] hoặc [VD40]`);
+  if (p.pool.length) warn.push(`${p.pool.length} câu chưa có mã vòng thi nên KHÔNG được dùng – hãy đặt dưới mục [KD], [VCNV], [CNV], [TT], [VD20], [VD30], [VD40] hoặc [PHU]`);
   const b = { r1: take(p.r1, RULES.R1_COUNT, 'Khởi động'), r2: take(p.r2, 4, 'Vượt CNV (hàng ngang)'), cnv: take(p.cnv, 1, 'Câu từ khóa CNV')[0] || null, r3: take(p.r3, 4, 'Tăng tốc') };
-  b.v = { 20: [...p.v20], 30: [...p.v30], 40: [...p.v40] };
-  const r4n = b.v[20].length + b.v[30].length + b.v[40].length;
-  if (r4n < 12) warn.push(`Về đích: nên có ≥ 12 câu (đang có ${r4n}), thiếu sẽ dùng lại câu Về đích`);
+  b.v = { 20: [...p.v20], 30: [...p.v30], 40: [...p.v40] }; b.tb = [...p.tb];
+  // Về đích: trường hợp xấu nhất – cả 4 đội chọn gói 60 (cần 12 câu 20đ), gói 80 (8 câu 30đ), gói 100 (8 câu 40đ)
+  const need = RULES.TEAM_COUNT, need20 = 3 * need, need30 = 2 * need, need40 = 2 * need;
+  if (b.v[20].length < need) warn.push(`Về đích 20đ: tối thiểu ${need} câu (mỗi gói đều có 1 câu 20đ), đang có ${b.v[20].length}`);
+  if (b.v[40].length < need40) warn.push(`Về đích 40đ: cần ${need40} câu để đủ khi cả ${need} đội chọn gói 100đ, đang có ${b.v[40].length}`);
+  if (b.v[20].length < need20 || b.v[30].length < need30) warn.push(`Về đích (khuyến nghị, không lặp câu với mọi cách chọn gói): ${need20} câu 20đ, ${need30} câu 30đ, ${need40} câu 40đ – đang có ${b.v[20].length}/${b.v[30].length}/${b.v[40].length}`);
+  if (!b.tb.length) warn.push('Câu hỏi phụ: chưa có câu [PHU] – nếu cuối trận có đội bằng điểm sẽ không phân định được (khuyến nghị 3 câu)');
   b.total = Object.values(p).reduce((s, a) => s + a.length, 0); b.warn = warn;
-  b.count = { r1: b.r1.length, r2: b.r2.length, cnv: b.cnv ? 1 : 0, r3: b.r3.length, v20: b.v[20].length, v30: b.v[30].length, v40: b.v[40].length, pool: p.pool.length };
+  b.count = { r1: b.r1.length, r2: b.r2.length, cnv: b.cnv ? 1 : 0, r3: b.r3.length, v20: b.v[20].length, v30: b.v[30].length, v40: b.v[40].length, tb: b.tb.length, pool: p.pool.length };
   return b;
 }
 
@@ -825,9 +946,10 @@ function roundRule(r) {
     `${RULES.R1_COUNT} câu trong ${RULES.R1_TIME} giây cho cả vòng • đúng +${RULES.R1_POINT}đ/câu • mỗi đội có thứ tự câu và vị trí A, B, C, D khác nhau.`,
     `4 hàng ngang (${RULES.R2_ROW_TIME}s/câu, đúng +${RULES.R2_POINT}đ). Đoán chướng ngại vật càng sớm càng nhiều điểm: ${RULES.CNV_POINTS.join(' – ')}đ. Đoán sai mất quyền đoán.`,
     `4 câu, ${RULES.R3_TIME}s/câu. Đội trả lời đúng nhanh nhất +${RULES.R3_POINTS[0]}đ, tiếp theo ${RULES.R3_POINTS.slice(1).join(' – ')}đ.`,
-    `Lần lượt từng đội chọn gói 60 / 80 / 100đ và có thể đặt Ngôi sao hy vọng (đúng ×2, sai bị trừ). Đội thi sai → 3 đội còn lại có ${RULES.BUZZ_TIME} giây bấm chuông giành quyền.`][r];
+    `Lần lượt từng đội chọn gói 60 / 80 / 100đ và có thể đặt Ngôi sao hy vọng (đúng ×2, sai bị trừ). Đội thi sai → 3 đội còn lại có ${RULES.BUZZ_TIME} giây bấm chuông giành quyền.`,
+    `Dành cho các đội BẰNG ĐIỂM sau Về đích. Câu hỏi hiện cho các đội bằng điểm; đội bấm chuông trước (${RULES.TB_BUZZ_TIME}s) được trả lời (${RULES.TB_ANSWER_TIME}s): đúng thì xếp trên, sai/hết giờ thì xếp dưới. Không làm thay đổi điểm số.`][r];
 }
-function rankOf(teams) { return teams.map((t, i) => ({ ...t, i })).sort((a, b) => b.score - a.score); }
+function rankOf(teams) { return teams.map((t, i) => ({ ...t, i })).sort((a, b) => b.score - a.score || (b.tb || 0) - (a.tb || 0)); }
 function scoreStrip(p, me = -1) {
   return `<div class="grid grid-cols-2 sm:grid-cols-4 gap-2">${p.teams.map((t, i) => `<div class="rounded-xl px-3 py-2 border-2 ${i === me ? 'bg-white' : 'bg-slate-50'}" style="border-color:${i === me ? t.color : '#e2e8f0'}">
     <div class="text-[11px] font-black truncate" style="color:${t.color}">${esc(t.name)}</div><div class="text-2xl font-black tabular-nums">${t.score}</div></div>`).join('')}</div>`;
@@ -850,6 +972,7 @@ function teamScreen(p, t, ctx) {
   if (p.round === 2) return r2Team(p, t, ctx);
   if (p.round === 3) return r3Team(p, t, ctx);
   if (p.round === 4) return r4Team(p, t, ctx);
+  if (p.round === 5) return r5Team(p, t, ctx);
   return '';
 }
 
@@ -993,7 +1116,7 @@ function r4Team(p, t, ctx) {
       optsHTML(v.opts, { act: 'steal', disabled: ctx.ro || !me || pend, wrong: v.main.c, chosen: pend ? ctx.pend.c : -1 }) +
       `<div class="mt-4 text-center font-black text-amber-700"><i class="fa-solid fa-bell"></i> ${me ? 'Đội bạn đã giành quyền – chọn đáp án!' : esc(p.teams[v.buzzer].name) + ' đã giành quyền trả lời'}</div>`;
   } else {
-    body += optsHTML(v.opts, { disabled: true, correct: v.ans, chosen: v.main.c, wrong: v.steal ? v.steal.c : -1 }) + r4Outcome(p);
+    body += optsHTML(v.opts, { disabled: true, correct: v.ans, chosen: v.main ? v.main.c : -1, wrong: v.steal ? v.steal.c : -1 }) + r4Outcome(p);
   }
   return head + `<div class="card qcard p-5 sm:p-7 mt-4 pop">${body}</div>`;
 }
@@ -1012,7 +1135,7 @@ function finalBoard(p, me = -1) {
   return `<div class="card p-6 sm:p-10 text-center pop"><div class="text-sm font-black text-violet-600 uppercase tracking-wider">Kết quả chung cuộc</div>
     <div class="text-3xl sm:text-4xl font-black mt-2">🏆 ${esc(rk[0].name)} về nhất!</div>
     <div class="mt-6 space-y-2 max-w-xl mx-auto">${rk.map((x, k) => `<div class="flex items-center justify-between rounded-2xl px-4 py-3 border-2 ${x.i === me ? 'bg-violet-50' : 'bg-white'}" style="border-color:${x.color}">
-      <div class="flex items-center gap-3 font-black"><span class="text-2xl">${medal[k]}</span>${esc(x.name)}</div><div class="text-2xl font-black tabular-nums">${x.score}</div></div>`).join('')}</div></div>`;
+      <div class="flex items-center gap-3 font-black"><span class="text-2xl">${medal[k]}</span>${esc(x.name)}${x.tb > 0 ? '<span class="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-100 text-amber-700"><i class="fa-solid fa-scale-balanced"></i> thắng câu hỏi phụ</span>' : ''}${rk.some(y => y.i !== x.i && y.score === x.score && (y.tb || 0) === (x.tb || 0)) ? '<span class="text-[10px] font-black px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">đồng hạng</span>' : ''}</div><div class="text-2xl font-black tabular-nums">${x.score}</div></div>`).join('')}</div></div>`;
 }
 
 /* =====================================================================
@@ -1042,7 +1165,7 @@ function hostInit() {
 }
 
 function buildPub() {
-  const p = { roomId: H.roomId, phase: H.phase, teams: H.teams.map(t => ({ name: t.name, color: t.color, members: t.members, dev: t.dev, score: t.score })), rejects: H.rejects };
+  const p = { roomId: H.roomId, phase: H.phase, teams: H.teams.map(t => ({ name: t.name, color: t.color, members: t.members, dev: t.dev, score: t.score, tb: t.tb || 0 })), rejects: H.rejects };
   if (H.phase === 'game') { p.round = H.g.round; p.status = H.g.status; p.view = pubRound(H.g); }
   return p;
 }
@@ -1072,6 +1195,11 @@ function pubRound(g) {
       text: showQ ? cur.q.text : null, opts: showQ ? cur.q.opts : null, ans: r.st === 'reveal' ? cur.q.ans : -1,
       deadline: r.deadline, total: r.total, main: r.main, buzzer: r.buzzer, steal: r.steal };
   }
+  if (g.round === 5 && g.r5) {
+    const r = g.r5, show = r.q && r.st !== 'ready';
+    return { group: r.group, alive: r.alive, st: r.st, qi: r.qi, text: show ? r.q.text : null, opts: show ? r.q.opts : null, ans: r.st === 'reveal' && r.q ? r.q.ans : -1,
+      deadline: r.deadline, total: r.total, buzzer: r.buzzer, res: r.res, msg: r.msg };
+  }
   return null;
 }
 
@@ -1091,6 +1219,11 @@ function onAction(a) {
     else if (a.type === 'r4ans' && r.st === 'answer' && t === r.order[r.turn] && a.ts <= r.deadline + 300) mainAnswer(a.c);
     else if (a.type === 'buzz' && r.st === 'buzz' && t !== r.order[r.turn] && a.ts <= r.deadline + 300) { r.buzzer = t; r.st = 'steal'; setDl(r, RULES.STEAL_TIME); }
     else if (a.type === 'r4steal' && r.st === 'steal' && t === r.buzzer && a.ts <= r.deadline + 300) stealResult(a.c);
+  }
+  else if (g.round === 5 && g.r5 && g.status === 'play') {
+    const r = g.r5;
+    if (a.type === 'buzz' && r.st === 'buzz' && r.alive.includes(t) && a.ts <= r.deadline + 300) { r.buzzer = t; r.st = 'answer'; setDl(r, RULES.TB_ANSWER_TIME); }
+    else if (a.type === 'tbans' && r.st === 'answer' && t === r.buzzer && a.ts <= r.deadline + 300) tbResult(a.c);
   }
   commit();
 }
@@ -1197,9 +1330,41 @@ function h_nextQ() {
   const g = H.g, r = g.r4;
   if (r.qi < r.qs.length - 1) { r.qi++; r.st = 'ready'; r.main = null; r.buzzer = -1; r.steal = null; }
   else if (r.turn < r.order.length - 1) { r.turn++; Object.assign(r, { st: 'pick', pkg: 0, star: -1, qs: [], qi: 0, hist: [], main: null, buzzer: -1, steal: null }); }
+  else finishOrTie();
+  commit();
+}
+/* ---------- Câu hỏi phụ: phân định các đội bằng điểm ---------- */
+function tieGroup() {   // nhóm đội bằng điểm có thứ hạng cao nhất
+  const rk = rankOf(H.teams);
+  for (const x of rk) { const grp = rk.filter(y => y.score === x.score && (y.tb || 0) === (x.tb || 0)).map(y => y.i); if (grp.length > 1) return grp; }
+  return null;
+}
+function finishOrTie() {
+  const grp = tieGroup(), g = H.g;
+  if (grp && g.bank.tb && g.bank.tb.length) {
+    g.round = 5; g.status = 'intro'; UI.tab = 'main';
+    g.r5 = { group: grp, alive: [...grp], st: 'ready', qi: -1, q: null, left: g.r5 ? g.r5.left : shuffle(g.bank.tb), start: 0, deadline: 0, total: 0, buzzer: -1, res: null, msg: '' };
+  } else { H.phase = 'end'; UI.confetti = false; }
+}
+function h_tbShow() {
+  const g = H.g, r = g.r5;
+  r.q = r.left.length ? r.left.shift() : g.bank.tb[Math.floor(Math.random() * g.bank.tb.length)];
+  r.qi++; r.st = 'buzz'; r.buzzer = -1; r.res = null; r.msg = ''; setDl(r, RULES.TB_BUZZ_TIME); commit();
+}
+function tbResult(c) {
+  const r = H.g.r5, t = r.buzzer, ok = c === r.q.ans;
+  r.res = { c, ok, team: t };
+  if (ok) { H.teams[t].tb = (H.teams[t].tb || 0) + 1; r.msg = `${H.teams[t].name} trả lời ĐÚNG – xếp trên các đội bằng điểm`; r.alive = []; }
+  else { H.teams[t].tb = (H.teams[t].tb || 0) - 1; r.alive = r.alive.filter(x => x !== t); r.msg = `${H.teams[t].name} ${c < 0 ? 'hết giờ' : 'trả lời sai'} – xếp dưới các đội còn lại`; }
+  r.st = 'reveal';
+}
+function h_tbNext() {   // sau mỗi câu phụ: còn bằng điểm thì hỏi tiếp, hết thì kết thúc
+  const g = H.g, r = g.r5, grp = tieGroup();
+  if (grp && g.bank.tb.length) { Object.assign(r, { group: grp, alive: [...grp], st: 'ready', q: null, buzzer: -1, res: null, msg: '' }); g.status = 'play'; }
   else { H.phase = 'end'; UI.confetti = false; }
   commit();
 }
+function h_tbSkip() { if (confirm('Bỏ qua câu hỏi phụ và xem kết quả (các đội bằng điểm sẽ đồng hạng)?')) { H.phase = 'end'; UI.confetti = false; commit(); } }
 function h_pickFor(pkg) { pickPkg(pkg, -1); commit(); }
 
 /* ---------- Đồng hồ máy chủ ---------- */
@@ -1217,6 +1382,11 @@ function hostTick() {
     if (r.st === 'answer') { mainAnswer(-1); ch = true; }
     else if (r.st === 'buzz') { r.st = 'reveal'; ch = true; }
     else if (r.st === 'steal') { stealResult(-1); ch = true; }
+  }
+  if (g.round === 5 && g.r5 && g.status === 'play' && now > g.r5.deadline) {
+    const r = g.r5;
+    if (r.st === 'buzz') { r.st = 'reveal'; r.res = null; r.msg = 'Không đội nào bấm chuông – GV hiện câu hỏi phụ tiếp theo'; ch = true; }
+    else if (r.st === 'answer') { tbResult(-1); ch = true; }
   }
   if (ch) commit();
 }
@@ -1236,19 +1406,19 @@ function h_start() {
   if (!H.teams.every(t => t.dev)) return;
   const bank = buildBank(H.bankText);
   if (!bank.r1.length) return alert('Bộ câu hỏi chưa có câu nào cho vòng Khởi động.');
-  H.teams.forEach(t => t.score = 0); H.phase = 'game'; H.g = { round: 1, status: 'intro', bank }; UI.tab = 'main';
+  H.teams.forEach(t => { t.score = 0; t.tb = 0; }); H.phase = 'game'; H.g = { round: 1, status: 'intro', bank }; UI.tab = 'main';
   startR1(); commit();
 }
 function h_startRound() {
   const g = H.g;
   if (g.round === 2) { if (!g.bank.r2.length) { g.round = 3; g.status = 'intro'; return commit(); } startR2(); }
-  else if (g.round === 3) startR3(); else if (g.round === 4) startR4();
+  else if (g.round === 3) startR3(); else if (g.round === 4) startR4(); else if (g.round === 5) g.status = 'play';
   commit();
 }
 function h_endRound() { const g = H.g; if (g.round === 2 && g.r2 && g.r2.rs === 'play') revealRow(); if (g.round === 3 && g.r3 && g.r3.qs === 'play') revealR3(); g.status = 'review'; commit(); }
 function h_revealNow() { const g = H.g; if (g.round === 2) revealRow(); if (g.round === 3) revealR3(); commit(); }
-function h_nextRound() { const g = H.g; if (g.round >= 4) { H.phase = 'end'; UI.confetti = false; } else { g.round++; g.status = 'intro'; } UI.tab = 'main'; commit(); }
-function h_replay() { H.teams.forEach(t => t.score = 0); H.g = null; H.phase = 'lobby'; commit(); }
+function h_nextRound() { const g = H.g; if (g.round >= 4) finishOrTie(); else { g.round++; g.status = 'intro'; } UI.tab = 'main'; commit(); }
+function h_replay() { H.teams.forEach(t => { t.score = 0; t.tb = 0; }); H.g = null; H.phase = 'lobby'; commit(); }
 function closeRoom() { Net.publish(H.roomId, { roomId: H.roomId, phase: 'closed', teams: [], rejects: {} }); }
 function h_backSetup() { if (!confirm('Quay lại chia đội? Phòng hiện tại sẽ đóng, mã PIN cũ hết hiệu lực.')) return; closeRoom(); H.teams.forEach(t => { t.dev = null; t.score = 0; }); H.phase = 'setup'; H.g = null; commit(); }
 function h_resetAll() { if (!confirm('Xóa toàn bộ (danh sách, đội, bộ câu hỏi) và làm lại từ đầu?')) return; closeRoom(); H = hostDefault(); commit(); }
@@ -1363,7 +1533,7 @@ function renderHost() {
           </div>
         </div>
         <div class="flex items-center gap-2">
-          <!-- (tạm ẩn nhãn chế độ kết nối) --><button onclick="h_help('start')" class="px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs border border-amber-200 flex items-center gap-1.5 transition shadow-sm"><i class="fa-solid fa-book-open text-amber-600"></i><span class="hidden sm:inline">Hướng dẫn sử dụng</span></button>
+          <!-- (tạm ẩn nhãn chế độ kết nối) --><button onclick="h_help('intro')" class="px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs border border-amber-200 flex items-center gap-1.5 transition shadow-sm"><i class="fa-solid fa-book-open text-amber-600"></i><span class="hidden sm:inline">Hướng dẫn sử dụng</span></button>
           ${H.phase === 'setup' ? '' : `<button onclick="h_backSetup()" class="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-xs border border-purple-200 flex items-center gap-1.5 transition shadow-sm"><i class="fa-solid fa-users-gear text-purple-600"></i><span class="hidden sm:inline">Chia lại đội</span></button>`}
           <button onclick="h_fullscreen()" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 hidden sm:flex items-center justify-center text-xs transition" title="Chiếu máy chiếu"><i class="fa-solid fa-expand"></i></button>
           <span class="hidden lg:inline-flex items-center gap-1.5 text-[11px] font-black px-2.5 py-1 rounded-lg bg-slate-900 text-white"><i class="fa-solid fa-user-shield text-amber-300"></i>${esc(authUser())}</span>
@@ -1421,7 +1591,7 @@ function sidebarHTML() {
           ${link('fa-users-gear', 'purple', 'Danh sách & Chia đội', ph === 'setup' ? '' : 'h_backSetup()', ph === 'setup', `${H.students.length} HS • ${H.teams.length} đội`)}
           ${link('fa-door-open', 'emerald', 'Phòng chờ & Mã PIN', '', ph === 'lobby', ph === 'setup' ? 'Chưa mở phòng' : `${joined}/${H.teams.length} đội đã vào`, ph === 'setup')}
           ${link('fa-users-viewfinder', 'indigo', 'Màn hình các đội (BGK)', ph === 'game' ? 'h_tab(0)' : '', ph === 'game' && UI.tab !== 'main', 'Xem y hệt máy từng đội', ph !== 'game')}
-          ${link('fa-book-open', 'amber', 'Hướng dẫn sử dụng', "h_help('start')", !!UI.help, 'Word, Excel, luật thi, tùy chỉnh')}
+          ${link('fa-book-open', 'amber', 'Hướng dẫn sử dụng', "h_help('intro')", !!UI.help, 'Word, Excel, luật thi, tùy chỉnh')}
           ${link('fa-eye', 'pink', 'Xem trước giao diện', "h_preview('lobby')", !!UI.preview, 'Màn hình đội & GV từng vòng')}
           ${link('fa-trophy', 'amber', 'Bảng điểm', ph === 'game' ? "h_tab('main')" : '', ph === 'end' || (ph === 'game' && UI.tab === 'main'), H.teams.map(t => t.score).join(' • '), ph === 'setup' || ph === 'lobby')}
         </div>
@@ -1502,7 +1672,7 @@ function setupHTML() {
           <button class="btn btn-soft !py-1.5 !text-xs" onclick="h_sampleTex()"><i class="fa-solid fa-file-code text-purple-600"></i> .tex mẫu</button>
           <button class="btn btn-soft !py-1.5 !text-xs" onclick="h_help('word')"><i class="fa-solid fa-circle-question text-amber-600"></i> Soạn đề Word</button>
           <button class="btn btn-soft !py-1.5 !text-xs" onclick="h_help('latex')"><i class="fa-solid fa-circle-question text-purple-600"></i> Soạn đề LaTeX</button></div></div></div>
-    <div class="grid grid-cols-2 sm:grid-cols-4 ${cnt.pool ? 'lg:grid-cols-8' : 'lg:grid-cols-7'} gap-2 text-center">${[['Khởi động', cnt.r1, RULES.R1_COUNT], ['Hàng ngang', cnt.r2, 4], ['Từ khóa CNV', cnt.cnv, 1], ['Tăng tốc', cnt.r3, 4], ['Về đích 20đ', cnt.v20, 0], ['Về đích 30đ', cnt.v30, 0], ['Về đích 40đ', cnt.v40, 0]].concat(cnt.pool ? [['Chưa có mã (bỏ)', cnt.pool, -1]] : []).map(([n, c, need]) =>
+    <div class="grid grid-cols-2 sm:grid-cols-4 ${cnt.pool ? 'lg:grid-cols-9' : 'lg:grid-cols-8'} gap-2 text-center">${[['Khởi động', cnt.r1, RULES.R1_COUNT], ['Hàng ngang', cnt.r2, 4], ['Từ khóa CNV', cnt.cnv, 1], ['Tăng tốc', cnt.r3, 4], ['Về đích 20đ', cnt.v20, 3 * RULES.TEAM_COUNT], ['Về đích 30đ', cnt.v30, 2 * RULES.TEAM_COUNT], ['Về đích 40đ', cnt.v40, 2 * RULES.TEAM_COUNT], ['Câu hỏi phụ', cnt.tb, 3]].concat(cnt.pool ? [['Chưa có mã (bỏ)', cnt.pool, -1]] : []).map(([n, c, need]) =>
       `<div class="rounded-xl p-2 border ${need < 0 || (need && c < need) ? 'border-rose-200 bg-rose-50' : 'border-slate-200 bg-slate-50'}"><div class="text-[11px] font-bold text-slate-500">${n}</div><div class="text-xl font-black ${need < 0 ? 'text-rose-600' : ''}">${c}${need > 0 ? `<span class="text-xs text-slate-400">/${need}</span>` : ''}</div></div>`).join('')}</div>
     ${b.warn.length ? `<div class="mt-3 text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3">${b.warn.map(esc).join('<br>')}</div>` : ''}
     <details class="mt-3 text-xs text-slate-600"><summary class="cursor-pointer font-bold">Cấu trúc file câu hỏi</summary><pre class="mt-2 bg-slate-50 rounded-xl p-3 whitespace-pre-wrap">[KHỞI ĐỘNG]  (7 câu)
@@ -1577,11 +1747,11 @@ function lobbyHTML() {
 }
 
 function roundStepper(g) {
-  const colors = ['', '#fbbf24', '#34d399', '#38bdf8', '#f472b6'];
+  const colors = ['', '#fbbf24', '#34d399', '#38bdf8', '#f472b6', '#fcd34d'];
   return `<div class="stage rounded-3xl p-5 sm:p-6 text-white shadow-xl flex flex-wrap items-center justify-between gap-4">
     <div class="flex items-center gap-4 min-w-0">
       <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/15 border border-white/25 backdrop-blur grid place-items-center text-2xl sm:text-3xl flex-shrink-0" style="color:${colors[g.round]}"><i class="fa-solid ${ROUND_ICONS[g.round]}"></i></div>
-      <div class="min-w-0"><div class="text-[11px] font-black uppercase tracking-[.2em] text-white/60">Đường lên đỉnh Olympia • Vòng ${g.round}/4</div>
+      <div class="min-w-0"><div class="text-[11px] font-black uppercase tracking-[.2em] text-white/60">Đường lên đỉnh Olympia • ${g.round === 5 ? 'Phân định các đội bằng điểm' : `Vòng ${g.round}/4`}</div>
         <div class="text-2xl sm:text-4xl font-black tracking-tight leading-tight">${ROUND_NAMES[g.round].toUpperCase()}</div>
         <div class="text-xs text-white/75 mt-1 max-w-2xl hidden md:block">${roundRule(g.round)}</div></div></div>
     <div class="flex gap-1.5">${[1, 2, 3, 4].map(r => `<div title="${ROUND_NAMES[r]}" class="w-10 h-10 rounded-xl grid place-items-center text-sm font-black border ${r === g.round ? 'bg-white text-slate-900 border-white' : r < g.round ? 'bg-emerald-400/90 text-white border-emerald-300' : 'bg-white/10 text-white/50 border-white/20'}">${r < g.round ? '<i class="fa-solid fa-check"></i>' : r}</div>`).join('')}</div>
@@ -1607,6 +1777,12 @@ const okBadge = a => !a ? '<span class="text-slate-400">Chưa trả lời</span>
 
 function hostControls(p) {
   const g = H.g, v = p.view, B = (txt, fn, cls = 'btn-dark', dis = false) => `<button class="btn ${cls}" onclick="${fn}" ${dis ? 'disabled' : ''}>${txt}</button>`;
+  if (g.round === 5) {
+    if (g.status === 'intro') return B('<i class="fa-solid fa-scale-balanced"></i> Bắt đầu câu hỏi phụ', 'h_startRound()', 'btn-pri') + B('Bỏ qua – xem kết quả', 'h_tbSkip()', 'btn-soft');
+    if (v.st === 'ready') return B(`<i class="fa-solid fa-eye"></i> Hiện câu hỏi phụ ${v.qi + 2}`, 'h_tbShow()', 'btn-pri') + B('Bỏ qua – xem kết quả', 'h_tbSkip()', 'btn-soft');
+    if (v.st === 'reveal') return B('Tiếp tục <i class="fa-solid fa-arrow-right"></i>', 'h_tbNext()', 'btn-pri') + `<span class="text-xs font-bold text-slate-500">Còn đội bằng điểm thì hỏi câu phụ tiếp, hết thì sang kết quả</span>`;
+    return `<span class="text-sm font-black">${v.st === 'buzz' ? 'Chờ các đội bằng điểm bấm chuông' : esc(p.teams[v.buzzer].name) + ' đang trả lời'}</span><div class="flex-1 min-w-[220px]">${timerHTML(v.deadline, v.total)}</div>`;
+  }
   if (g.status === 'intro') return B(`<i class="fa-solid fa-play"></i> Bắt đầu vòng ${g.round}: ${ROUND_NAMES[g.round]}`, 'h_startRound()', 'btn-pri');
   if (g.status === 'review') return B(g.round < 4 ? `Sang vòng ${g.round + 1}: ${ROUND_NAMES[g.round + 1]} <i class="fa-solid fa-arrow-right"></i>` : 'Xem kết quả chung cuộc', 'h_nextRound()', 'btn-pri');
   if (g.round === 1) return `<div class="flex-1 min-w-[220px]">${timerHTML(v.deadline, RULES.R1_TIME)}</div>` + B('<i class="fa-solid fa-flag-checkered"></i> Kết thúc vòng sớm', "if(confirm('Kết thúc vòng 1 ngay?'))h_endRound()", 'btn-soft');
@@ -1636,6 +1812,7 @@ function hostControls(p) {
 }
 function hostMain(p) {
   const g = H.g, v = p.view;
+  if (g.round === 5) return tbBoard(p, true) + `<div class="mt-5">${scoreCards(p, i => v.group.includes(i) ? '<div class="text-xs font-black mt-2 text-amber-600"><i class="fa-solid fa-scale-balanced"></i> Bằng điểm – thi câu hỏi phụ</div>' : '')}</div>`;
   if (g.status === 'intro') return `<div class="card p-8 text-center"><div class="text-sm font-black text-violet-600 uppercase">Vòng ${g.round}</div><div class="text-4xl font-black mt-1">${ROUND_NAMES[g.round]}</div><p class="mt-3 text-slate-600 max-w-2xl mx-auto">${roundRule(g.round)}</p></div>` + `<div class="mt-5">${scoreCards(p)}</div>`;
   if (g.round === 1) {
     return scoreCards(p, i => {
@@ -1667,7 +1844,30 @@ function hostMain(p) {
       ${v.st === 'steal' ? `<div class="mt-5 text-center text-2xl font-black" style="color:${p.teams[v.buzzer].color}"><i class="fa-solid fa-bell"></i> ${esc(p.teams[v.buzzer].name)} giành quyền trả lời!</div>` : ''}${r4Outcome(p)}`;
     return r4Head(p) + `<div class="card qcard p-6 sm:p-8 big my-5">${center}</div>` + scoreCards(p, i => i === v.active ? '<div class="text-xs font-black mt-2 text-violet-600"><i class="fa-solid fa-microphone"></i> Đang thi</div>' : '');
   }
+  if (g.round === 5) return tbBoard(p, true) + `<div class="mt-5">${scoreCards(p, i => v.group.includes(i) ? '<div class="text-xs font-black mt-2 text-amber-600"><i class="fa-solid fa-scale-balanced"></i> Bằng điểm – thi câu hỏi phụ</div>' : '')}</div>`;
   return '';
+}
+function tbBoard(p, host) {
+  const v = p.view, names = v.group.map(i => badge(p.teams[i])).join(' ');
+  let body = '';
+  if (p.status === 'intro' || v.st === 'ready') body = `<div class="text-center py-6"><div class="text-slate-500 font-bold">Các đội bằng ${p.teams[v.group[0]].score} điểm</div><div class="mt-3 flex flex-wrap justify-center gap-2">${names}</div><p class="mt-4 text-sm text-slate-600 max-w-xl mx-auto">${roundRule(5)}</p></div>`;
+  else body = `<div class="text-xs font-black text-amber-600 uppercase mb-2">Câu hỏi phụ ${v.qi + 1} • ${names}</div><div class="text-2xl sm:text-3xl font-black mb-5 leading-snug">${rich(v.text)}</div>
+      ${optsHTML(v.opts, { disabled: true, correct: v.ans, chosen: v.res ? v.res.c : -1 })}
+      ${v.st === 'buzz' ? `<div class="mt-5 text-center text-2xl font-black text-amber-600 pulse-soft"><i class="fa-solid fa-bell"></i> Các đội bằng điểm bấm chuông!</div>` : ''}
+      ${v.st === 'answer' ? `<div class="mt-5 text-center text-2xl font-black" style="color:${p.teams[v.buzzer].color}"><i class="fa-solid fa-bell"></i> ${esc(p.teams[v.buzzer].name)} giành quyền trả lời!</div>` : ''}
+      ${v.st === 'reveal' ? `<div class="mt-5 text-center text-lg font-black ${v.res && v.res.ok ? 'text-emerald-600' : 'text-rose-600'}">${esc(v.msg)}</div>` : ''}`;
+  return `<div class="card qcard p-6 sm:p-8 ${host ? 'big' : ''}">${v.st === 'buzz' || v.st === 'answer' ? timerHTML(v.deadline, v.total) + '<div class="mt-4"></div>' : ''}${body}</div>`;
+}
+function r5Team(p, t, ctx) {
+  const v = p.view, inGroup = v.group.includes(t), pend = ctx.pend && ['buzz', 'tbans'].includes(ctx.pend.type);
+  if (v.st !== 'reveal' && v.st !== 'ready') rerenderAt(v.deadline);
+  if (!inGroup) return tbBoard(p, false) + `<div class="mt-3 text-center text-sm font-bold text-slate-500">Các đội bằng điểm đang thi câu hỏi phụ – đội bạn theo dõi.</div>`;
+  if (v.st === 'buzz' && v.alive.includes(t)) return `<div class="card qcard p-5 sm:p-7 pop">${timerHTML(v.deadline, v.total)}<div class="text-xs font-black text-amber-600 uppercase mt-4 mb-2">Câu hỏi phụ – đội bạn đang bằng điểm</div>
+      <div class="text-xl sm:text-2xl font-black mb-5">${rich(v.text)}</div>${optsHTML(v.opts, { disabled: true })}
+      <div class="mt-6 grid place-items-center"><button class="bell grid place-items-center" data-a="buzz" ${ctx.ro || pend ? 'disabled' : ''}><i class="fa-solid fa-bell"></i></button><div class="mt-3 font-black text-amber-700">BẤM CHUÔNG ĐỂ TRẢ LỜI!</div></div></div>`;
+  if (v.st === 'answer' && v.buzzer === t) return `<div class="card qcard p-5 sm:p-7 pop">${timerHTML(v.deadline, v.total)}<div class="text-xs font-black text-amber-600 uppercase mt-4 mb-2">Đội bạn giành quyền – chọn đáp án</div>
+      <div class="text-xl sm:text-2xl font-black mb-5">${rich(v.text)}</div>${optsHTML(v.opts, { act: 'tbans', disabled: ctx.ro || pend, chosen: pend ? ctx.pend.c : -1 })}</div>`;
+  return tbBoard(p, false);
 }
 function gameHTML() {
   const p = buildPub(), g = H.g;
@@ -1759,7 +1959,8 @@ const TACT = {
   pickGo: () => T.pick.pkg && tsend({ type: 'r4pick', pkg: T.pick.pkg, star: T.pick.star }),
   r4: d => tsend({ type: 'r4ans', c: +d.c }),
   buzz: () => tsend({ type: 'buzz' }),
-  steal: d => tsend({ type: 'r4steal', c: +d.c })
+  steal: d => tsend({ type: 'r4steal', c: +d.c }),
+  tbans: d => tsend({ type: 'tbans', c: +d.c })
 };
 function renderTeam() {
   RR = 0;
@@ -1836,7 +2037,7 @@ function h_sampleDocx() {
   } catch (e) { h_downloadTemplate(); }
 }
 const HELP_SECTIONS = [
-  ['start', 'fa-rocket', 'Bắt đầu nhanh'], ['word', 'fa-file-word', 'File Word câu hỏi'], ['latex', 'fa-square-root-variable', 'File LaTeX (ex_test, TikZ)'], ['excel', 'fa-file-excel', 'File Excel danh sách lớp'],
+  ['intro', 'fa-mountain', 'Giới thiệu cuộc thi'], ['start', 'fa-rocket', 'Bắt đầu nhanh'], ['count', 'fa-calculator', 'Số câu của 1 đề'], ['word', 'fa-file-word', 'File Word câu hỏi'], ['latex', 'fa-square-root-variable', 'File LaTeX (ex_test, TikZ)'], ['excel', 'fa-file-excel', 'File Excel danh sách lớp'],
   ['teams', 'fa-users-gear', 'Chia đội & mã PIN'], ['rounds', 'fa-flag-checkered', 'Luật & điều khiển 4 vòng'], ['students', 'fa-mobile-screen', 'Học sinh vào thi'],
   ['custom', 'fa-sliders', 'Tùy chỉnh'], ['trouble', 'fa-life-ring', 'Xử lý sự cố']];
 function helpContent(k) {
@@ -1848,6 +2049,36 @@ function helpContent(k) {
   const code = t => `<pre class="mt-3 rounded-2xl bg-slate-900 text-slate-100 text-[13px] leading-relaxed p-4 overflow-x-auto whitespace-pre-wrap">${esc(t)}</pre>`;
   const btn = (fn, ic, t) => `<button class="btn btn-soft mt-3 mr-2" onclick="${fn}"><i class="fa-solid ${ic}"></i> ${t}</button>`;
   switch (k) {
+    case 'intro': {
+      const n = RULES.TEAM_COUNT;
+      const card = (no, ic, col, name, big, txt) => `<div class="rounded-3xl border-2 p-5 bg-white" style="border-color:${col}55;background:linear-gradient(160deg,${col}14,#fff 60%)">
+        <div class="flex items-center gap-3"><div class="w-11 h-11 rounded-2xl grid place-items-center text-white text-lg flex-shrink-0" style="background:${col}"><i class="fa-solid ${ic}"></i></div>
+          <div><div class="text-[11px] font-black uppercase tracking-wider" style="color:${col}">Vòng ${no}</div><div class="text-lg font-black text-slate-900 leading-tight">${name}</div></div></div>
+        <div class="mt-3 text-sm font-black text-slate-800">${big}</div><div class="mt-1 text-sm text-slate-600 leading-relaxed">${txt}</div></div>`;
+      return `<div class="relative overflow-hidden rounded-3xl hero-gradient text-white p-6 sm:p-8"><div class="relative z-10">
+          <div class="inline-flex items-center gap-2 bg-white/20 border border-white/30 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider"><i class="fa-solid fa-mountain"></i> Sân chơi trí tuệ trong lớp học</div>
+          <h3 class="text-3xl sm:text-4xl font-black mt-3 leading-tight">ĐƯỜNG LÊN ĐỈNH OLYMPIA</h3>
+          <p class="mt-2 text-white/95 max-w-3xl leading-relaxed">Mô phỏng chương trình truyền hình nổi tiếng <b>“Đường lên đỉnh Olympia”</b>, được thiết kế lại cho tiết học: cả lớp chia thành <b>${n} đội</b>, mỗi đội thi trên một điện thoại/máy tính, vượt qua <b>4 vòng thi</b> để giành vị trí cao nhất trên bảng xếp hạng.</p>
+          <div class="mt-4 flex flex-wrap gap-2 text-xs font-black">${[['fa-users', `${n} đội thi đấu`], ['fa-mobile-screen', 'Mỗi đội 1 thiết bị'], ['fa-display', 'GV điều khiển trên máy chiếu'], ['fa-list-check', 'Trắc nghiệm 4 đáp án'], ['fa-square-root-variable', 'Hỗ trợ công thức & hình vẽ']].map(([i, t]) => `<span class="px-3 py-1.5 rounded-xl bg-white/20 border border-white/30"><i class="fa-solid ${i}"></i> ${t}</span>`).join('')}</div>
+        </div></div>` +
+        `<h3 class="text-xl font-black text-slate-900 mt-6">Mục tiêu</h3>` +
+        `<div class="mt-3 grid sm:grid-cols-3 gap-3">${[['fa-brain', '#7c3aed', 'Ôn tập chủ động', 'Biến tiết ôn tập/củng cố thành trận thi đấu sôi nổi, học sinh nhớ kiến thức lâu hơn.'], ['fa-people-group', '#059669', 'Làm việc nhóm', 'Các thành viên thảo luận, thống nhất đáp án và chiến thuật chọn gói, đặt Ngôi sao hy vọng.'], ['fa-bolt', '#d97706', 'Tư duy nhanh & chính xác', 'Vòng Tăng tốc, chuông giành quyền rèn phản xạ; điểm phụ thuộc cả độ đúng lẫn tốc độ.']].map(([i, c, t, d]) => `<div class="rounded-2xl border border-slate-200 bg-slate-50 p-4"><div class="w-9 h-9 rounded-xl grid place-items-center text-white" style="background:${c}"><i class="fa-solid ${i}"></i></div><div class="font-black mt-2">${t}</div><div class="text-sm text-slate-600 mt-1 leading-relaxed">${d}</div></div>`).join('')}</div>` +
+        `<h3 class="text-xl font-black text-slate-900 mt-6">4 vòng thi</h3>` +
+        `<div class="mt-3 grid md:grid-cols-2 gap-3">
+          ${card(1, 'fa-bolt', '#d97706', 'Khởi Động', `${RULES.R1_COUNT} câu • ${RULES.R1_TIME} giây • +${RULES.R1_POINT}đ/câu đúng`, `Cả ${n} đội trả lời <b>cùng lúc</b> trên máy của mình. Mỗi đội có thứ tự câu và vị trí A, B, C, D khác nhau nên không “nhìn bài” được.`)}
+          ${card(2, 'fa-puzzle-piece', '#059669', 'Vượt Chướng Ngại Vật', `4 hàng ngang +${RULES.R2_POINT}đ • đoán CNV ${RULES.CNV_POINTS.join(' – ')}đ`, 'GV mở lần lượt 4 hàng ngang; đáp án mỗi hàng là gợi ý cho <b>từ khóa chướng ngại vật</b>. Đoán CNV càng sớm càng nhiều điểm, đoán sai mất quyền.')}
+          ${card(3, 'fa-gauge-high', '#0284c7', 'Tăng Tốc', `4 câu • ${RULES.R3_TIME} giây/câu • ${RULES.R3_POINTS.join(' – ')}đ`, 'Các đội cùng trả lời một câu; hệ thống đo thời gian đến <b>phần trăm giây</b>. Đội đúng nhanh nhất được nhiều điểm nhất.')}
+          ${card(4, 'fa-flag-checkered', '#db2777', 'Về Đích', 'Gói 60 – 80 – 100đ • Ngôi sao hy vọng • Chuông giành quyền', `Lần lượt từng đội chọn gói câu hỏi; có thể đặt <b>Ngôi sao hy vọng</b> (đúng ×2, sai bị trừ). Đội thi sai → các đội còn lại có ${RULES.BUZZ_TIME} giây bấm chuông giành quyền trả lời.`)}
+        </div>` +
+        `<div class="mt-3 rounded-3xl border-2 border-amber-200 bg-amber-50/60 p-5 flex gap-4 items-start"><div class="w-11 h-11 rounded-2xl grid place-items-center text-white text-lg flex-shrink-0 bg-amber-500"><i class="fa-solid fa-scale-balanced"></i></div>
+          <div><div class="text-lg font-black text-slate-900">Câu hỏi phụ – khi các đội bằng điểm</div><div class="text-sm text-slate-600 mt-1 leading-relaxed">Sau Về đích, nếu có đội bằng điểm, các đội đó bấm chuông giành quyền trả lời câu hỏi phụ: đúng xếp trên, sai xếp dưới. Điểm số giữ nguyên, chỉ phân định thứ hạng.</div></div></div>` +
+        `<h3 class="text-xl font-black text-slate-900 mt-6">Vai trò</h3>` +
+        tbl(['Ai', 'Dùng thiết bị gì', 'Làm gì'], [
+          ['<b>Giáo viên</b> (người dẫn chương trình)', 'Máy tính nối máy chiếu/TV', 'Chia đội, cấp mã PIN, điều khiển từng vòng, chiếu bảng điểm và màn hình của từng đội.'],
+          ['<b>Mỗi đội</b>', '1 điện thoại hoặc máy tính có Internet', 'Nhập mã PIN của đội, thảo luận và chọn đáp án, bấm chuông.'],
+          ['<b>Cả lớp</b> (khán giả)', 'Nhìn màn hình chiếu', 'Theo dõi câu hỏi, đáp án và bảng điểm trực tiếp.']]) +
+        tip('<i class="fa-solid fa-lightbulb"></i> <b>Gợi ý tổ chức:</b> 1 trận khoảng 30–40 phút. Phân công trong đội: 1 bạn cầm máy, 1 bạn thư ký, các bạn còn lại cùng giải. Nên cho cả lớp xem trước bằng nút <b>Xem trước giao diện</b> để học sinh làm quen.', 'purple');
+    }
     case 'start': return H2('Bắt đầu nhanh – 6 bước') + P('Trang này gồm 2 phần: <b>máy giáo viên</b> (trang bạn đang xem – chiếu lên máy chiếu/TV) và <b>máy của các đội</b> (điện thoại hoặc máy tính của học sinh).') +
       step(1, 'Nạp danh sách lớp', 'Chọn file Excel (hoặc dán danh sách tên) ở bước 1 của trang chính.') +
       step(2, 'Chia 4 đội', 'Bấm <b>Chia ngẫu nhiên</b>, <b>Chia xen kẽ</b> hoặc <b>Chia theo tổ</b>; kéo thả tên để đổi đội; bấm vào tên đội để đổi tên.') +
@@ -1857,13 +2088,30 @@ function helpContent(k) {
       step(6, 'Bấm BẮT ĐẦU', 'Khi đủ 4 đội, nút BẮT ĐẦU sáng lên. Cả 4 đội cùng vào Vòng 1 – Khởi động.') +
       tip('<i class="fa-solid fa-eye"></i> Muốn xem trước học sinh sẽ thấy gì? Bấm <b>Xem trước giao diện</b> ở menu trái – xem được cả màn hình điện thoại của đội và màn hình máy chiếu của giáo viên ở từng vòng.', 'purple') +
       tip('<i class="fa-solid fa-triangle-exclamation"></i> Máy giáo viên phải <b>có Internet và giữ trang mở suốt buổi thi</b>. Đóng trang thì các đội mất kết nối.', 'rose');
+    case 'count': {
+      const n = RULES.TEAM_COUNT;
+      return H2('Số câu cần cho 1 đề hoàn chỉnh') + P(`Áp dụng cho cả file <b>Word</b> và file <b>LaTeX</b> (cùng mã vòng). Tính cho <b>${n} đội</b>, theo trường hợp xấu nhất để đề không bao giờ thiếu câu.`) +
+        tbl(['Vòng', 'Mã', 'Tối thiểu', 'Khuyến nghị (thoáng)', 'Vì sao'], [
+          ['<b>1. Khởi động</b>', '<code>KD</code>', `${RULES.R1_COUNT}`, `${RULES.R1_COUNT}`, `${n} đội làm chung ${RULES.R1_COUNT} câu (chỉ đảo thứ tự & đáp án).`],
+          ['<b>2. Vượt chướng ngại vật</b>', '<code>VCNV</code> + <code>CNV</code>', '4 + 1', '4 + 1', '4 hàng ngang + 1 câu từ khóa, cả lớp dùng chung.'],
+          ['<b>3. Tăng tốc</b>', '<code>TT</code>', '4', '4', '4 câu, các đội trả lời cùng lúc.'],
+          ['<b>4. Về đích – 20đ</b>', '<code>VD20</code>', `${n}`, `${3 * n}`, `Gói nào cũng có câu 20đ. Nếu cả ${n} đội chọn gói 60 (=20+20+20) cần ${3 * n} câu.`],
+          ['<b>4. Về đích – 30đ</b>', '<code>VD30</code>', '0', `${2 * n}`, `Chỉ gói 80 (=20+30+30) dùng. Cả ${n} đội chọn gói 80 cần ${2 * n} câu.`],
+          ['<b>4. Về đích – 40đ</b>', '<code>VD40</code>', `${2 * n}`, `${2 * n}`, `<b>Cả ${n} đội chọn gói 100 (=20+40+40)</b> cần ${n} câu 20đ + <b>${2 * n} câu 40đ</b>.`],
+          ['<b>Câu hỏi phụ</b>', '<code>PHU</code>', '1', '3 – 5', '2 đội bằng điểm: thường 1 câu là phân định xong; dự phòng khi không đội nào bấm chuông, hoặc 3–4 đội bằng điểm.'],
+          ['<b>TỔNG</b>', '', `<b>${RULES.R1_COUNT + 5 + 4 + n + 2 * n + 1}</b>`, `<b>${RULES.R1_COUNT + 5 + 4 + 3 * n + 2 * n + 2 * n + 3}</b>`, 'Tối thiểu = đủ cho trường hợp cả 4 đội chọn gói 100đ. Khuyến nghị = đủ cho mọi cách chọn gói, không lặp câu.']]) +
+        tip(`<b>Khuyến nghị soạn ${RULES.R1_COUNT + 5 + 4 + 3 * n + 2 * n + 2 * n + 3} câu</b> (≈ 50 câu) cho 1 đề: ${RULES.R1_COUNT} KD · 4 VCNV · 1 CNV · 4 TT · ${3 * n} VD20 · ${2 * n} VD30 · ${2 * n} VD40 · 3 PHU. Ô đếm ở bước 3 sẽ báo đỏ nếu còn thiếu.`, 'purple') +
+        P('<b>Khi 2 đội bằng điểm</b> sau Về đích: trò chơi tự chuyển sang <b>Câu hỏi phụ</b>. Câu hỏi hiện cho các đội bằng điểm; đội bấm chuông trước được trả lời – <b>đúng thì xếp trên</b>, sai hoặc hết giờ thì xếp dưới. Điểm số không thay đổi, chỉ phân định thứ hạng (bảng kết quả ghi “thắng câu hỏi phụ”). Nếu 3–4 đội bằng điểm, trò chơi hỏi tiếp cho đến khi phân định xong. GV có thể bấm “Bỏ qua” để các đội đồng hạng.') +
+        tip('Câu vượt quá số cần (vd. 9 câu KD) thì chỉ dùng các câu đầu. Về đích và Câu hỏi phụ được rút ngẫu nhiên; nếu hết câu, trò chơi chỉ dùng lại câu <b>cùng phần</b>, không lấy câu của vòng khác.');
+    }
     case 'word': return H2('Cấu trúc file Word câu hỏi') + P('File <b>.docx</b> (hoặc .txt; file <b>.tex</b> xem mục <i>File LaTeX</i>) gồm các <b>mục vòng thi</b> viết trong ngoặc vuông, dưới mỗi mục là các câu hỏi trắc nghiệm 4 đáp án.') +
       btn('h_sampleDocx()', 'fa-file-word text-blue-600', 'Tải file Word mẫu') + btn('h_downloadTemplate()', 'fa-file-lines', 'Tải bản .txt') +
       P('<b>Mỗi vòng chỉ lấy đúng những câu nằm dưới mã của vòng đó.</b> Câu không có mã sẽ <b>không được dùng</b> (trang báo số câu bị bỏ). Có thể ghi tên đầy đủ hoặc mã ngắn:') +
       tbl(['Vòng', 'Mã ngắn', 'Hoặc tên đầy đủ', 'Số câu cần'], [
         ['Khởi động', '<code>[KD]</code>', '<code>[KHỞI ĐỘNG]</code>', `${RULES.R1_COUNT} câu`], ['Vượt CNV – hàng ngang', '<code>[VCNV]</code>', '<code>[VƯỢT CHƯỚNG NGẠI VẬT]</code>', '4 câu'],
         ['Câu từ khóa CNV', '<code>[CNV]</code>', '<code>[TỪ KHÓA]</code>', '1 câu'], ['Tăng tốc', '<code>[TT]</code>', '<code>[TĂNG TỐC]</code>', '4 câu'],
-        ['Về đích 20đ / 30đ / 40đ', '<code>[VD20]</code> <code>[VD30]</code> <code>[VD40]</code>', '<code>[VỀ ĐÍCH 20]</code> …', '≥ 12 câu tổng']]) +
+        ['Về đích 20đ / 30đ / 40đ', '<code>[VD20]</code> <code>[VD30]</code> <code>[VD40]</code>', '<code>[VỀ ĐÍCH 20]</code> …', '12 / 8 / 8 câu'],
+        ['Câu hỏi phụ (khi bằng điểm)', '<code>[PHU]</code>', '<code>[CÂU HỎI PHỤ]</code>', '3 câu']]) +
       P('Ví dụ trong Word:') + code('[KD]\nCâu 1: Chất nào sau đây là base?\nA. HCl\nB. NaOH\nC. NaCl\nD. CO2\nĐáp án: B\n\n[TT]\nCâu 1: Tỉ khối của khí $\\ce{SO2}$ so với $\\ce{O2}$ là\nA. 2  B. 0,5  C. 1,5  D. 4\nĐáp án: A') +
       tbl(['Mục (gõ đúng như sau)', 'Dùng cho', 'Số câu cần'], [
         ['<code>[KHỞI ĐỘNG]</code>', 'Vòng 1', `${RULES.R1_COUNT} câu`], ['<code>[VƯỢT CHƯỚNG NGẠI VẬT]</code>', 'Vòng 2 – 4 hàng ngang', '4 câu'],
@@ -1891,7 +2139,8 @@ function helpContent(k) {
       tbl(['Vòng', 'Ghi sau \\begin{ex}', 'Số câu cần'], [
         ['Khởi động', '<code>\\begin{ex}%[KD]</code>', `${RULES.R1_COUNT} câu`], ['Vượt CNV – hàng ngang', '<code>\\begin{ex}%[VCNV]</code>', '4 câu'],
         ['Câu từ khóa CNV', '<code>\\begin{ex}%[CNV]</code>', '1 câu'], ['Tăng tốc', '<code>\\begin{ex}%[TT]</code>', '4 câu'],
-        ['Về đích 20 điểm', '<code>\\begin{ex}%[VD20]</code>', 'tổng các câu'], ['Về đích 30 điểm', '<code>\\begin{ex}%[VD30]</code>', 'Về đích'], ['Về đích 40 điểm', '<code>\\begin{ex}%[VD40]</code>', 'nên ≥ 12']]) +
+        ['Về đích 20 điểm', '<code>\\begin{ex}%[VD20]</code>', '12 câu'], ['Về đích 30 điểm', '<code>\\begin{ex}%[VD30]</code>', '8 câu'], ['Về đích 40 điểm', '<code>\\begin{ex}%[VD40]</code>', '8 câu'],
+        ['Câu hỏi phụ (bằng điểm)', '<code>\\begin{ex}%[PHU]</code>', '3 câu']]) +
       P('<b>Ví dụ từng phần:</b>') +
       code('% Khởi động\n\\begin{ex}%[KD]\nCông thức tính số mol là\n\\choice\n  {$n = m \\cdot M$}\n  {\\True $n = \\dfrac{m}{M}$}\n  {$n = \\dfrac{M}{m}$}\n  {$n = m + M$}\n\\loigiai{ ... }\n\\end{ex}') +
       code('% Vượt chướng ngại vật: 4 câu hàng ngang [VCNV] + 1 câu từ khóa [CNV]\n\\begin{ex}%[VCNV]\nChất làm tăng tốc độ phản ứng là\n\\choice\n  {\\True chất xúc tác}{chất phản ứng}{sản phẩm}{dung môi}\n\\end{ex}\n\n\\begin{ex}%[CNV]\nTừ khóa: đại lượng cho biết độ acid/base?\n\\choice\n  {Nồng độ}{\\True pH}{Tỉ khối}{Độ tan}\n\\end{ex}') +
@@ -1922,7 +2171,8 @@ function helpContent(k) {
       [`<b>1. Khởi động</b>`, `${RULES.R1_COUNT} câu trong ${RULES.R1_TIME} giây cho cả vòng. Đúng +${RULES.R1_POINT}đ. Mỗi đội có thứ tự câu và vị trí A–D khác nhau.`, 'Tự chạy sau khi bấm BẮT ĐẦU. Có nút <i>Kết thúc vòng sớm</i>.'],
       [`<b>2. Vượt chướng ngại vật</b>`, `4 hàng ngang, ${RULES.R2_ROW_TIME}s/câu, đúng +${RULES.R2_POINT}đ. Đoán CNV càng sớm càng nhiều điểm: ${RULES.CNV_POINTS.join(' – ')}đ. Đoán sai mất quyền.`, '<i>Mở hàng ngang 1…4</i>, <i>Dừng & công bố</i>, <i>Cơ hội cuối đoán CNV</i>.'],
       [`<b>3. Tăng tốc</b>`, `4 câu, ${RULES.R3_TIME}s/câu. Đúng nhanh nhất +${RULES.R3_POINTS[0]}đ, tiếp theo ${RULES.R3_POINTS.slice(1).join(' – ')}đ.`, '<i>Câu Tăng tốc 1…4</i>, <i>Dừng & công bố</i>.'],
-      [`<b>4. Về đích</b>`, `Lần lượt từng đội chọn gói 60/80/100đ, có thể đặt Ngôi sao hy vọng (đúng ×2, sai bị trừ). Đội thi sai → 3 đội còn lại có ${RULES.BUZZ_TIME}s bấm chuông; đúng được cộng điểm${RULES.STEAL_TAKES_FROM_MAIN ? ' (lấy từ đội đang thi)' : ''}, sai bị trừ một nửa.`, '<i>Hiện câu</i>, <i>Câu tiếp theo</i>, <i>Sang lượt đội kế</i>; có thể <i>chọn gói hộ</i> đội.']]) +
+      [`<b>4. Về đích</b>`, `Lần lượt từng đội chọn gói 60/80/100đ, có thể đặt Ngôi sao hy vọng (đúng ×2, sai bị trừ). Đội thi sai → 3 đội còn lại có ${RULES.BUZZ_TIME}s bấm chuông; đúng được cộng điểm${RULES.STEAL_TAKES_FROM_MAIN ? ' (lấy từ đội đang thi)' : ''}, sai bị trừ một nửa.`, '<i>Hiện câu</i>, <i>Câu tiếp theo</i>, <i>Sang lượt đội kế</i>; có thể <i>chọn gói hộ</i> đội.'],
+      [`<b>Câu hỏi phụ</b>`, roundRule(5), '<i>Bắt đầu câu hỏi phụ</i>, <i>Hiện câu hỏi phụ</i>, <i>Tiếp tục</i>; hoặc <i>Bỏ qua</i> (đồng hạng).']]) +
       P('<b>Màn hình phụ:</b> trong khi thi, bấm nút <b>Đội 1…4</b> (hoặc thẻ điểm của đội) để xem y hệt màn hình của đội đó. Bấm <b>Màn hình chính</b> để quay lại bảng điểm.') +
       tip('<i class="fa-solid fa-expand"></i> Bấm nút toàn màn hình (hoặc F11) khi chiếu. Bấm ☰ để ẩn menu trái cho rộng màn hình.', 'purple');
     case 'students': return H2('Học sinh vào thi') +
@@ -1984,6 +2234,7 @@ const PREVIEWS = [
   ['r4pick', 'fa-box-open', 'Vòng 4 · Chọn gói', 'Đội thi chọn gói & Ngôi sao hy vọng'],
   ['r4q', 'fa-flag-checkered', 'Vòng 4 · Trả lời', 'Màn hình đội đang thi'],
   ['r4buzz', 'fa-bell', 'Vòng 4 · Bấm chuông', 'Màn hình 3 đội còn lại khi đội thi sai'],
+  ['r5', 'fa-scale-balanced', 'Câu hỏi phụ (bằng điểm)', 'Phân định các đội bằng điểm'],
   ['review', 'fa-ranking-star', 'Kết thúc vòng', 'Điểm & thứ hạng sau mỗi vòng'],
   ['end', 'fa-trophy', 'Kết quả chung cuộc', 'Bảng xếp hạng cuối trận']];
 function h_preview(k) { UI.preview = k; renderHost(); }
@@ -2016,6 +2267,10 @@ function previewMock(k) {
   if (k === 'review') {
     const set = Array.from({ length: Math.max(1, b.r1.length) }, (_, i) => { const x = q(b.r1, i); return { text: x.text, opts: x.opts }; });
     p.status = 'review'; p.view = { startAt: now - 50000, deadline: now - 5000, sets: teams.map(() => set), prog: teams.map((_, ti) => set.map((_, qi) => ({ c: 0, ok: (qi + ti) % 3 !== 1, a: 0 }))) };
+  }
+  if (k === 'r5') {
+    p.round = 5; teams[0].score = teams[1].score = 60; const x = q(b.tb, 0);
+    p.view = { group: [0, 1], alive: [0, 1], st: 'buzz', qi: 0, text: x.text, opts: x.opts, ans: -1, deadline: D(11), total: RULES.TB_BUZZ_TIME, buzzer: -1, res: null, msg: '' };
   }
   if (k === 'end') p.phase = 'end';
   return { p, t, ctx };
