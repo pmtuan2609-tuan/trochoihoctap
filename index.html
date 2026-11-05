@@ -89,7 +89,7 @@
     </div>
 
     <!-- ==================== LEFT SIDEBAR (GIAO DIỆN CỘT DỌC) ==================== -->
-    <aside id="sidebar" class="w-64 xl:w-72 flex-shrink-0 bg-white border-r border-slate-200/90 flex flex-col justify-between h-screen sticky top-0 z-40 transition-all duration-300 shadow-sm lg:translate-x-0 -translate-x-full fixed lg:static">
+    <aside id="sidebar" class="w-60 xl:w-64 flex-shrink-0 bg-white border-r border-slate-200/90 flex flex-col justify-between h-screen sticky top-0 z-40 transition-all duration-300 shadow-sm -translate-x-full lg:translate-x-0 fixed lg:static">
         
         <div class="flex flex-col h-full overflow-hidden">
             <!-- Brand Logo Top Header -->
@@ -294,18 +294,18 @@
         </header>
 
         <!-- Main Body Content -->
-        <main class="flex-1 p-4 md:p-6 lg:p-8 space-y-6 max-w-7xl w-full mx-auto">
+        <main class="flex-1 px-4 sm:px-6 lg:px-8 py-5 space-y-6 w-full max-w-[1550px] mx-auto">
             
             <!-- Notice Banner (Matching reference image) -->
-            <div class="bg-amber-50/90 border border-amber-200 rounded-2xl px-4 py-2.5 flex items-center justify-between text-xs text-amber-900 font-medium shadow-sm">
+            <div class="bg-amber-50/90 border border-amber-200 rounded-2xl px-4 py-2.5 flex flex-wrap items-center justify-between text-xs text-amber-900 font-medium shadow-sm gap-2">
                 <div class="flex items-center gap-2 truncate">
                     <i class="fa-solid fa-bullhorn text-amber-600 flex-shrink-0"></i>
                     <span class="truncate">
                         <strong>Hỗ trợ giáo viên:</strong> Tải file Word (<code>.docx</code>) & danh sách lớp Excel (<code>.xlsx</code>) để tự động phân dạng bài tập và chia đội thi đấu!
                     </span>
                 </div>
-                <div class="flex items-center gap-2 flex-shrink-0 ml-3">
-                    <button onclick="window.app.openGuideModal()" class="px-2.5 py-1 rounded-lg bg-amber-200/80 hover:bg-amber-300 text-amber-950 font-bold transition flex items-center gap-1">
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <button onclick="window.app.openGuideModal()" class="px-2.5 py-1 rounded-lg bg-amber-200/90 hover:bg-amber-300 text-amber-950 font-bold transition flex items-center gap-1 shadow-xs">
                         <i class="fa-solid fa-book-open"></i> Hướng dẫn soạn đề
                     </button>
                     <button onclick="window.app.toggleTeacherDrawer()" class="text-amber-800 hover:text-amber-950 font-bold underline">
@@ -315,125 +315,118 @@
             </div>
 
             <!-- TEACHER DASHBOARD CONTAINER -->
-            <div id="teacher-dashboard" class="space-y-8">
+            <div id="teacher-dashboard" class="space-y-6">
                 
-                <!-- HERO BANNER (Matches the sunset/indigo/pink gradient from reference image) -->
-                <div class="relative overflow-hidden rounded-3xl hero-gradient p-6 md:p-10 shadow-lg text-white">
-                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
+                <!-- MASTER OLYMPIA HERO ARENA (Expansive Full-Width Banner) -->
+                <div class="relative overflow-hidden rounded-3xl hero-gradient p-6 sm:p-8 lg:p-10 shadow-xl text-white">
+                    <div class="relative z-10 space-y-6">
                         
-                        <!-- Left text info -->
-                        <div class="lg:col-span-7 space-y-4">
-                            <!-- New Badge Pill -->
-                            <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-3.5 py-1 rounded-full text-xs font-bold text-white border border-white/30 shadow-sm">
-                                <span class="bg-white text-rose-700 px-1.5 py-0.2 rounded font-black text-[10px]">CHUYÊN DỤNG</span>
-                                <span>Tối ưu cho Máy chiếu, TV thông minh & Bảng tương tác lớp học</span>
+                        <!-- Top Pill & Class Tag -->
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-bold text-white border border-white/30 shadow-sm">
+                                <span class="bg-white text-rose-700 px-2 py-0.5 rounded-full font-black text-[10px]">CHUYÊN DỤNG</span>
+                                <span>Tối ưu cho Máy chiếu, Smart TV & Bảng tương tác lớp học</span>
                             </div>
-
-                            <!-- Main Title -->
-                            <h1 class="text-4xl md:text-5xl lg:text-6xl font-black leading-tight font-heading tracking-tight drop-shadow-sm">
-                                ĐẤU TRƯỜNG TRI THỨC<br>
-                                ĐƯỜNG LÊN ĐỈNH OLYMPIA
-                            </h1>
-
-                            <!-- Subtitle -->
-                            <p class="text-white/95 text-sm md:text-base leading-relaxed max-w-xl font-medium">
-                                Biến tiết học ôn tập thành trận thi tài sôi động cho cả lớp với <strong>4 Vòng thi kinh điển</strong>: Khởi Động (+10đ), Tăng Tốc 1 & 2 (tính điểm tốc độ sát nút), Về Đích (gói 60đ - 80đ - 100đ, Ngôi sao hy vọng & Chuông cướp điểm).
-                            </p>
-
-                            <!-- Hero Action Buttons -->
-                            <div class="flex flex-wrap items-center gap-3 pt-2">
-                                <button onclick="window.app.startSelectedGameFullscreen('olympia')" class="px-7 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-black text-sm shadow-xl flex items-center gap-2 transform active:scale-95 transition">
-                                    <i class="fa-solid fa-play text-amber-400"></i>
-                                    <span>Bắt Đầu Chiếu Olympia Ngay</span>
-                                </button>
-
-                                <button onclick="window.roomManager.openClassDivideModal()" class="px-5 py-3.5 rounded-2xl bg-white/25 hover:bg-white/35 backdrop-blur-md text-white font-bold text-sm border border-white/40 shadow-sm flex items-center gap-2 transition">
-                                    <i class="fa-solid fa-users-gear"></i>
-                                    <span>Chia 4/6/8 Đội</span>
-                                </button>
-
-                                <button onclick="window.roomManager.openJudgeSpectatorMode()" class="px-5 py-3.5 rounded-2xl bg-indigo-600/85 hover:bg-indigo-600 text-white font-black text-sm border border-indigo-400/50 shadow-md flex items-center gap-2 transition">
-                                    <i class="fa-solid fa-users-viewfinder"></i>
-                                    <span>Chiếu Màn Hình Đội (BGK)</span>
-                                </button>
-
-                                <button onclick="window.app.toggleTeacherDrawer()" class="px-5 py-3.5 rounded-2xl bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-bold text-sm border border-white/30 shadow-sm flex items-center gap-2 transition">
-                                    <i class="fa-solid fa-folder-open"></i>
-                                    <span>Nạp File Word & Excel</span>
-                                </button>
-
-                                <button onclick="window.app.quickPickStudent()" class="px-4 py-3.5 rounded-2xl bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-bold text-sm border border-white/30 shadow-sm flex items-center gap-2 transition" title="Gọi ngẫu nhiên 1 học sinh">
-                                    <i class="fa-solid fa-shuffle"></i>
-                                    <span class="hidden sm:inline">Gọi học sinh</span>
-                                </button>
+                            <div class="flex items-center gap-2 text-xs">
+                                <span class="text-white/80">Lớp hiện tại:</span>
+                                <span class="font-bold text-slate-900 bg-white/90 px-3 py-1 rounded-xl shadow-xs" id="class-current-name">Lớp 10A1 (Mẫu)</span>
                             </div>
                         </div>
 
-                        <!-- Right Illustrated Gamified Card with Floating Badges (From Reference) -->
-                        <div class="lg:col-span-5 relative flex justify-center">
-                            <div class="relative w-full max-w-md">
-                                
-                                <!-- Floating Badge 1: Chính xác! +1 -->
-                                <div class="absolute -top-3 -left-4 z-20 bg-white text-emerald-700 px-3.5 py-1.5 rounded-2xl font-black text-xs shadow-lg border border-emerald-200 flex items-center gap-1.5 animate-bounce">
-                                    <i class="fa-solid fa-circle-check text-emerald-500 text-sm"></i>
-                                    <span>Chính xác! +1</span>
+                        <!-- Grand Title -->
+                        <div class="space-y-2">
+                            <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black font-heading tracking-tight drop-shadow-sm leading-tight">
+                                ĐẤU TRƯỜNG TRI THỨC • ĐƯỜNG LÊN ĐỈNH OLYMPIA
+                            </h1>
+                            <p class="text-white/95 text-xs sm:text-sm md:text-base leading-relaxed max-w-4xl font-medium">
+                                Biến tiết học ôn tập thành trận thi đấu sôi nổi cho toàn bộ học sinh với <strong>4 Vòng thi chính quy</strong>: Khởi Động (+10đ/câu • đề và đáp án đảo ngẫu nhiên chống nhìn bài), Tăng Tốc 1 & 2 (đua tốc độ sát nút mili-giây), Về Đích (gói 60đ - 80đ - 100đ, Ngôi sao hy vọng & Chuông cướp điểm).
+                            </p>
+                        </div>
+
+                        <!-- Hero Action Buttons Bar -->
+                        <div class="flex flex-wrap items-center gap-3 pt-1">
+                            <button onclick="window.app.startSelectedGameFullscreen('olympia')" 
+                                class="px-8 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-black text-sm shadow-xl flex items-center gap-2.5 transform active:scale-95 transition">
+                                <i class="fa-solid fa-play text-amber-400 text-base"></i>
+                                <span>Bắt Đầu Chiếu Olympia Ngay (F11)</span>
+                            </button>
+
+                            <button onclick="window.roomManager.openClassDivideModal()" 
+                                class="px-5 py-3.5 rounded-2xl bg-white/25 hover:bg-white/35 backdrop-blur-md text-white font-bold text-sm border border-white/40 shadow-sm flex items-center gap-2 transition">
+                                <i class="fa-solid fa-users-gear"></i>
+                                <span>Chia 4/6/8 Đội (Kéo Thả)</span>
+                            </button>
+
+                            <button onclick="window.roomManager.openJudgeSpectatorMode()" 
+                                class="px-5 py-3.5 rounded-2xl bg-indigo-600/90 hover:bg-indigo-600 text-white font-black text-sm border border-indigo-400/60 shadow-md flex items-center gap-2 transition"
+                                title="Chiếu góc nhìn của từng đội học sinh cho Ban Giám Khảo xem (Phím V)">
+                                <i class="fa-solid fa-users-viewfinder"></i>
+                                <span>Chiếu Màn Hình Đội (BGK)</span>
+                            </button>
+
+                            <button onclick="window.roomManager.openWaitingLobbyModal()" 
+                                class="px-5 py-3.5 rounded-2xl bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-bold text-sm border border-white/30 shadow-sm flex items-center gap-2 transition">
+                                <i class="fa-solid fa-door-open"></i>
+                                <span>Phòng Chờ Trực Tuyến</span>
+                            </button>
+
+                            <button onclick="window.app.openGuideModal()" 
+                                class="px-4 py-3.5 rounded-2xl bg-amber-400/90 hover:bg-amber-400 text-slate-950 font-black text-sm shadow-md flex items-center gap-2 transition">
+                                <i class="fa-solid fa-book-open"></i>
+                                <span>Hướng Dẫn & Mẫu Đề</span>
+                            </button>
+
+                            <button onclick="window.app.toggleTeacherDrawer()" 
+                                class="px-4 py-3.5 rounded-2xl bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-bold text-sm border border-white/30 shadow-sm flex items-center gap-2 transition">
+                                <i class="fa-solid fa-folder-open"></i>
+                                <span>Quản Lý File</span>
+                            </button>
+                        </div>
+
+                        <!-- 4 ROUNDS STRATEGY CARDS (Spacious Responsive 4-Column Grid) -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-3">
+                            <div class="bg-white/15 backdrop-blur-md p-3.5 rounded-2xl border border-white/25 shadow-sm text-left">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-xs font-black uppercase tracking-wider text-amber-300">1. Khởi Động</span>
+                                    <i class="fa-solid fa-bolt text-amber-300 text-xs"></i>
                                 </div>
-
-                                <!-- Floating Badge 2: Chuỗi đúng x5 -->
-                                <div class="absolute top-1/2 -right-4 z-20 bg-white text-amber-700 px-3.5 py-1.5 rounded-2xl font-black text-xs shadow-lg border border-amber-200 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-fire text-orange-500"></i>
-                                    <span>Chuỗi đúng ×5</span>
+                                <div class="text-sm font-black text-white">+10 Điểm / Câu</div>
+                                <div class="text-[11px] text-white/85 mt-0.5 leading-snug">
+                                    5-7 câu. Đảo câu và 4 phương án độc lập từng đội chống nhìn bài.
                                 </div>
+                            </div>
 
-                                <!-- Floating Badge 3: Đội Xanh dẫn đầu -->
-                                <div class="absolute -bottom-3 left-6 z-20 bg-white text-blue-800 px-4 py-1.5 rounded-2xl font-black text-xs shadow-lg border border-blue-200 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-trophy text-amber-500"></i>
-                                    <span>Đội Xanh dẫn đầu</span>
+                            <div class="bg-white/15 backdrop-blur-md p-3.5 rounded-2xl border border-white/25 shadow-sm text-left">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-xs font-black uppercase tracking-wider text-emerald-300">2. Tăng Tốc 1</span>
+                                    <i class="fa-solid fa-gauge-high text-emerald-300 text-xs"></i>
                                 </div>
-
-                                <!-- Center Illustrated Preview Card -->
-                                <div class="bg-white/95 rounded-3xl p-4 shadow-2xl border-4 border-white/40 overflow-hidden text-slate-800">
-                                    <div class="rounded-2xl overflow-hidden bg-gradient-to-b from-sky-200 via-sky-100 to-amber-100 border border-slate-200 p-4 min-h-[220px] flex flex-col justify-between relative">
-                                        <!-- Sun and Clouds -->
-                                        <div class="flex items-center justify-between">
-                                            <div class="flex gap-2">
-                                                <i class="fa-solid fa-cloud text-white/80 text-xl"></i>
-                                                <i class="fa-solid fa-cloud text-white/60 text-sm mt-1"></i>
-                                            </div>
-                                            <div class="w-10 h-10 rounded-full bg-amber-300 shadow-md flex items-center justify-center">
-                                                <div class="w-7 h-7 rounded-full bg-amber-400"></div>
-                                            </div>
-                                        </div>
-
-                                        <!-- Racing track and playful items -->
-                                        <div class="space-y-3 my-2">
-                                            <!-- Racing Road with cute cars -->
-                                            <div class="bg-slate-700 rounded-xl p-2 flex items-center justify-between border-b-2 border-dashed border-white/60">
-                                                <div class="flex items-center gap-1 text-rose-400 font-bold text-xs">
-                                                    <i class="fa-solid fa-car-side text-lg"></i>
-                                                    <span class="text-[10px] text-white">#1</span>
-                                                </div>
-                                                <div class="flex items-center gap-1 text-purple-400 font-bold text-xs">
-                                                    <i class="fa-solid fa-car-side text-lg"></i>
-                                                    <span class="text-[10px] text-white">#2</span>
-                                                </div>
-                                                <i class="fa-solid fa-flag-checkered text-white text-sm"></i>
-                                            </div>
-
-                                            <!-- River with cute ducks -->
-                                            <div class="bg-cyan-500/80 rounded-xl p-2 flex items-center justify-around text-amber-300 text-lg">
-                                                <i class="fa-solid fa-duck text-xl transform hover:scale-125 transition">🦆</i>
-                                                <i class="fa-solid fa-duck text-xl transform hover:scale-125 transition">🦆</i>
-                                                <span class="text-white text-[11px] font-bold">Đua vịt sông xanh</span>
-                                            </div>
-                                        </div>
-
-                                        <div class="text-center text-[10px] font-bold text-slate-600 bg-white/70 py-1 rounded-lg">
-                                            Chiếu trực tiếp máy chiếu & bảng tương tác
-                                        </div>
-                                    </div>
+                                <div class="text-sm font-black text-white">20đ - 15đ - 10đ - 5đ</div>
+                                <div class="text-[11px] text-white/85 mt-0.5 leading-snug">
+                                    5-7 câu. Đo phản xạ mili-giây, xếp hạng tốc độ trả lời đúng.
                                 </div>
+                            </div>
 
+                            <div class="bg-white/15 backdrop-blur-md p-3.5 rounded-2xl border border-white/25 shadow-sm text-left">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-xs font-black uppercase tracking-wider text-sky-300">3. Tăng Tốc 2</span>
+                                    <i class="fa-solid fa-stopwatch text-sky-300 text-xs"></i>
+                                </div>
+                                <div class="text-sm font-black text-white">Sát Nút Mili-giây</div>
+                                <div class="text-[11px] text-white/85 mt-0.5 leading-snug">
+                                    5-7 câu. Tăng tốc chặng 2, bứt phá bảng xếp hạng lớp.
+                                </div>
+                            </div>
+
+                            <div class="bg-white/15 backdrop-blur-md p-3.5 rounded-2xl border border-white/25 shadow-sm text-left">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-xs font-black uppercase tracking-wider text-pink-300">4. Về Đích</span>
+                                    <i class="fa-solid fa-star text-pink-300 text-xs"></i>
+                                </div>
+                                <div class="text-sm font-black text-white">Gói 60 - 80 - 100đ</div>
+                                <div class="text-[11px] text-white/85 mt-0.5 leading-snug">
+                                    4 câu/đội. Ngôi sao hy vọng (×2) & Chuông cướp điểm 5 giây.
+                                </div>
                             </div>
                         </div>
 
@@ -519,84 +512,63 @@
                     </div>
                 </div>
 
-                <!-- GAMES SHOWCASE SECTION (All games list with cards) -->
-                <div id="games-showcase-section" class="space-y-4">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h3 class="text-xl font-black text-slate-900 font-heading">Danh Sách Trò Chơi Học Tập</h3>
-                            <p class="text-xs text-slate-500 font-medium">Chọn một trò chơi để khởi động cuộc thi cho lớp</p>
+                <!-- LIVE TEAMS OVERVIEW (Bảng Đấu Các Đội Olympia) -->
+                <div class="bg-white border-2 border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
+                    <div class="flex flex-wrap items-center justify-between border-b border-slate-100 pb-3 gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-lg font-black">
+                                <i class="fa-solid fa-trophy"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-black text-slate-900">Bảng Thi Đấu Các Đội Olympia</h3>
+                                <p class="text-xs text-slate-500">Mã PIN kết nối độc lập, điểm số trực tiếp và danh sách thành viên</p>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-2 text-xs">
-                            <span class="text-slate-400">Lớp hiện tại:</span>
-                            <span class="font-bold text-purple-700 bg-purple-50 px-2.5 py-1 rounded-lg border border-purple-200" id="class-current-name">Lớp 10A1 (Mẫu)</span>
+                        <div class="flex items-center gap-2">
+                            <button onclick="window.roomManager.openClassDivideModal()" class="px-3.5 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-xs border border-purple-200 flex items-center gap-1.5 transition">
+                                <i class="fa-solid fa-users-gear text-purple-600"></i>
+                                <span>Chia lại đội</span>
+                            </button>
+                            <button onclick="window.roomManager.openJudgeSpectatorMode()" class="px-3.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs border border-indigo-200 flex items-center gap-1.5 transition">
+                                <i class="fa-solid fa-users-viewfinder text-indigo-600"></i>
+                                <span>Màn hình các đội (BGK)</span>
+                            </button>
                         </div>
                     </div>
 
-                    <!-- HERO FEATURED GAME: ĐƯỜNG LÊN ĐỈNH OLYMPIA -->
-                    <div class="bg-gradient-to-r from-rose-50 via-white to-amber-50 border-3 border-rose-300 rounded-3xl p-6 md:p-8 shadow-xl relative overflow-hidden">
-                        <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
-                            <div class="space-y-3 max-w-2xl">
-                                <div class="flex flex-wrap items-center gap-2">
-                                    <span class="px-3.5 py-1 rounded-full bg-rose-600 text-white font-black text-xs uppercase tracking-wider shadow">
-                                        <i class="fa-solid fa-fire mr-1"></i> Trò Chơi Trọng Tâm
-                                    </span>
-                                    <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 font-bold text-xs border border-amber-300">
-                                        Chuẩn hóa 4 Vòng Thi Đấu Học Tập
-                                    </span>
-                                </div>
-                                <h3 class="text-2xl sm:text-3xl font-black text-slate-900 font-heading">
-                                    Đường Lên Đỉnh Olympia
-                                </h3>
-                                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                                    Hệ thống thi đấu chia theo <strong>4 Đội (4 Tổ), 6 Đội hoặc 8 Đội</strong> với mã PIN riêng biệt cho từng đội. Gồm 4 vòng thi đầy kịch tính:
-                                </p>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-semibold text-slate-700 pt-1">
-                                    <div class="flex items-center gap-2 bg-white/80 p-2 rounded-xl border border-rose-100">
-                                        <i class="fa-solid fa-circle-check text-emerald-600"></i>
-                                        <span><strong>Vòng 1 (Khởi động):</strong> Đúng +10đ/câu</span>
-                                    </div>
-                                    <div class="flex items-center gap-2 bg-white/80 p-2 rounded-xl border border-amber-100">
-                                        <i class="fa-solid fa-bolt text-amber-600"></i>
-                                        <span><strong>Vòng 2 (Tăng tốc 1):</strong> Điểm tốc độ 20-15-10-5đ</span>
-                                    </div>
-                                    <div class="flex items-center gap-2 bg-white/80 p-2 rounded-xl border border-indigo-100">
-                                        <i class="fa-solid fa-gauge-high text-indigo-600"></i>
-                                        <span><strong>Vòng 3 (Tăng tốc 2):</strong> Sát nút từng mili-giây</span>
-                                    </div>
-                                    <div class="flex items-center gap-2 bg-white/80 p-2 rounded-xl border border-purple-100">
-                                        <i class="fa-solid fa-star text-purple-600"></i>
-                                        <span><strong>Vòng 4 (Về đích):</strong> Gói 60đ - 80đ - 100đ</span>
-                                    </div>
-                                </div>
+                    <!-- Teams List Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="dashboard-teams-grid">
+                        <div class="p-4 rounded-2xl border-2 border-purple-200 bg-purple-50/40 text-left space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2.5 py-0.5 rounded-full bg-purple-600 text-white font-black text-xs">Đội 1 (Tổ 1)</span>
+                                <span class="text-xs font-mono font-bold text-slate-500">PIN: 1024</span>
                             </div>
-
-                            <!-- Hero Action Buttons -->
-                            <div class="flex flex-col sm:flex-row lg:flex-col gap-3 w-full lg:w-auto flex-shrink-0">
-                                <button onclick="window.app.selectGame('olympia')"
-                                    class="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-black text-sm shadow-xl flex items-center justify-center gap-2 transform active:scale-95 transition">
-                                    <i class="fa-solid fa-play"></i>
-                                    <span>Vào Thi Đấu Ngay</span>
-                                </button>
-
-                                <button onclick="window.roomManager.openClassDivideModal()"
-                                    class="px-6 py-2.5 rounded-2xl bg-white hover:bg-slate-50 text-purple-700 font-bold text-xs border-2 border-purple-300 shadow-sm flex items-center justify-center gap-2 transition">
-                                    <i class="fa-solid fa-users-gear text-purple-600"></i>
-                                    <span>Chia Đội (Kéo Thả 4, 6, 8 Đội)</span>
-                                </button>
-
-                                <button onclick="window.roomManager.openWaitingLobbyModal()"
-                                    class="px-6 py-2.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-300 shadow-sm flex items-center justify-center gap-2 transition">
-                                    <i class="fa-solid fa-door-open text-emerald-600"></i>
-                                    <span>Mở Phòng Chờ Trực Tuyến</span>
-                                </button>
-
-                                <button onclick="window.roomManager.openJudgeSpectatorMode()"
-                                    class="px-6 py-2.5 rounded-2xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-black text-xs border border-indigo-200 shadow-sm flex items-center justify-center gap-2 transition"
-                                    title="Chiếu góc nhìn của từng đội học sinh cho Ban Giám Khảo xem">
-                                    <i class="fa-solid fa-users-viewfinder text-indigo-600"></i>
-                                    <span>Chiếu Màn Hình Đội (Cho BGK Xem)</span>
-                                </button>
+                            <div class="text-2xl font-black text-slate-900 font-mono">0 <span class="text-xs font-sans text-slate-400 font-bold">điểm</span></div>
+                            <div class="text-[11px] text-slate-500">5 học sinh • Sẵn sàng</div>
+                        </div>
+                        <div class="p-4 rounded-2xl border-2 border-amber-200 bg-amber-50/40 text-left space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2.5 py-0.5 rounded-full bg-amber-600 text-white font-black text-xs">Đội 2 (Tổ 2)</span>
+                                <span class="text-xs font-mono font-bold text-slate-500">PIN: 2048</span>
                             </div>
+                            <div class="text-2xl font-black text-slate-900 font-mono">0 <span class="text-xs font-sans text-slate-400 font-bold">điểm</span></div>
+                            <div class="text-[11px] text-slate-500">5 học sinh • Sẵn sàng</div>
+                        </div>
+                        <div class="p-4 rounded-2xl border-2 border-emerald-200 bg-emerald-50/40 text-left space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white font-black text-xs">Đội 3 (Tổ 3)</span>
+                                <span class="text-xs font-mono font-bold text-slate-500">PIN: 3072</span>
+                            </div>
+                            <div class="text-2xl font-black text-slate-900 font-mono">0 <span class="text-xs font-sans text-slate-400 font-bold">điểm</span></div>
+                            <div class="text-[11px] text-slate-500">5 học sinh • Sẵn sàng</div>
+                        </div>
+                        <div class="p-4 rounded-2xl border-2 border-rose-200 bg-rose-50/40 text-left space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2.5 py-0.5 rounded-full bg-rose-600 text-white font-black text-xs">Đội 4 (Tổ 4)</span>
+                                <span class="text-xs font-mono font-bold text-slate-500">PIN: 4096</span>
+                            </div>
+                            <div class="text-2xl font-black text-slate-900 font-mono">0 <span class="text-xs font-sans text-slate-400 font-bold">điểm</span></div>
+                            <div class="text-[11px] text-slate-500">5 học sinh • Sẵn sàng</div>
                         </div>
                     </div>
                 </div>
