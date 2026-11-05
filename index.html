@@ -60,13 +60,26 @@
   .phone .sm\:text-2xl{font-size:1.25rem!important}.phone .sm\:p-7,.phone .sm\:p-12{padding:1.25rem!important}
   .katex{font-size:1.08em}.opt .katex{font-size:1.05em}.katex-display{margin:.4em 0}
   .tikz{display:block;max-width:100%;height:auto;max-height:300px;object-fit:contain;margin:.6rem auto;background:#fff;border-radius:.6rem;padding:.25rem}
-  .big .tikz{max-height:360px}.opt .tikz{max-height:120px;margin:.2rem 0;display:inline-block}
+  .big .tikz{max-height:360px}.opt .tikz{max-height:120px;margin:.2rem 0;display:inline-block;background:transparent;padding:0}
   .tikz-miss{display:inline-flex;align-items:center;gap:.35rem;font-size:.75rem;font-weight:700;color:#b45309;background:#fffbeb;border:1px dashed #f59e0b;border-radius:.6rem;padding:.35rem .6rem;margin:.3rem 0}
   .immini{display:flex;flex-wrap:wrap;gap:1rem;align-items:center}.immini-t{flex:1 1 220px;min-width:0}.immini-f{flex:0 1 auto;margin:0 auto}
   .phone .immini{flex-direction:column}
   .logo-word{font-family:'Be Vietnam Pro',system-ui,sans-serif;font-weight:900;letter-spacing:-.035em;line-height:.9}
   .logo-grad{background:linear-gradient(90deg,#7c3aed 0%,#db2777 55%,#f59e0b 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
   .logo-badge{background:linear-gradient(135deg,#6d28d9 0%,#db2777 60%,#f59e0b 100%);box-shadow:0 8px 18px -6px rgba(219,39,119,.55),inset 0 1px 0 rgba(255,255,255,.35)}
+  .pod-step{transform-origin:bottom;animation:podrise .9s cubic-bezier(.2,.9,.25,1.05) both}
+  .pod-top{animation:podpop .55s cubic-bezier(.2,.9,.3,1.3) both}
+  .pod-crown{animation:podcrown 2.4s ease-in-out infinite}
+  .pod-tag{display:inline-flex;align-items:center;gap:.25rem;font-size:9px;font-weight:900;padding:2px 7px;border-radius:999px;white-space:nowrap}
+  .pod-light{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 40% 55% at 50% 30%,rgba(253,230,138,.35),transparent 70%),conic-gradient(from 200deg at 50% -10%,transparent 0 10deg,rgba(255,255,255,.07) 14deg 22deg,transparent 26deg 46deg,rgba(255,255,255,.06) 50deg 58deg,transparent 62deg)}
+  @keyframes podrise{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+  @keyframes podpop{from{opacity:0;transform:translateY(18px) scale(.85)}to{opacity:1;transform:none}}
+  @keyframes podcrown{0%,100%{transform:translateY(0) rotate(-6deg)}50%{transform:translateY(-5px) rotate(6deg)}}
+  @media (prefers-reduced-motion:reduce){.pod-step,.pod-top,.pod-crown{animation:none}}
+  .ui-dlg button{outline:none}.ui-dlg button:focus-visible{box-shadow:0 0 0 4px rgba(167,139,250,.55)}
+  .ui-dlg .ui-dlg-bg{animation:uifade .18s ease both}.ui-dlg .ui-dlg-card{animation:uipop .26s cubic-bezier(.2,.9,.3,1.25) both}
+  .ui-dlg.ui-out{animation:uifade .18s ease reverse both}.ui-toast{animation:uitoast .3s cubic-bezier(.2,.9,.3,1.2) both}.ui-toast.ui-out{animation:uifade .22s ease reverse both}
+  @keyframes uifade{from{opacity:0}to{opacity:1}}@keyframes uipop{from{opacity:0;transform:translateY(14px) scale(.94)}to{opacity:1;transform:none}}@keyframes uitoast{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
   .pulse-soft{animation:ps 1.4s infinite}@keyframes ps{50%{opacity:.45}}
   .pop{animation:pop .35s ease-out}@keyframes pop{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
   .tabular-nums{font-variant-numeric:tabular-nums}
@@ -456,6 +469,49 @@ const norm = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '
 const rid = () => Math.random().toString(36).slice(2, 8).toUpperCase();
 const fmtT = ms => (Math.max(0, ms) / 1000).toFixed(2) + 's';
 function makePins(n) { const s = new Set(); while (s.size < n) s.add(String(100000 + Math.floor(Math.random() * 900000))); return [...s]; }
+
+/* ===================== HỘP THOẠI & THÔNG BÁO (thay confirm/alert) ===================== */
+const TONES = {
+  danger: { c: '#e11d48', bg: '#fff1f2', grad: 'linear-gradient(90deg,#f43f5e,#be123c)', icon: 'fa-triangle-exclamation' },
+  warn: { c: '#d97706', bg: '#fffbeb', grad: 'linear-gradient(90deg,#f59e0b,#ea580c)', icon: 'fa-circle-exclamation' },
+  info: { c: '#7c3aed', bg: '#f5f3ff', grad: 'linear-gradient(90deg,#9333ea,#4f46e5)', icon: 'fa-circle-info' },
+  success: { c: '#059669', bg: '#ecfdf5', grad: 'linear-gradient(90deg,#10b981,#047857)', icon: 'fa-circle-check' } };
+function uiLayer() { let l = document.getElementById('ui-layer'); if (!l) { l = document.createElement('div'); l.id = 'ui-layer'; document.body.appendChild(l); } return l; }
+function ask(o) {   // trả về Promise<true/false>
+  o = typeof o === 'string' ? { msg: o } : o;
+  const t = TONES[o.tone || 'info'], alertOnly = !!o.alertOnly;
+  return new Promise(res => {
+    const wrap = document.createElement('div');
+    wrap.className = 'ui-dlg fixed inset-0 z-[300] grid place-items-center p-4';
+    wrap.innerHTML = `<div class="ui-dlg-bg absolute inset-0 bg-slate-950/60 backdrop-blur-sm"></div>
+      <div role="alertdialog" aria-modal="true" class="ui-dlg-card relative w-full max-w-[420px] bg-white rounded-[1.75rem] shadow-2xl overflow-hidden">
+        <div class="h-1.5" style="background:${t.grad}"></div>
+        <div class="px-6 sm:px-7 pt-6 pb-5 text-center">
+          <div class="mx-auto w-16 h-16 rounded-2xl grid place-items-center text-2xl" style="background:${t.bg};color:${t.c}"><i class="fa-solid ${o.icon || t.icon}"></i></div>
+          <div class="mt-4 text-xl font-black text-slate-900 leading-snug">${esc(o.title || (alertOnly ? 'Thông báo' : 'Xác nhận'))}</div>
+          ${o.msg ? `<div class="mt-2 text-[14.5px] text-slate-600 leading-relaxed">${o.html ? o.msg : esc(o.msg)}</div>` : ''}
+        </div>
+        <div class="px-6 sm:px-7 pb-6 flex flex-col-reverse sm:flex-row gap-2.5">
+          ${alertOnly ? '' : `<button data-r="0" class="flex-1 py-3 rounded-2xl font-black text-sm bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition">${esc(o.cancel || 'Hủy')}</button>`}
+          <button data-r="1" class="flex-1 py-3 rounded-2xl font-black text-sm text-white shadow-lg transition hover:brightness-110 active:scale-[.98]" style="background:${t.grad}">${esc(o.ok || (alertOnly ? 'Đã hiểu' : 'Đồng ý'))}</button>
+        </div></div>`;
+    const done = v => { document.removeEventListener('keydown', key, true); wrap.classList.add('ui-out'); setTimeout(() => wrap.remove(), 180); res(v); };
+    const key = e => { if (e.key === 'Escape') { e.preventDefault(); done(alertOnly); } else if (e.key === 'Enter') { e.preventDefault(); done(true); } };
+    wrap.addEventListener('click', e => { const b = e.target.closest('[data-r]'); if (b) done(b.dataset.r === '1'); else if (e.target.classList.contains('ui-dlg-bg')) done(alertOnly); });
+    document.addEventListener('keydown', key, true);
+    uiLayer().appendChild(wrap); setTimeout(() => wrap.querySelector('[data-r="1"]').focus(), 30);
+  });
+}
+function say(o) { o = typeof o === 'string' ? { msg: o } : o; return ask({ tone: 'warn', ...o, alertOnly: true }); }
+function toast(msg, tone = 'success', ms = 3800) {
+  const t = TONES[tone], l = uiLayer();
+  let box = document.getElementById('ui-toasts');
+  if (!box) { box = document.createElement('div'); box.id = 'ui-toasts'; box.className = 'fixed z-[310] bottom-5 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 w-[calc(100%-2rem)] max-w-md pointer-events-none'; l.appendChild(box); }
+  const el = document.createElement('div');
+  el.className = 'ui-toast pointer-events-auto w-full flex items-center gap-3 bg-white rounded-2xl shadow-2xl border border-slate-200 pl-3 pr-4 py-3';
+  el.innerHTML = `<span class="w-9 h-9 rounded-xl grid place-items-center flex-shrink-0" style="background:${t.bg};color:${t.c}"><i class="fa-solid ${t.icon}"></i></span><span class="text-sm font-bold text-slate-700 leading-snug">${esc(msg)}</span>`;
+  box.appendChild(el); setTimeout(() => { el.classList.add('ui-out'); setTimeout(() => el.remove(), 220); }, ms);
+}
 
 /* ===================== KẾT NỐI =====================
    1) Có FIREBASE_CONFIG  → dùng Firebase.
@@ -1131,11 +1187,54 @@ function reviewTeam(p, t) {
     <div class="mt-6">${scoreStrip(p, t)}</div><div class="mt-4 text-sm text-slate-400 font-semibold">Chờ giáo viên chuyển sang vòng tiếp theo…</div></div>`;
 }
 function finalBoard(p, me = -1) {
-  const rk = rankOf(p.teams), medal = ['🥇', '🥈', '🥉', '🎖️', '🎖️', '🎖️'];
-  return `<div class="card p-6 sm:p-10 text-center pop"><div class="flex justify-center mb-3">${champMark('w-20 h-20')}</div><div class="text-sm font-black text-violet-600 uppercase tracking-wider">EDU Champions • Kết quả chung cuộc</div>
-    <div class="text-3xl sm:text-4xl font-black mt-2">🏆 ${esc(rk[0].name)} về nhất!</div>
-    <div class="mt-6 space-y-2 max-w-xl mx-auto">${rk.map((x, k) => `<div class="flex items-center justify-between rounded-2xl px-4 py-3 border-2 ${x.i === me ? 'bg-violet-50' : 'bg-white'}" style="border-color:${x.color}">
-      <div class="flex items-center gap-3 font-black"><span class="text-2xl">${medal[k]}</span>${esc(x.name)}${x.tb > 0 ? '<span class="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-100 text-amber-700"><i class="fa-solid fa-scale-balanced"></i> thắng câu hỏi phụ</span>' : ''}${rk.some(y => y.i !== x.i && y.score === x.score && (y.tb || 0) === (x.tb || 0)) ? '<span class="text-[10px] font-black px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">đồng hạng</span>' : ''}</div><div class="text-2xl font-black tabular-nums">${x.score}</div></div>`).join('')}</div></div>`;
+  const rk = rankOf(p.teams);
+  const same = (a, b) => a.score === b.score && (a.tb || 0) === (b.tb || 0);
+  const place = x => 1 + rk.filter(y => y.score > x.score || (y.score === x.score && (y.tb || 0) > (x.tb || 0))).length;
+  const MED = { 1: ['#fef3c7', '#fbbf24', '#b45309', '🥇', 'Vô địch'], 2: ['#f1f5f9', '#cbd5e1', '#64748b', '🥈', 'Á quân'], 3: ['#ffedd5', '#fb923c', '#c2410c', '🥉', 'Hạng ba'] };
+  const stepH = ['h-[150px] sm:h-[200px]', 'h-[105px] sm:h-[145px]', 'h-[70px] sm:h-[100px]'];
+  const delay = [0.75, 0.4, 0.1];
+  const tags = x => (x.tb > 0 ? '<span class="pod-tag bg-amber-300/90 text-amber-900"><i class="fa-solid fa-scale-balanced"></i> thắng câu phụ</span>' : '') +
+    (rk.some(y => y.i !== x.i && same(x, y)) ? '<span class="pod-tag bg-white/25 text-white">đồng hạng</span>' : '') +
+    (x.i === me ? '<span class="pod-tag bg-white text-violet-700"><i class="fa-solid fa-user-group"></i> Đội bạn</span>' : '');
+  const col = k => {
+    const x = rk[k]; if (!x) return '<div></div>';
+    const pl = place(x), m = MED[pl] || MED[3], d = delay[k];
+    return `<div class="flex flex-col items-center justify-end min-w-0">
+      <div class="pod-top text-center w-full px-0.5" style="animation-delay:${d + 0.55}s">
+        ${pl === 1 ? '<div class="pod-crown text-3xl sm:text-5xl leading-none mb-1">👑</div>' : ''}
+        <div class="relative mx-auto ${pl === 1 ? 'w-16 h-16 sm:w-24 sm:h-24 text-3xl sm:text-5xl' : 'w-14 h-14 sm:w-20 sm:h-20 text-2xl sm:text-4xl'} rounded-full grid place-items-center border-4 shadow-xl ${x.i === me ? 'ring-4 ring-white/70' : ''}" style="background:${x.color};border-color:${m[1]}">${m[3]}</div>
+        <div class="mt-2 font-black text-white text-[13px] sm:text-xl leading-tight truncate">${esc(x.name)}</div>
+        <div class="mt-1.5 inline-flex items-baseline gap-0.5 px-2.5 sm:px-4 py-0.5 sm:py-1 rounded-full font-black tabular-nums shadow" style="background:${m[0]};color:${m[2]}"><span class="text-base sm:text-2xl">${x.score}</span><span class="text-[10px] sm:text-xs">điểm</span></div>
+        <div class="mt-1.5 flex flex-wrap justify-center gap-1 min-h-[18px]">${tags(x)}</div>
+      </div>
+      <div class="pod-step mt-2 w-full ${stepH[k]} rounded-t-2xl relative overflow-hidden shadow-[0_-8px_24px_-12px_rgba(0,0,0,.5)]" style="background:linear-gradient(180deg,${m[1]},${m[2]});animation-delay:${d}s">
+        <div class="absolute inset-x-0 top-0 h-2.5 bg-white/45"></div>
+        <div class="absolute inset-y-0 left-0 w-1/3 bg-white/10"></div>
+        <div class="relative h-full flex flex-col items-center justify-center text-white drop-shadow">
+          <div class="font-black leading-none text-4xl sm:text-7xl">${pl}</div>
+          <div class="text-[9px] sm:text-xs font-black uppercase tracking-[.2em] opacity-90 mt-0.5 sm:mt-1">${m[4]}</div></div>
+      </div></div>`;
+  };
+  const champs = rk.filter(x => same(x, rk[0]));
+  const title = champs.length > 1 ? `Đồng vô địch: ${champs.map(x => esc(x.name)).join(' & ')}` : `${esc(rk[0].name)} vô địch!`;
+  const mine = me >= 0 ? rk.find(x => x.i === me) : null;
+  const rest = rk.slice(3);
+  return `<div class="pod-wrap stage relative overflow-hidden rounded-3xl px-3 sm:px-10 pt-6 sm:pt-9 pb-0 text-center text-white pop">
+    <div class="pod-light"></div>
+    <div class="relative z-10">
+      <div class="flex justify-center">${champMark('w-12 h-12 sm:w-16 sm:h-16')}</div>
+      <div class="mt-2 text-[10px] sm:text-xs font-black uppercase tracking-[.3em] text-amber-200">EDU Champions • Kết quả chung cuộc</div>
+      <div class="mt-1 text-2xl sm:text-4xl font-black tracking-tight">🏆 ${title}</div>
+      ${mine ? `<div class="mt-3 inline-flex items-center gap-2 rounded-full bg-white/15 border border-white/25 px-4 py-1.5 text-sm font-black"><span class="w-2.5 h-2.5 rounded-full" style="background:${mine.color}"></span>Đội bạn xếp hạng ${place(mine)}/${rk.length} • ${mine.score} điểm</div>` : ''}
+      <div class="mt-6 sm:mt-8 grid grid-cols-3 gap-2 sm:gap-5 items-end max-w-3xl mx-auto">${col(1)}${col(0)}${col(2)}</div>
+    </div>
+    <div class="relative z-10 -mx-3 sm:-mx-10 h-3 sm:h-4 bg-gradient-to-b from-white/30 to-white/5"></div>
+    ${rest.length ? `<div class="relative z-10 -mx-3 sm:-mx-10 bg-white/10 border-t border-white/15 px-3 sm:px-10 py-3 sm:py-4 flex flex-wrap justify-center gap-2 sm:gap-3">${rest.map(x => `
+      <div class="flex items-center gap-2.5 rounded-2xl bg-white/10 border border-white/20 px-3 py-2 ${x.i === me ? 'ring-2 ring-white' : ''}">
+        <span class="w-7 h-7 rounded-lg grid place-items-center font-black text-sm bg-white/20">${place(x)}</span>
+        <span class="w-2.5 h-2.5 rounded-full" style="background:${x.color}"></span><span class="font-black text-sm">${esc(x.name)}</span>
+        <span class="font-black tabular-nums text-amber-200">${x.score}đ</span>${tags(x)}</div>`).join('')}</div>` : '<div class="h-4"></div>'}
+  </div>`;
 }
 
 /* =====================================================================
@@ -1364,7 +1463,7 @@ function h_tbNext() {   // sau mỗi câu phụ: còn bằng điểm thì hỏi 
   else { H.phase = 'end'; UI.confetti = false; }
   commit();
 }
-function h_tbSkip() { if (confirm('Bỏ qua câu hỏi phụ và xem kết quả (các đội bằng điểm sẽ đồng hạng)?')) { H.phase = 'end'; UI.confetti = false; commit(); } }
+async function h_tbSkip() { if (await ask({ title: 'Bỏ qua câu hỏi phụ?', msg: 'Các đội đang bằng điểm sẽ được tính đồng hạng trên bục nhận giải.', ok: 'Bỏ qua & xem kết quả', tone: 'warn', icon: 'fa-scale-balanced' })) { H.phase = 'end'; UI.confetti = false; commit(); } }
 function h_pickFor(pkg) { pickPkg(pkg, -1); commit(); }
 
 /* ---------- Đồng hồ máy chủ ---------- */
@@ -1393,19 +1492,19 @@ function hostTick() {
 
 /* ---------- Nút điều khiển của GV ---------- */
 function h_tab(t) { UI.tab = t; renderHost(); }
-function h_openLobby() {
-  if (H.teams.some(t => !t.members.length) && !confirm('Có đội chưa có thành viên. Vẫn mở phòng chờ?')) return;
+async function h_openLobby(skipAsk) {
+  if (!skipAsk && H.teams.some(t => !t.members.length) && !(await ask({ title: 'Có đội chưa có thành viên', msg: 'Vẫn mở phòng chờ và cấp mã PIN cho các đội?', ok: 'Vẫn mở phòng chờ', tone: 'warn', icon: 'fa-users-slash' }))) return;
   const old = H.teams.map(t => t.pin), pins = makePins(H.teams.length);
   H.teams.forEach((t, i) => { t.pin = pins[i]; t.dev = null; t.score = 0; });
   H.rejects = {}; H.g = null; H.phase = 'lobby'; UI.showPin = {};
   Net.registerPins(H.roomId, pins, old); listen(); commit();
 }
-function h_regenPins() { if (confirm('Tạo mã PIN mới? Các đội đã vào sẽ phải nhập lại.')) h_openLobby(); }
-function h_unlock(t) { if (confirm(`Mở khóa ${H.teams[t].name}? Thiết bị đang vào sẽ bị thoát, đội có thể nhập lại PIN trên máy khác.`)) { H.teams[t].dev = null; commit(); } }
+async function h_regenPins() { if (await ask({ title: 'Tạo mã PIN mới?', msg: 'Các đội đã vào phòng sẽ bị thoát ra và phải nhập mã PIN mới.', ok: 'Tạo mã mới', tone: 'warn', icon: 'fa-key' })) h_openLobby(true); }
+async function h_unlock(t) { if (await ask({ title: `Mở khóa ${H.teams[t].name}?`, msg: 'Thiết bị đang vào sẽ bị thoát. Đội có thể nhập lại mã PIN trên máy khác, điểm số được giữ nguyên.', ok: 'Mở khóa', tone: 'warn', icon: 'fa-lock-open' })) { H.teams[t].dev = null; commit(); toast(`Đã mở khóa ${H.teams[t].name}`, 'info'); } }
 function h_start() {
   if (!H.teams.every(t => t.dev)) return;
   const bank = buildBank(H.bankText);
-  if (!bank.r1.length) return alert('Bộ câu hỏi chưa có câu nào cho vòng Khởi động.');
+  if (!bank.r1.length) return say({ title: 'Thiếu câu hỏi Khởi động', msg: 'Bộ câu hỏi chưa có câu nào mang mã [KD]. Hãy nạp lại đề ở bước 3.', tone: 'danger', icon: 'fa-bolt' });
   H.teams.forEach(t => { t.score = 0; t.tb = 0; }); H.phase = 'game'; H.g = { round: 1, status: 'intro', bank }; UI.tab = 'main';
   startR1(); commit();
 }
@@ -1415,13 +1514,14 @@ function h_startRound() {
   else if (g.round === 3) startR3(); else if (g.round === 4) startR4(); else if (g.round === 5) g.status = 'play';
   commit();
 }
+async function h_endR1Ask() { if (await ask({ title: 'Kết thúc vòng 1 ngay?', msg: 'Các đội chưa làm xong sẽ dừng ở số câu hiện tại, điểm đã có được giữ nguyên.', ok: 'Kết thúc vòng', tone: 'warn', icon: 'fa-flag-checkered' })) h_endRound(); }
 function h_endRound() { const g = H.g; if (g.round === 2 && g.r2 && g.r2.rs === 'play') revealRow(); if (g.round === 3 && g.r3 && g.r3.qs === 'play') revealR3(); g.status = 'review'; commit(); }
 function h_revealNow() { const g = H.g; if (g.round === 2) revealRow(); if (g.round === 3) revealR3(); commit(); }
 function h_nextRound() { const g = H.g; if (g.round >= 4) finishOrTie(); else { g.round++; g.status = 'intro'; } UI.tab = 'main'; commit(); }
 function h_replay() { H.teams.forEach(t => { t.score = 0; t.tb = 0; }); H.g = null; H.phase = 'lobby'; commit(); }
 function closeRoom() { Net.publish(H.roomId, { roomId: H.roomId, phase: 'closed', teams: [], rejects: {} }); }
-function h_backSetup() { if (!confirm('Quay lại chia đội? Phòng hiện tại sẽ đóng, mã PIN cũ hết hiệu lực.')) return; closeRoom(); H.teams.forEach(t => { t.dev = null; t.score = 0; }); H.phase = 'setup'; H.g = null; commit(); }
-function h_resetAll() { if (!confirm('Xóa toàn bộ (danh sách, đội, bộ câu hỏi) và làm lại từ đầu?')) return; closeRoom(); H = hostDefault(); commit(); }
+async function h_backSetup() { if (!(await ask({ title: 'Quay lại chia đội?', msg: 'Phòng thi hiện tại sẽ đóng, mã PIN cũ hết hiệu lực và điểm số trận đấu bị xóa.', ok: 'Quay lại chia đội', tone: 'danger', icon: 'fa-users-gear' }))) return; closeRoom(); H.teams.forEach(t => { t.dev = null; t.score = 0; }); H.phase = 'setup'; H.g = null; commit(); }
+async function h_resetAll() { if (!(await ask({ title: 'Làm mới toàn bộ?', msg: 'Xóa danh sách lớp, các đội và bộ câu hỏi đang dùng để làm lại từ đầu. Thao tác này không thể hoàn tác.', ok: 'Xóa & làm lại', tone: 'danger', icon: 'fa-rotate' }))) return; closeRoom(); H = hostDefault(); commit(); }
 function h_fullscreen() { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(() => { }); }
 
 /* ---------- Danh sách lớp & chia đội ---------- */
@@ -1444,17 +1544,17 @@ async function h_rosterFile(file) {
       list = rows.slice(start).map(r => String(r[nameCol] ?? '').trim());
     }
     list = list.filter(n => n && !/^\d+$/.test(n));
-    if (!list.length) return alert('Không tìm thấy cột tên học sinh. File cần có cột "Họ và tên".');
+    if (!list.length) return say({ title: 'Không tìm thấy cột tên học sinh', msg: 'File Excel cần có cột "Họ và tên" (hoặc hai cột "Họ" và "Tên"). Bấm "Tải Excel mẫu" để đối chiếu.', tone: 'danger', icon: 'fa-file-excel' });
     setStudents(list, `Đã nạp ${list.length} học sinh từ "${file.name}"`);
-  } catch (e) { alert('Không đọc được file: ' + e.message); }
+  } catch (e) { say({ title: 'Không đọc được file', msg: e.message, tone: 'danger', icon: 'fa-file-circle-xmark' }); }
 }
 function h_rosterPaste() {
   const list = ($('#paste-names').value || '').split('\n').map(s => s.replace(/^\s*\d+[.)\t ]+/, '').split('\t')[0].trim()).filter(Boolean);
   if (list.length) setStudents(list, `Đã nạp ${list.length} học sinh từ danh sách dán vào`);
 }
-function setStudents(list, msg) { H.students = list; H.teams.forEach(t => t.members = []); UI.msg = msg; divide('order', true); }
+function setStudents(list, msg) { H.students = list; H.teams.forEach(t => t.members = []); UI.msg = msg; divide('order', true); toast(msg); }
 function divide(mode, silent) {
-  if (!H.students.length) return alert('Chưa có danh sách lớp.');
+  if (!H.students.length) return say({ title: 'Chưa có danh sách lớp', msg: 'Hãy nạp file Excel hoặc dán danh sách tên học sinh ở bước 1 trước khi chia đội.', icon: 'fa-users' });
   const list = mode === 'random' ? shuffle(H.students) : [...H.students];
   H.teams.forEach(t => t.members = []);
   const n = H.teams.length, per = Math.ceil(list.length / n);
@@ -1501,10 +1601,10 @@ async function h_bankFile(file) {
       note = `Đã đọc ${r.n} câu trắc nghiệm từ file LaTeX` + (r.skipped ? ` (bỏ qua ${r.skipped} câu không phải \\choice 4 đáp án hoặc thiếu \\True)` : '') + '.';
     } else text = /\.docx$/i.test(file.name) ? (await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() })).value : await file.text();
     const b = buildBank(text);
-    if (note) setTimeout(() => alert(note), 50);
-    if (!b.total) return alert('Không nhận được câu hỏi nào. Kiểm tra định dạng: "Câu 1: ...", "A. ...", "Đáp án: A".');
+    if (!b.total) return say({ title: 'Không nhận được câu hỏi nào', html: true, msg: 'Kiểm tra định dạng: mỗi câu có <b>“Câu 1: …”</b>, các dòng <b>“A. …”</b> và <b>“Đáp án: A”</b>. Với file .tex: mỗi câu cần <b>\\choice</b> 4 đáp án và <b>\\True</b>.', tone: 'danger', icon: 'fa-file-circle-question' });
     H.bankText = text; H.bankName = file.name; commit();
-  } catch (e) { alert('Không đọc được file: ' + e.message); }
+    toast(note || `Đã nạp ${b.total} câu hỏi từ “${file.name}”`, b.warn.length ? 'warn' : 'success', 4500);
+  } catch (e) { say({ title: 'Không đọc được file', msg: e.message, tone: 'danger', icon: 'fa-file-circle-xmark' }); }
 }
 function h_sampleBank() { H.bankText = SAMPLE_BANK; H.bankName = 'Bộ câu hỏi mẫu – KHTN 8 (Chương I–II)'; commit(); }
 function h_downloadTemplate() {
@@ -1628,18 +1728,19 @@ function sidebarHTML() {
 }
 
 function heroHTML(title, desc, pill) {
-  const rc = [['1. Khởi Động', 'fa-bolt', 'text-amber-300', `+${RULES.R1_POINT} Điểm / Câu • ${RULES.R1_TIME}s`, `${RULES.R1_COUNT} câu, đảo đề & đáp án từng đội.`],
-    ['2. Vượt Chướng Ngại Vật', 'fa-puzzle-piece', 'text-emerald-300', '4 Hàng Ngang + Đoán CNV', `Đoán CNV ${RULES.CNV_POINTS.join(' - ')}đ.`],
-    ['3. Tăng Tốc', 'fa-gauge-high', 'text-sky-300', RULES.R3_POINTS.join('đ - ') + 'đ', `4 câu ${RULES.R3_TIME}s, xếp hạng tốc độ.`],
-    ['4. Về Đích', 'fa-star', 'text-pink-300', 'Gói 60 - 80 - 100đ', `Ngôi sao hy vọng & chuông ${RULES.BUZZ_TIME} giây.`]];
+  const rc = [['1. Khởi Động', 'fa-bolt', 'linear-gradient(135deg,#fbbf24 0%,#f59e0b 45%,#d97706 100%)', `+${RULES.R1_POINT} Điểm / Câu • ${RULES.R1_TIME}s`, `${RULES.R1_COUNT} câu, đảo đề & đáp án từng đội.`],
+    ['2. Vượt Chướng Ngại Vật', 'fa-puzzle-piece', 'linear-gradient(135deg,#34d399 0%,#10b981 45%,#047857 100%)', '4 Hàng Ngang + Đoán CNV', `Đoán CNV ${RULES.CNV_POINTS.join(' - ')}đ.`],
+    ['3. Tăng Tốc', 'fa-gauge-high', 'linear-gradient(135deg,#38bdf8 0%,#0ea5e9 45%,#0369a1 100%)', RULES.R3_POINTS.join('đ - ') + 'đ', `4 câu ${RULES.R3_TIME}s, xếp hạng tốc độ.`],
+    ['4. Về Đích', 'fa-flag-checkered', 'linear-gradient(135deg,#fb7185 0%,#e11d48 50%,#9f1239 100%)', 'Gói 60 - 80 - 100đ', `Ngôi sao hy vọng & chuông ${RULES.BUZZ_TIME} giây.`]];
   return `<div class="relative overflow-hidden rounded-3xl hero-gradient p-6 sm:p-8 shadow-xl text-white mb-6"><div class="relative z-10 space-y-5">
     <div class="flex flex-wrap items-center justify-between gap-3">
-      <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-bold border border-white/30"><span class="bg-white text-rose-700 px-2 py-0.5 rounded-full font-black text-[10px]">${pill}</span><span>Tối ưu cho Máy chiếu, Smart TV & Bảng tương tác</span></div>
+      <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-bold border border-white/30"><span class="bg-white text-rose-700 px-2 py-0.5 rounded-full font-black text-[10px] whitespace-nowrap flex-shrink-0">${pill}</span><span>Tối ưu cho Máy chiếu, Smart TV & Bảng tương tác</span></div>
       <div class="flex items-center gap-2 text-xs"><span class="text-white/80">Lớp hiện tại:</span><span class="font-bold text-slate-900 bg-white/90 px-3 py-1 rounded-xl">${H.students.length} học sinh • ${H.teams.length} đội</span></div></div>
     <div class="space-y-2"><h1 class="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight leading-tight drop-shadow-sm">${title}</h1><p class="text-white/95 text-sm leading-relaxed max-w-4xl font-medium">${desc}</p></div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">${rc.map(([n, ic, col, big, sm]) => `<div class="bg-white/15 backdrop-blur-md p-3.5 rounded-2xl border border-white/25 text-left">
-      <div class="flex items-center justify-between mb-1"><span class="text-xs font-black uppercase tracking-wider ${col}">${n}</span><i class="fa-solid ${ic} ${col} text-xs"></i></div>
-      <div class="text-sm font-black">${big}</div><div class="text-[11px] text-white/85 mt-0.5 leading-snug">${sm}</div></div>`).join('')}</div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">${rc.map(([n, ic, bg, big, sm]) => `<div class="relative overflow-hidden p-4 rounded-2xl border border-white/30 text-left shadow-lg shadow-black/10" style="background:${bg}">
+      <i class="fa-solid ${ic} absolute -right-3 -bottom-4 text-[72px] text-white/15 pointer-events-none"></i>
+      <div class="relative flex items-center gap-2.5 mb-2"><span class="w-8 h-8 rounded-xl bg-white/25 border border-white/30 grid place-items-center text-sm flex-shrink-0"><i class="fa-solid ${ic}"></i></span><span class="text-xs font-black uppercase tracking-wider leading-tight">${n}</span></div>
+      <div class="relative text-[15px] font-black">${big}</div><div class="relative text-[11px] text-white/90 mt-0.5 leading-snug font-medium">${sm}</div></div>`).join('')}</div>
   </div></div>`;
 }
 function setupHTML() {
@@ -1799,7 +1900,7 @@ function hostControls(p) {
   }
   if (g.status === 'intro') return B(`<i class="fa-solid fa-play"></i> Bắt đầu vòng ${g.round}: ${ROUND_NAMES[g.round]}`, 'h_startRound()', 'btn-pri');
   if (g.status === 'review') return B(g.round < 4 ? `Sang vòng ${g.round + 1}: ${ROUND_NAMES[g.round + 1]} <i class="fa-solid fa-arrow-right"></i>` : 'Xem kết quả chung cuộc', 'h_nextRound()', 'btn-pri');
-  if (g.round === 1) return `<div class="flex-1 min-w-[220px]">${timerHTML(v.deadline, RULES.R1_TIME)}</div>` + B('<i class="fa-solid fa-flag-checkered"></i> Kết thúc vòng sớm', "if(confirm('Kết thúc vòng 1 ngay?'))h_endRound()", 'btn-soft');
+  if (g.round === 1) return `<div class="flex-1 min-w-[220px]">${timerHTML(v.deadline, RULES.R1_TIME)}</div>` + B('<i class="fa-solid fa-flag-checkered"></i> Kết thúc vòng sớm', 'h_endR1Ask()', 'btn-soft');
   if (g.round === 2) {
     if (g.status === 'final') return `<div class="flex-1 min-w-[220px]">${timerHTML(v.finalDl, RULES.CNV_FINAL_TIME)}</div>` + B('Kết thúc vòng 2', 'h_endRound()', 'btn-soft');
     if (v.rs === 'play') return `<div class="flex-1 min-w-[220px]">${timerHTML(v.deadline, RULES.R2_ROW_TIME)}</div>` + B('<i class="fa-solid fa-eye"></i> Dừng & công bố đáp án', 'h_revealNow()', 'btn-soft');
@@ -1900,8 +2001,8 @@ function gameHTML() {
 }
 function endHTML() {
   const p = buildPub();
-  if (!UI.confetti && window.confetti) { UI.confetti = true; setTimeout(() => { confetti({ particleCount: 180, spread: 100, origin: { y: .6 } }); }, 200); }
-  return `<div class="max-w-3xl mx-auto space-y-4">${finalBoard(p)}
+  if (!UI.confetti && window.confetti) { UI.confetti = true; setTimeout(() => { confetti({ particleCount: 200, spread: 110, origin: { y: .55 } }); setTimeout(() => confetti({ particleCount: 90, angle: 60, spread: 70, origin: { x: 0, y: .7 } }), 350); setTimeout(() => confetti({ particleCount: 90, angle: 120, spread: 70, origin: { x: 1, y: .7 } }), 500); }, 1300); }
+  return `<div class="max-w-5xl mx-auto space-y-4">${finalBoard(p)}
     <div class="flex flex-wrap justify-center gap-3"><button class="btn btn-pri" onclick="h_replay()"><i class="fa-solid fa-rotate-right"></i> Chơi lại (giữ đội & mã PIN)</button><button class="btn btn-soft" onclick="h_backSetup()"><i class="fa-solid fa-users-gear"></i> Chia đội mới</button></div></div>`;
 }
 
@@ -1997,6 +2098,8 @@ function renderTeam() {
     return;
   }
   const p = T.p, me = p.teams[T.t];
+  if (p.phase === 'end' && !T.confetti && window.confetti) { T.confetti = true; setTimeout(() => confetti({ particleCount: 140, spread: 90, origin: { y: .55 } }), 1300); }
+  if (p.phase !== 'end') T.confetti = false;
   root.innerHTML = teamHeaderHTML(p, me) + `
     ${T.lost ? '<div class="max-w-4xl mx-auto px-3 pt-3"><div class="rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-bold px-4 py-2.5"><i class="fa-solid fa-wifi fa-fade"></i> Mất kết nối với máy giáo viên – đang tự kết nối lại…</div></div>' : ''}
     <main class="max-w-4xl mx-auto p-3 sm:p-6 pb-10">${teamScreen(p, T.t, { ro: false, pend: T.pend, cnvOpen: T.cnvOpen, pick: T.pick })}</main>`;
@@ -2020,7 +2123,7 @@ function teamHeaderHTML(p, me, sticky = true) {
 function h_help(k) { UI.help = k; renderHost(); const b = document.getElementById('help-body'); b && (b.scrollTop = 0); }
 function dl(blob, name) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); }
 function h_sampleExcel() {
-  if (!window.XLSX) return alert('Chưa tải được thư viện Excel. Kiểm tra Internet rồi thử lại.');
+  if (!window.XLSX) return say({ title: 'Chưa tải được thư viện Excel', msg: 'Kiểm tra kết nối Internet rồi tải lại trang và thử lại.', tone: 'danger', icon: 'fa-wifi' });
   const names = ['Nguyễn Văn An', 'Trần Thị Bình', 'Lê Minh Châu', 'Phạm Gia Huy', 'Võ Ngọc Lan', 'Đỗ Quốc Bảo', 'Hồ Thanh Tâm', 'Bùi Khánh Linh', 'Huỳnh Đức Phát', 'Ngô Mỹ Duyên', 'Phan Nhật Nam', 'Dương Bảo Ngọc'];
   const ws = XLSX.utils.aoa_to_sheet([['STT', 'Họ và tên', 'Lớp'], ...names.map((n, i) => [i + 1, n, '8A4'])]);
   ws['!cols'] = [{ wch: 6 }, { wch: 28 }, { wch: 8 }];
@@ -2381,7 +2484,7 @@ function previewHTML() {
 /* ============================ ĐĂNG NHẬP GV ============================ */
 const AUTH_HASH = '531ddb6aebcb5c05ed6a18e7ff3c66272aebb9cc9834e68e3af1cf1d59731b09'; // tài khoản quản trị (đã mã hóa)
 function authUser() { try { return localStorage.getItem('olp_auth') || sessionStorage.getItem('olp_auth') || ''; } catch (e) { return ''; } }
-function h_logout() { if (!confirm('Đăng xuất khỏi trang giáo viên?')) return; try { localStorage.removeItem('olp_auth'); sessionStorage.removeItem('olp_auth'); } catch (e) { } location.reload(); }
+async function h_logout() { if (!(await ask({ title: 'Đăng xuất?', msg: 'Bạn cần đăng nhập lại để điều khiển trò chơi. Dữ liệu lớp và trận đấu trên máy này vẫn được giữ.', ok: 'Đăng xuất', tone: 'info', icon: 'fa-right-from-bracket' }))) return; try { localStorage.removeItem('olp_auth'); sessionStorage.removeItem('olp_auth'); } catch (e) { } location.reload(); }
 async function sha256(t) { const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)); return [...new Uint8Array(d)].map(x => x.toString(16).padStart(2, '0')).join(''); }
 const LG = { err: '', show: false, modal: false };
 function renderLogin() {
