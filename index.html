@@ -1554,9 +1554,9 @@ function renderHost() {
 /* ===== Logo trò chơi EDU Champions: khiên tím – cúp vàng – ngôi sao ===== */
 let _cm = 0;
 function champMark(cls = 'w-12 h-12') { const u = 'cm' + (++_cm); return `<span class="inline-block flex-shrink-0 ${cls}"><svg class="w-full h-full" xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='${u}b' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='#8b5cf6'/><stop offset='.55' stop-color='#6d28d9'/><stop offset='1' stop-color='#312e81'/></linearGradient><linearGradient id='${u}g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='#fef3c7'/><stop offset='.35' stop-color='#fcd34d'/><stop offset='1' stop-color='#d97706'/></linearGradient><linearGradient id='${u}r' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='#fde68a'/><stop offset='.5' stop-color='#f59e0b'/><stop offset='1' stop-color='#db2777'/></linearGradient></defs><path d='M32 3.5 L55.5 11.5 V29.5 C55.5 45.5 45 55.5 32 60.5 C19 55.5 8.5 45.5 8.5 29.5 V11.5 Z' fill='url(#${u}b)' stroke='url(#${u}r)' stroke-width='3' stroke-linejoin='round'/><path d='M32 7.5 L51.5 14.2 V29.5 C51.5 43 43 51.6 32 56 Z' fill='#fff' opacity='.08'/><path d='M22.5 17.5 C22.5 17.5 18 17.5 17.6 18.2 C16.8 24.5 19.6 29.4 24.6 30.2' fill='none' stroke='url(#${u}g)' stroke-width='2.8' stroke-linecap='round'/><path d='M41.5 17.5 C41.5 17.5 46 17.5 46.4 18.2 C47.2 24.5 44.4 29.4 39.4 30.2' fill='none' stroke='url(#${u}g)' stroke-width='2.8' stroke-linecap='round'/><path d='M21.5 15.5 H42.5 V25 C42.5 31.4 37.8 36.2 32 36.2 C26.2 36.2 21.5 31.4 21.5 25 Z' fill='url(#${u}g)'/><path d='M29.3 36 H34.7 L35.6 41.2 H28.4 Z' fill='#d97706'/><rect x='23.5' y='41' width='17' height='4.6' rx='1.6' fill='url(#${u}g)'/><rect x='26.5' y='45.2' width='11' height='2.6' rx='1.2' fill='#b45309'/><path d='M32.00,20.00 L33.32,23.58 L37.14,23.73 L34.14,26.10 L35.17,29.77 L32.00,27.65 L28.83,29.77 L29.86,26.10 L26.86,23.73 L30.68,23.58Z' fill='#7c3aed'/><path d='M14.5,9.9 Q15.508000000000001,12.491999999999999 18.1,13.5 Q15.508000000000001,14.508000000000001 14.5,17.1 Q13.491999999999999,14.508000000000001 10.9,13.5 Q13.491999999999999,12.491999999999999 14.5,9.9Z' fill='#fde68a'/><path d='M50.5,40.2 Q51.284,42.216 53.3,43 Q51.284,43.784 50.5,45.8 Q49.716,43.784 47.7,43 Q49.716,42.216 50.5,40.2Z' fill='#fff' opacity='.9'/><path d='M47.5,7.3 Q48.116,8.884 49.7,9.5 Q48.116,10.116 47.5,11.7 Q46.884,10.116 45.3,9.5 Q46.884,8.884 47.5,7.3Z' fill='#fff' opacity='.8'/></svg></span>`; }
-function champStackHTML() {   // logo xếp dọc – dùng cho màn hình hẹp (điện thoại)
+function champStackHTML(word = 'text-[32px] sm:text-[38px]') {   // logo xếp dọc – dùng cho màn hình hẹp (điện thoại)
   return `<span class="inline-flex flex-col items-center select-none">${champMark('w-20 h-20')}
-    <span class="logo-word text-[32px] sm:text-[38px] whitespace-nowrap mt-3"><span class="text-slate-900">EDU</span> <span class="logo-grad">CHAMPIONS</span></span>
+    <span class="logo-word ${word} whitespace-nowrap mt-3"><span class="text-slate-900">EDU</span> <span class="logo-grad">CHAMPIONS</span></span>
     <span class="text-[10px] mt-2 font-extrabold uppercase tracking-[.25em] whitespace-nowrap text-slate-400">Đấu trường tri thức</span></span>`;
 }
 function champLogoHTML(size = 'md', dark = false) {
@@ -2069,11 +2069,32 @@ function helpContent(k) {
         <div class="flex items-center gap-3"><div class="w-11 h-11 rounded-2xl grid place-items-center text-white text-lg flex-shrink-0" style="background:${col}"><i class="fa-solid ${ic}"></i></div>
           <div><div class="text-[11px] font-black uppercase tracking-wider" style="color:${col}">Vòng ${no}</div><div class="text-lg font-black text-slate-900 leading-tight">${name}</div></div></div>
         <div class="mt-3 text-sm font-black text-slate-800">${big}</div><div class="mt-1 text-sm text-slate-600 leading-relaxed">${txt}</div></div>`;
-      return `<div class="relative overflow-hidden rounded-3xl hero-gradient text-white p-6 sm:p-8"><div class="relative z-10">
-          <div class="inline-flex items-center gap-2 bg-white/20 border border-white/30 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider"><i class="fa-solid fa-trophy"></i> Sân chơi trí tuệ trong lớp học</div>
-          <div class="mt-4 inline-flex rounded-3xl bg-white/95 px-5 py-4 shadow-lg max-w-full overflow-hidden"><span class="hidden sm:inline-flex">${champLogoHTML('lg')}</span><span class="sm:hidden">${champStackHTML()}</span></div>
-          <p class="mt-2 text-white/95 max-w-3xl leading-relaxed"><b>EDU Champions</b> là gameshow trí tuệ dành cho lớp học, lấy cảm hứng từ các cuộc thi kiến thức trên truyền hình: cả lớp chia thành <b>${n} đội</b>, mỗi đội thi trên một điện thoại/máy tính, vượt qua <b>4 vòng thi</b> để giành vị trí cao nhất trên bảng xếp hạng.</p>
-          <div class="mt-4 flex flex-wrap gap-2 text-xs font-black">${[['fa-users', `${n} đội thi đấu`], ['fa-mobile-screen', 'Mỗi đội 1 thiết bị'], ['fa-display', 'GV điều khiển trên máy chiếu'], ['fa-list-check', 'Trắc nghiệm 4 đáp án'], ['fa-square-root-variable', 'Hỗ trợ công thức & hình vẽ']].map(([i, t]) => `<span class="px-3 py-1.5 rounded-xl bg-white/20 border border-white/30"><i class="fa-solid ${i}"></i> ${t}</span>`).join('')}</div>
+      return `<div class="relative overflow-hidden rounded-3xl hero-gradient text-white p-6 sm:p-8 lg:p-10">
+        <div class="absolute -right-16 -bottom-20 w-72 h-72 rounded-full bg-white/10 pointer-events-none"></div>
+        <div class="relative z-10 grid lg:grid-cols-[minmax(0,1fr)_320px] gap-6 lg:gap-10 items-center">
+          <div class="order-2 lg:order-1 min-w-0">
+            <div class="inline-flex items-center gap-2 bg-white/20 border border-white/30 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider"><i class="fa-solid fa-trophy text-amber-300"></i> Sân chơi trí tuệ trong lớp học</div>
+            <h3 class="mt-3 text-2xl sm:text-3xl lg:text-[34px] font-black leading-tight tracking-tight">Học mà chơi,<br class="hidden sm:block"> chơi mà giành chiến thắng!</h3>
+            <p class="mt-3 text-white/90 leading-relaxed max-w-2xl"><b class="text-white">EDU Champions</b> là gameshow kiến thức dành cho lớp học. Cả lớp chia thành <b class="text-white">${n} đội</b>, cùng vượt qua <b class="text-white">4 vòng thi</b> <span class="whitespace-nowrap">Khởi động</span> – <span class="whitespace-nowrap">Vượt chướng ngại vật</span> – <span class="whitespace-nowrap">Tăng tốc</span> – <span class="whitespace-nowrap">Về đích</span> để chạm tay vào ngôi vô địch.</p>
+          </div>
+          <div class="order-1 lg:order-2 flex justify-center">
+            <div class="w-full max-w-[320px] rounded-[2rem] bg-white/95 text-slate-900 shadow-2xl px-5 pt-7 pb-5 text-center ring-4 ring-white/25">
+              ${champStackHTML('text-[28px]')}
+              <div class="mt-5 grid grid-cols-4 gap-1.5">${[1, 2, 3, 4].map(r => `<div class="rounded-xl py-2 px-1 text-[10px] font-black leading-tight flex flex-col items-center gap-1" style="background:${['', '#fef3c7', '#d1fae5', '#e0f2fe', '#fce7f3'][r]};color:${['', '#b45309', '#047857', '#0369a1', '#be185d'][r]}"><i class="fa-solid ${ROUND_ICONS[r]} text-sm"></i>${['', 'Khởi động', 'Vượt CNV', 'Tăng tốc', 'Về đích'][r]}</div>`).join('')}</div>
+              <div class="mt-3 text-[10px] font-bold text-slate-400"><i class="fa-solid fa-gamepad text-purple-500"></i> Trò chơi lớp học của EDU GAME</div>
+            </div>
+          </div>
+        </div>
+        <div class="relative z-10 mt-7 pt-6 border-t border-white/20 grid grid-cols-2 sm:grid-cols-5 gap-3">${[
+          ['fa-users', '#7c3aed', `${n} đội`, 'tranh tài cùng lúc'],
+          ['fa-mobile-screen', '#2563eb', '1 máy / đội', 'điện thoại, máy tính'],
+          ['fa-display', '#db2777', 'Màn hình lớn', 'GV dẫn dắt trận đấu'],
+          ['fa-list-check', '#059669', 'Trắc nghiệm', '4 lựa chọn A, B, C, D'],
+          ['fa-square-root-variable', '#d97706', 'Công thức', 'toán, hóa học, hình vẽ']].map(([ic, col, t, d], k) => `
+          <div class="${k === 4 ? 'col-span-2 sm:col-span-1' : ''} flex flex-col items-start gap-2.5 rounded-2xl bg-white/10 border border-white/20 px-3.5 py-3 backdrop-blur-sm">
+            <div class="w-10 h-10 rounded-xl bg-white grid place-items-center text-base flex-shrink-0 shadow-sm" style="color:${col}"><i class="fa-solid ${ic}"></i></div>
+            <div class="min-w-0"><div class="font-black text-[15px] leading-tight whitespace-nowrap">${t}</div><div class="text-[11px] font-semibold text-white/75 mt-0.5 leading-snug">${d}</div></div>
+          </div>`).join('')}
         </div></div>` +
         `<h3 class="text-xl font-black text-slate-900 mt-6">Mục tiêu</h3>` +
         `<div class="mt-3 grid sm:grid-cols-3 gap-3">${[['fa-brain', '#7c3aed', 'Ôn tập chủ động', 'Biến tiết ôn tập/củng cố thành trận thi đấu sôi nổi, học sinh nhớ kiến thức lâu hơn.'], ['fa-people-group', '#059669', 'Làm việc nhóm', 'Các thành viên thảo luận, thống nhất đáp án và chiến thuật chọn gói, đặt Ngôi sao hy vọng.'], ['fa-bolt', '#d97706', 'Tư duy nhanh & chính xác', 'Vòng Tăng tốc, chuông giành quyền rèn phản xạ; điểm phụ thuộc cả độ đúng lẫn tốc độ.']].map(([i, c, t, d]) => `<div class="rounded-2xl border border-slate-200 bg-slate-50 p-4"><div class="w-9 h-9 rounded-xl grid place-items-center text-white" style="background:${c}"><i class="fa-solid ${i}"></i></div><div class="font-black mt-2">${t}</div><div class="text-sm text-slate-600 mt-1 leading-relaxed">${d}</div></div>`).join('')}</div>` +
