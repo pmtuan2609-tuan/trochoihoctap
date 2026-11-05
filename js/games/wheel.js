@@ -1,5 +1,5 @@
 /**
- * Game 4: Vòng Quay May Mắn (Lucky Wheel) & Hộp Quà Bí Mật (Mystery Boxes)
+ * Game 4: Vòng Quay May Mắn & Hộp Quà Bí Mật - Light & Crisp Theme
  */
 class FunGames {
     constructor() {
@@ -9,8 +9,6 @@ class FunGames {
         this.currentAngle = 0;
         this.isSpinning = false;
         this.spinVelocity = 0;
-
-        // Mystery Boxes state
         this.boxes = [];
     }
 
@@ -19,7 +17,6 @@ class FunGames {
         const container = document.getElementById('game-stage');
         if (!container) return;
 
-        // Populate items from class roster or points
         const students = window.classManager.students;
         if (students && students.length > 0) {
             this.wheelItems = students.slice(0, 16).map(s => s.name);
@@ -29,50 +26,50 @@ class FunGames {
 
         container.innerHTML = `
             <div class="relative w-full max-w-5xl mx-auto flex flex-col items-center gap-6 p-4">
-                <div class="bg-slate-900/90 backdrop-blur border border-amber-500/30 rounded-2xl p-4 w-full flex items-center justify-between shadow-xl">
+                <div class="bg-white border border-slate-200 rounded-3xl p-4 w-full flex items-center justify-between shadow-sm">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-amber-400 to-orange-500 flex items-center justify-center text-slate-950 font-black text-2xl shadow-lg">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-100 border border-amber-300 flex items-center justify-center text-amber-700 font-black text-2xl shadow-sm">
                             <i class="fa-solid fa-dharmachakra"></i>
                         </div>
                         <div>
-                            <div class="text-xs font-semibold text-amber-400 uppercase tracking-wider">Trò chơi vui nhộn</div>
-                            <div class="text-lg font-bold text-white">Vòng Quay May Mắn Lớp Học</div>
+                            <div class="text-xs font-bold text-amber-800 uppercase tracking-wider">Trò chơi vui nhộn</div>
+                            <div class="text-lg font-black text-slate-900">Vòng Quay May Mắn Lớp Học</div>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        <button onclick="window.funGames.setWheelMode('students')" class="px-3 py-1.5 rounded-lg bg-cyan-600 text-white font-bold text-xs hover:bg-cyan-500">
+                        <button onclick="window.funGames.setWheelMode('students')" class="px-3.5 py-2 rounded-xl bg-blue-50 text-blue-700 border border-blue-200 font-bold text-xs hover:bg-blue-100 transition shadow-sm">
                             Quay tên học sinh
                         </button>
-                        <button onclick="window.funGames.setWheelMode('prizes')" class="px-3 py-1.5 rounded-lg bg-purple-600 text-white font-bold text-xs hover:bg-purple-500">
+                        <button onclick="window.funGames.setWheelMode('prizes')" class="px-3.5 py-2 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 font-bold text-xs hover:bg-purple-100 transition shadow-sm">
                             Quay điểm thưởng
                         </button>
                     </div>
                 </div>
 
-                <!-- Wheel Canvas Box -->
-                <div class="relative flex flex-col items-center justify-center p-6 bg-slate-900 border-2 border-amber-400/40 rounded-3xl shadow-2xl">
+                <!-- Wheel Canvas Box (Clean White Frame) -->
+                <div class="relative flex flex-col items-center justify-center p-6 bg-white border-2 border-slate-200 rounded-3xl shadow-sm">
                     <!-- Pointer Indicator -->
-                    <div class="absolute top-2 z-20 text-red-500 text-4xl drop-shadow-[0_4px_10px_rgba(239,68,68,0.8)] filter">
+                    <div class="absolute top-2 z-20 text-red-500 text-4xl drop-shadow filter">
                         <i class="fa-solid fa-location-pin transform rotate-180"></i>
                     </div>
 
                     <canvas id="lucky-wheel-canvas" width="460" height="460" class="max-w-full aspect-square"></canvas>
 
                     <!-- Center Spin Button -->
-                    <button id="spin-btn" onclick="window.funGames.spinWheel()" class="mt-6 px-10 py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xl shadow-xl shadow-amber-500/30 transform active:scale-95 transition">
+                    <button id="spin-btn" onclick="window.funGames.spinWheel()" class="mt-6 px-10 py-4 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xl shadow-lg shadow-amber-500/20 transform active:scale-95 transition">
                         <i class="fa-solid fa-play mr-2"></i> QUAY NGAY
                     </button>
                 </div>
 
                 <!-- Winner Announcement Popup -->
-                <div id="wheel-winner-display" class="hidden text-center p-4 bg-amber-500/20 border-2 border-amber-400 rounded-2xl w-full max-w-md animate-bounce">
-                    <div class="text-xs text-amber-300 uppercase font-bold">Người được gọi tên</div>
-                    <div id="wheel-winner-name" class="text-2xl font-black text-white mt-1">Nguyễn Văn A</div>
+                <div id="wheel-winner-display" class="hidden text-center p-5 bg-amber-50 border-2 border-amber-300 rounded-2xl w-full max-w-md shadow-sm animate-bounce">
+                    <div class="text-xs text-amber-800 uppercase font-black">Người được gọi tên</div>
+                    <div id="wheel-winner-name" class="text-2xl md:text-3xl font-black text-slate-900 mt-1">Nguyễn Văn A</div>
                 </div>
 
                 <div class="w-full flex justify-start">
-                    <button onclick="window.app.showGameSelection()" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold border border-slate-700 flex items-center gap-2">
-                        <i class="fa-solid fa-arrow-left"></i> Quay lại
+                    <button onclick="window.app.showGameSelection()" class="px-5 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-bold border border-slate-200 shadow-sm flex items-center gap-2 transition">
+                        <i class="fa-solid fa-arrow-left"></i> Quay lại menu
                     </button>
                 </div>
             </div>
@@ -167,7 +164,6 @@ class FunGames {
         const winnerBox = document.getElementById('wheel-winner-display');
         if (winnerBox) winnerBox.classList.add('hidden');
 
-        // Randomized initial velocity & duration
         this.spinVelocity = 0.35 + Math.random() * 0.25;
         const friction = 0.985;
         let lastTickAngle = this.currentAngle;
@@ -176,7 +172,6 @@ class FunGames {
             this.currentAngle += this.spinVelocity;
             this.spinVelocity *= friction;
 
-            // Sound click on each segment passage
             const arc = (2 * Math.PI) / this.wheelItems.length;
             if (Math.abs(this.currentAngle - lastTickAngle) >= arc) {
                 window.soundFX.playWheelClick();
@@ -200,7 +195,6 @@ class FunGames {
     finishSpin() {
         const numItems = this.wheelItems.length;
         const arc = (2 * Math.PI) / numItems;
-        // Pointer is at top (-PI/2)
         const normalizedAngle = (3 * Math.PI / 2 - (this.currentAngle % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
         const winningIndex = Math.floor(normalizedAngle / arc) % numItems;
         const winner = this.wheelItems[winningIndex];
@@ -241,17 +235,17 @@ class FunGames {
 
         container.innerHTML = `
             <div class="relative w-full max-w-5xl mx-auto flex flex-col gap-6 p-4">
-                <div class="bg-slate-900/90 backdrop-blur border border-purple-500/30 rounded-2xl p-4 flex items-center justify-between shadow-xl">
+                <div class="bg-white border border-slate-200 rounded-3xl p-4 flex items-center justify-between shadow-sm">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-purple-500 to-indigo-600 flex items-center justify-center text-white font-black text-2xl shadow-lg">
+                        <div class="w-12 h-12 rounded-2xl bg-purple-100 border border-purple-300 flex items-center justify-center text-purple-700 font-black text-2xl shadow-sm">
                             <i class="fa-solid fa-gift"></i>
                         </div>
                         <div>
-                            <div class="text-xs font-semibold text-purple-400 uppercase tracking-wider">Trò chơi vui nhộn</div>
-                            <div class="text-lg font-bold text-white">Hộp Quà Bí Mật Tri Thức</div>
+                            <div class="text-xs font-bold text-purple-800 uppercase tracking-wider">Trò chơi vui nhộn</div>
+                            <div class="text-lg font-black text-slate-900">Hộp Quà Bí Mật Tri Thức</div>
                         </div>
                     </div>
-                    <div class="text-xs text-purple-300 bg-purple-500/20 px-3 py-1.5 rounded-full border border-purple-400/30">
+                    <div class="text-xs text-purple-700 bg-purple-50 px-3.5 py-1.5 rounded-full border border-purple-200 font-bold shadow-sm">
                         Chọn hộp quà -> Trả lời câu hỏi -> Mở quà may mắn!
                     </div>
                 </div>
@@ -261,15 +255,15 @@ class FunGames {
                 </div>
 
                 <div class="w-full flex justify-start">
-                    <button onclick="window.app.showGameSelection()" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold border border-slate-700 flex items-center gap-2">
-                        <i class="fa-solid fa-arrow-left"></i> Quay lại
+                    <button onclick="window.app.showGameSelection()" class="px-5 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-bold border border-slate-200 shadow-sm flex items-center gap-2 transition">
+                        <i class="fa-solid fa-arrow-left"></i> Quay lại menu
                     </button>
                 </div>
             </div>
 
             <!-- Box Question Modal -->
-            <div id="box-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-                <div class="bg-slate-900 border-2 border-purple-400 rounded-3xl max-w-xl w-full p-6 md:p-8 shadow-2xl relative" id="box-modal-body">
+            <div id="box-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+                <div class="bg-white border border-slate-200 rounded-3xl max-w-xl w-full p-6 md:p-8 shadow-2xl relative text-slate-900" id="box-modal-body">
                 </div>
             </div>
         `;
@@ -284,9 +278,9 @@ class FunGames {
         return this.boxes.map((box, idx) => {
             if (box.opened) {
                 return `
-                    <div class="p-6 rounded-3xl bg-slate-900/60 border-2 border-dashed border-slate-700 text-center flex flex-col items-center justify-center min-h-[140px] opacity-60">
-                        <i class="fa-solid fa-box-open text-3xl text-purple-400 mb-2"></i>
-                        <span class="text-xs font-bold text-amber-300">${box.prize}</span>
+                    <div class="p-6 rounded-3xl bg-slate-50 border-2 border-dashed border-slate-300 text-center flex flex-col items-center justify-center min-h-[140px] opacity-75 shadow-sm">
+                        <i class="fa-solid fa-box-open text-3xl text-purple-500 mb-2"></i>
+                        <span class="text-xs font-black text-amber-700">${box.prize}</span>
                     </div>
                 `;
             }
@@ -294,8 +288,8 @@ class FunGames {
             const color = boxColors[idx % boxColors.length];
             return `
                 <button onclick="window.funGames.openBox(${box.id})"
-                    class="group relative p-6 rounded-3xl bg-gradient-to-tr ${color} shadow-xl hover:scale-105 active:scale-95 transition-all duration-200 flex flex-col items-center justify-center min-h-[140px] border-2 border-white/20">
-                    <span class="absolute top-2 right-3 text-xs font-black text-white/80">#${box.id}</span>
+                    class="group relative p-6 rounded-3xl bg-gradient-to-tr ${color} shadow-md hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-200 flex flex-col items-center justify-center min-h-[140px] border-2 border-white/50">
+                    <span class="absolute top-2 right-3 text-xs font-black text-white/90">#${box.id}</span>
                     <i class="fa-solid fa-gift text-4xl text-white drop-shadow group-hover:rotate-12 transition-transform"></i>
                     <span class="text-xs font-black text-white mt-3 uppercase tracking-wider">Hộp Số ${box.id}</span>
                 </button>
@@ -315,17 +309,17 @@ class FunGames {
         const q = box.q;
         modalBody.innerHTML = `
             <div class="text-center mb-6">
-                <span class="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 font-bold text-xs border border-purple-400/40">
+                <span class="px-3.5 py-1.5 rounded-full bg-purple-50 text-purple-700 font-bold text-xs border border-purple-200 shadow-sm">
                     Thử thách mở Hộp Quà Bí Mật #${box.id}
                 </span>
-                <h3 class="text-xl font-bold text-white mt-4 leading-relaxed">${q.question}</h3>
+                <h3 class="text-xl font-bold text-slate-900 mt-4 leading-relaxed">${q.question}</h3>
             </div>
 
             <div class="grid grid-cols-1 gap-3 mb-6">
                 ${['A', 'B', 'C', 'D'].map(l => `
-                    <button onclick="window.funGames.checkAnswerBox(${box.id}, '${l}')" class="p-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 text-left transition flex items-center gap-3">
-                        <span class="w-8 h-8 rounded-lg bg-purple-500/20 text-purple-300 font-bold flex items-center justify-center text-sm">${l}</span>
-                        <span class="text-white text-sm font-medium flex-1">${q.options[l]}</span>
+                    <button onclick="window.funGames.checkAnswerBox(${box.id}, '${l}')" class="p-4 rounded-2xl bg-white hover:bg-slate-50 border-2 border-slate-200 hover:border-purple-400 text-left transition flex items-center gap-3 shadow-sm">
+                        <span class="w-9 h-9 rounded-xl bg-purple-50 text-purple-700 font-black flex items-center justify-center text-sm border border-purple-200">${l}</span>
+                        <span class="text-slate-800 text-sm md:text-base font-semibold flex-1">${q.options[l]}</span>
                     </button>
                 `).join('')}
             </div>
@@ -350,15 +344,15 @@ class FunGames {
 
             modalBody.innerHTML = `
                 <div class="text-center py-4">
-                    <div class="w-16 h-16 rounded-full bg-emerald-500/20 border border-emerald-400 mx-auto flex items-center justify-center text-emerald-400 text-3xl mb-3 animate-bounce">
+                    <div class="w-16 h-16 rounded-full bg-emerald-100 border border-emerald-300 mx-auto flex items-center justify-center text-emerald-600 text-3xl mb-3 animate-bounce shadow-sm">
                         <i class="fa-solid fa-gift"></i>
                     </div>
-                    <h3 class="text-2xl font-black text-emerald-400 mb-1">CHÍNH XÁC! HỘP QUÀ ĐÃ MỞ!</h3>
-                    <p class="text-sm text-slate-300 mb-4">Phần quà bí mật bên trong là:</p>
-                    <div class="p-4 bg-gradient-to-r from-purple-500/20 to-pink-500/20 border-2 border-purple-400 rounded-2xl text-2xl font-black text-amber-300 mb-6">
+                    <h3 class="text-2xl font-black text-emerald-700 mb-1">CHÍNH XÁC! HỘP QUÀ ĐÃ MỞ!</h3>
+                    <p class="text-sm text-slate-600 mb-4">Phần quà bí mật bên trong là:</p>
+                    <div class="p-5 bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-300 rounded-2xl text-2xl font-black text-amber-700 mb-6 shadow-sm">
                         ${box.prize}
                     </div>
-                    <button onclick="document.getElementById('box-modal').classList.add('hidden'); window.funGames.startMysteryBoxes();" class="px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white font-bold">
+                    <button onclick="document.getElementById('box-modal').classList.add('hidden'); window.funGames.startMysteryBoxes();" class="px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold shadow transition">
                         Đóng và tiếp tục
                     </button>
                 </div>
@@ -367,12 +361,12 @@ class FunGames {
             window.soundFX.playWrong();
             modalBody.innerHTML = `
                 <div class="text-center py-4">
-                    <div class="w-16 h-16 rounded-full bg-rose-500/20 border border-rose-400 mx-auto flex items-center justify-center text-rose-400 text-3xl mb-3">
+                    <div class="w-16 h-16 rounded-full bg-rose-100 border border-rose-300 mx-auto flex items-center justify-center text-rose-600 text-3xl mb-3 shadow-sm">
                         <i class="fa-solid fa-lock"></i>
                     </div>
-                    <h3 class="text-2xl font-black text-rose-400 mb-2">CHƯA MỞ ĐƯỢC HỘP!</h3>
-                    <p class="text-sm text-slate-300 mb-6">Rất tiếc! Đáp án đúng là: <strong class="text-emerald-400">${box.q.answer}. ${box.q.options[box.q.answer]}</strong></p>
-                    <button onclick="document.getElementById('box-modal').classList.add('hidden');" class="px-6 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold border border-slate-700">
+                    <h3 class="text-2xl font-black text-rose-600 mb-2">CHƯA MỞ ĐƯỢC HỘP!</h3>
+                    <p class="text-sm text-slate-600 mb-6">Rất tiếc! Đáp án đúng là: <strong class="text-emerald-700">${box.q.answer}. ${box.q.options[box.q.answer]}</strong></p>
+                    <button onclick="document.getElementById('box-modal').classList.add('hidden');" class="px-6 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold border border-slate-300 transition">
                         Thử lại sau
                     </button>
                 </div>

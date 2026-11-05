@@ -148,6 +148,110 @@ class App {
         if (classNameElem) classNameElem.textContent = window.classManager.className;
     }
 
+    /* ---------------- SIDEBAR & LAYOUT CONTROLS ---------------- */
+    toggleSidebar(force) {
+        const sidebar = document.getElementById('sidebar');
+        const backdrop = document.getElementById('sidebar-backdrop');
+        if (!sidebar) return;
+
+        const isClosed = sidebar.classList.contains('-translate-x-full');
+        const shouldOpen = force !== undefined ? force : isClosed;
+
+        if (shouldOpen) {
+            sidebar.classList.remove('-translate-x-full');
+            if (backdrop) backdrop.classList.remove('hidden');
+        } else {
+            sidebar.classList.add('-translate-x-full');
+            if (backdrop) backdrop.classList.add('hidden');
+        }
+    }
+
+    setActiveSidebar(element) {
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.classList.remove('active');
+        });
+        if (element) {
+            element.classList.add('active');
+        }
+        // Auto-close on mobile if clicked
+        if (window.innerWidth < 1024) {
+            this.toggleSidebar(false);
+        }
+    }
+
+    filterSidebarGames(query) {
+        const term = (query || '').toLowerCase().trim();
+        const list = document.getElementById('sidebar-games-list');
+        if (!list) return;
+
+        const buttons = list.querySelectorAll('button');
+        buttons.forEach(btn => {
+            const text = btn.textContent.toLowerCase();
+            if (!term || text.includes(term)) {
+                btn.classList.remove('hidden');
+            } else {
+                btn.classList.add('hidden');
+            }
+        });
+    }
+
+    toggleTeacherDrawer() {
+        window.soundFX.playClick();
+        this.showGameSelection();
+        const drawer = document.getElementById('teacher-files-drawer');
+        if (drawer) {
+            drawer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            drawer.classList.add('ring-4', 'ring-purple-400');
+            setTimeout(() => drawer.classList.remove('ring-4', 'ring-purple-400'), 1500);
+        }
+    }
+
+    openPinRoomModal() {
+        window.soundFX.playClick();
+        const modal = document.getElementById('global-modal');
+        const body = document.getElementById('global-modal-body');
+        if (!modal || !body) return;
+
+        // Generate a fun 6-digit classroom room PIN
+        const randomPin = Math.floor(100000 + Math.random() * 900000);
+
+        body.innerHTML = `
+            <div class="text-center py-3 text-slate-900">
+                <div class="w-16 h-16 rounded-2xl bg-purple-100 border border-purple-200 mx-auto flex items-center justify-center text-purple-700 text-3xl mb-3 shadow-sm">
+                    <i class="fa-solid fa-gamepad"></i>
+                </div>
+                <h3 class="text-2xl font-black text-slate-900 mb-1 font-heading">Tham Gia Phòng Chơi Bằng Mã PIN</h3>
+                <p class="text-xs text-slate-500 mb-5">Học sinh nhập mã PIN trên điện thoại/máy tính hoặc giáo viên phát mã cho lớp</p>
+
+                <!-- PIN Code Display Box -->
+                <div class="bg-gradient-to-r from-purple-50 via-indigo-50 to-pink-50 border-2 border-dashed border-purple-300 rounded-3xl p-6 mb-6 shadow-sm">
+                    <div class="text-[11px] font-bold text-purple-800 uppercase tracking-widest mb-1">Mã PIN Phòng Học Hiện Tại</div>
+                    <div class="text-4xl md:text-5xl font-black font-mono tracking-widest text-purple-700 my-2 select-all">${randomPin}</div>
+                    <div class="text-xs text-slate-500">Học sinh kết nối cùng thi đấu trực tiếp theo thời gian thực</div>
+                </div>
+
+                <!-- Input to join another room -->
+                <div class="max-w-xs mx-auto mb-6">
+                    <div class="text-xs font-bold text-slate-700 text-left mb-1.5">Hoặc nhập mã PIN phòng khác:</div>
+                    <div class="flex gap-2">
+                        <input type="text" maxlength="6" placeholder="Nhập 6 số PIN..." class="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-center text-lg font-black tracking-widest text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                        <button onclick="alert('Đã kết nối thành công vào phòng chơi!'); window.app.closeAllModals();" class="px-5 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm shadow">
+                            Vào
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex justify-center">
+                    <button onclick="window.app.closeAllModals()" class="px-6 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm border border-slate-200">
+                        Đóng
+                    </button>
+                </div>
+            </div>
+        `;
+
+        modal.classList.remove('hidden');
+    }
+
     /* ---------------- GAME NAVIGATION ---------------- */
     selectGame(gameId) {
         window.soundFX.playClick();
@@ -158,6 +262,24 @@ class App {
         const arena = document.getElementById('game-arena');
         if (dashboard) dashboard.classList.add('hidden');
         if (arena) arena.classList.remove('hidden');
+
+        // Update top breadcrumb
+        const breadcrumb = document.getElementById('top-breadcrumb');
+        const titles = {
+            'olympia': 'Đường lên đỉnh Olympia',
+            'millionaire': 'Ai là triệu phú',
+            'goldminer': 'Đào vàng tri thức',
+            'wheel': 'Vòng quay may mắn',
+            'mystery': 'Hộp quà bí mật'
+        };
+        if (breadcrumb) {
+            breadcrumb.textContent = titles[gameId] || 'Trò chơi';
+        }
+
+        // Close mobile sidebar if open
+        if (window.innerWidth < 1024) {
+            this.toggleSidebar(false);
+        }
 
         // Scroll to top smoothly
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -192,6 +314,15 @@ class App {
         const arena = document.getElementById('game-arena');
         if (arena) arena.classList.add('hidden');
         if (dashboard) dashboard.classList.remove('hidden');
+
+        const breadcrumb = document.getElementById('top-breadcrumb');
+        if (breadcrumb) breadcrumb.textContent = 'Trang chủ';
+
+        const homeBtn = document.getElementById('side-home-btn');
+        if (homeBtn) {
+            document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
+            homeBtn.classList.add('active');
+        }
 
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -243,20 +374,20 @@ class App {
         if (modal && body) {
             const team = window.classManager.teams.find(t => t.id === student.teamId);
             body.innerHTML = `
-                <div class="text-center py-4">
-                    <div class="w-20 h-20 rounded-full bg-cyan-500/20 border-2 border-cyan-400 mx-auto flex items-center justify-center text-cyan-400 text-3xl mb-4 animate-bounce">
+                <div class="text-center py-4 text-slate-900">
+                    <div class="w-20 h-20 rounded-full bg-blue-100 border-2 border-blue-400 mx-auto flex items-center justify-center text-blue-600 text-3xl mb-4 animate-bounce shadow-sm">
                         <i class="fa-solid fa-user-check"></i>
                     </div>
-                    <div class="text-xs text-cyan-400 font-bold uppercase tracking-wider">Học sinh được chọn ngẫu nhiên</div>
-                    <h2 class="text-3xl font-black text-white mt-1 mb-2">${student.name}</h2>
-                    <div class="inline-block px-4 py-1.5 rounded-full ${team ? team.bg + '/20 border ' + team.border + ' ' + team.text : 'bg-slate-800 text-slate-300'} text-xs font-bold mb-6">
+                    <div class="text-xs text-blue-700 font-bold uppercase tracking-wider">Học sinh được chọn ngẫu nhiên</div>
+                    <h2 class="text-3xl font-black text-slate-900 mt-1 mb-2">${student.name}</h2>
+                    <div class="inline-block px-4 py-1.5 rounded-full ${team ? team.bg + '/15 border ' + team.border + ' ' + team.text : 'bg-slate-100 text-slate-700'} text-xs font-bold mb-6">
                         ${team ? team.name : 'STT: ' + student.id} • Lớp ${student.className}
                     </div>
                     <div class="flex gap-3 justify-center">
-                        <button onclick="window.app.quickPickStudent()" class="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-sm">
+                        <button onclick="window.app.quickPickStudent()" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow transition">
                             <i class="fa-solid fa-shuffle mr-1"></i> Chọn bạn khác
                         </button>
-                        <button onclick="window.app.closeAllModals()" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm border border-slate-700">
+                        <button onclick="window.app.closeAllModals()" class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm border border-slate-200 transition">
                             Xong
                         </button>
                     </div>
@@ -273,31 +404,31 @@ class App {
         if (!modal || !body) return;
 
         body.innerHTML = `
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
-                <div class="flex items-center gap-2 text-cyan-400 font-bold text-lg">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4 text-slate-900">
+                <div class="flex items-center gap-2 text-blue-700 font-bold text-lg">
                     <i class="fa-solid fa-list-check"></i>
                     <span>Ngân Hàng Câu Hỏi (${this.questions.length} câu)</span>
                 </div>
-                <button onclick="window.app.closeAllModals()" class="text-slate-400 hover:text-white">
+                <button onclick="window.app.closeAllModals()" class="text-slate-400 hover:text-slate-700">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
 
             <div class="max-h-[60vh] overflow-y-auto pr-2 space-y-3">
                 ${this.questions.map((q, idx) => `
-                    <div class="p-4 rounded-xl bg-slate-800/80 border border-slate-700/80 text-left">
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-left shadow-sm">
                         <div class="flex items-center justify-between mb-2">
-                            <span class="font-bold text-amber-300 text-sm">Câu ${idx + 1}</span>
-                            <span class="text-xs px-2 py-0.5 rounded-full ${
-                                q.difficulty === 'Dễ' ? 'bg-emerald-500/20 text-emerald-300' :
-                                q.difficulty === 'Khó' ? 'bg-rose-500/20 text-rose-300' : 'bg-blue-500/20 text-blue-300'
+                            <span class="font-black text-amber-700 text-sm">Câu ${idx + 1}</span>
+                            <span class="text-xs px-2.5 py-0.5 rounded-full font-bold ${
+                                q.difficulty === 'Dễ' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' :
+                                q.difficulty === 'Khó' ? 'bg-rose-100 text-rose-800 border border-rose-200' : 'bg-blue-100 text-blue-800 border border-blue-200'
                             }">${q.difficulty || 'Vừa'}</span>
                         </div>
-                        <div class="text-sm font-semibold text-white mb-3">${q.question}</div>
+                        <div class="text-sm font-bold text-slate-900 mb-3 leading-relaxed">${q.question}</div>
                         <div class="grid grid-cols-2 gap-2 text-xs">
                             ${['A', 'B', 'C', 'D'].map(l => `
-                                <div class="p-2 rounded-lg ${l === q.answer ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold' : 'bg-slate-900/60 text-slate-300'}">
-                                    <span class="font-bold mr-1">${l}.</span> ${q.options[l] || ''}
+                                <div class="p-2.5 rounded-xl ${l === q.answer ? 'bg-emerald-100 text-emerald-900 border border-emerald-300 font-black' : 'bg-white text-slate-700 border border-slate-200'}">
+                                    <span class="font-black mr-1">${l}.</span> ${q.options[l] || ''}
                                 </div>
                             `).join('')}
                         </div>
@@ -305,8 +436,8 @@ class App {
                 `).join('')}
             </div>
 
-            <div class="mt-4 pt-3 border-t border-slate-800 flex justify-end">
-                <button onclick="window.app.closeAllModals()" class="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm">
+            <div class="mt-4 pt-3 border-t border-slate-200 flex justify-end">
+                <button onclick="window.app.closeAllModals()" class="px-5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm border border-slate-200">
                     Đóng
                 </button>
             </div>
@@ -327,29 +458,29 @@ class App {
 
         const students = window.classManager.students;
         body.innerHTML = `
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
-                <div class="flex items-center gap-2 text-amber-400 font-bold text-lg">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4 text-slate-900">
+                <div class="flex items-center gap-2 text-amber-700 font-bold text-lg">
                     <i class="fa-solid fa-users"></i>
                     <span>Danh Sách Lớp: ${window.classManager.className} (${students.length} HS)</span>
                 </div>
-                <button onclick="window.app.closeAllModals()" class="text-slate-400 hover:text-white">
+                <button onclick="window.app.closeAllModals()" class="text-slate-400 hover:text-slate-700">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
 
             <!-- Teams Summary -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-4 font-bold">
                 ${window.classManager.teams.map(t => `
-                    <div class="p-2.5 rounded-xl bg-slate-800/80 border ${t.border} text-center">
+                    <div class="p-2.5 rounded-xl bg-white border ${t.border} text-center shadow-sm">
                         <div class="text-[11px] font-bold ${t.text}">${t.name}</div>
-                        <div class="text-base font-black text-white font-mono mt-0.5">${t.score} điểm</div>
+                        <div class="text-base font-black text-slate-900 font-mono mt-0.5">${t.score} điểm</div>
                     </div>
                 `).join('')}
             </div>
 
             <div class="max-h-[50vh] overflow-y-auto pr-2">
-                <table class="w-full text-left text-xs text-slate-300">
-                    <thead class="bg-slate-800/90 text-slate-400 uppercase font-bold sticky top-0">
+                <table class="w-full text-left text-xs text-slate-800">
+                    <thead class="bg-slate-100 text-slate-700 uppercase font-black sticky top-0 border-b border-slate-200">
                         <tr>
                             <th class="p-2.5">STT</th>
                             <th class="p-2.5">Họ và tên</th>
@@ -357,15 +488,15 @@ class App {
                             <th class="p-2.5 text-right">Điểm</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-slate-800">
+                    <tbody class="divide-y divide-slate-200">
                         ${students.map(s => {
                             const team = window.classManager.teams.find(t => t.id === s.teamId);
                             return `
-                                <tr class="hover:bg-slate-800/40">
-                                    <td class="p-2.5 font-mono text-slate-500">${s.id}</td>
-                                    <td class="p-2.5 font-bold text-white">${s.name}</td>
-                                    <td class="p-2.5"><span class="${team ? team.text : ''} font-semibold">${team ? team.name : ''}</span></td>
-                                    <td class="p-2.5 text-right font-mono font-bold text-amber-400">${s.score}</td>
+                                <tr class="hover:bg-slate-50">
+                                    <td class="p-2.5 font-mono text-slate-400 font-bold">${s.id}</td>
+                                    <td class="p-2.5 font-bold text-slate-900">${s.name}</td>
+                                    <td class="p-2.5"><span class="${team ? team.text : ''} font-bold">${team ? team.name : ''}</span></td>
+                                    <td class="p-2.5 text-right font-mono font-black text-amber-600">${s.score}</td>
                                 </tr>
                             `;
                         }).join('')}
@@ -373,11 +504,11 @@ class App {
                 </table>
             </div>
 
-            <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between">
-                <button onclick="window.classManager.exportToExcel()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-2">
+            <div class="mt-4 pt-3 border-t border-slate-200 flex items-center justify-between">
+                <button onclick="window.classManager.exportToExcel()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-2 shadow">
                     <i class="fa-solid fa-file-excel"></i> Xuất kết quả ra Excel
                 </button>
-                <button onclick="window.app.closeAllModals()" class="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm">
+                <button onclick="window.app.closeAllModals()" class="px-5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm border border-slate-200">
                     Đóng
                 </button>
             </div>
@@ -428,48 +559,48 @@ class App {
         ];
 
         body.innerHTML = `
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
-                <div class="flex items-center gap-2 text-purple-400 font-bold text-lg">
-                    <i class="fa-solid fa-palette text-amber-400"></i>
+            <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-4 text-slate-900">
+                <div class="flex items-center gap-2 text-purple-700 font-bold text-lg">
+                    <i class="fa-solid fa-palette text-purple-600"></i>
                     <span>Bộ Sưu Tập Logo Trò Chơi Giáo Dục (Edu Game)</span>
                 </div>
-                <button onclick="window.app.closeAllModals()" class="text-slate-400 hover:text-white">
+                <button onclick="window.app.closeAllModals()" class="text-slate-400 hover:text-slate-700">
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
 
             <!-- Showcase Banner Preview -->
-            <div class="mb-5 rounded-2xl overflow-hidden border border-slate-700 bg-slate-950">
-                <div class="text-[11px] font-bold text-slate-400 px-3 py-1.5 bg-slate-900 border-b border-slate-800 flex items-center justify-between">
-                    <span><i class="fa-solid fa-image text-cyan-400 mr-1.5"></i>Bản Thiết Kế 3D Vector Edu Game Showcase</span>
-                    <a href="assets/logos/eduplay_logo_showcase.jpg" target="_blank" class="text-cyan-400 hover:underline">Xem ảnh gốc HD</a>
+            <div class="mb-5 rounded-2xl overflow-hidden border border-slate-200 bg-slate-50 shadow-sm">
+                <div class="text-[11px] font-bold text-slate-600 px-3 py-1.5 bg-slate-100 border-b border-slate-200 flex items-center justify-between">
+                    <span><i class="fa-solid fa-image text-blue-600 mr-1.5"></i>Bản Thiết Kế 3D Vector Edu Game Showcase</span>
+                    <a href="assets/logos/eduplay_logo_showcase.jpg" target="_blank" class="text-blue-600 hover:underline">Xem ảnh gốc HD</a>
                 </div>
                 <img src="assets/logos/eduplay_logo_showcase.jpg" alt="Edu Game Logos Showcase" class="w-full max-h-48 object-cover object-top hover:opacity-95 transition">
             </div>
 
-            <div class="text-xs text-slate-300 font-bold mb-3 flex items-center justify-between">
+            <div class="text-xs text-slate-600 font-bold mb-3 flex items-center justify-between">
                 <span>Chọn mẫu Logo vector SVG để thay đổi giao diện website:</span>
             </div>
 
             <!-- Grid 4 Vector SVG Logos -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[48vh] overflow-y-auto pr-1">
                 ${logos.map(l => `
-                    <div class="p-4 rounded-2xl bg-slate-800/80 border ${l.border} flex flex-col justify-between hover:scale-[1.02] transition shadow-lg">
+                    <div class="p-4 rounded-2xl bg-white border-2 ${l.border} flex flex-col justify-between hover:scale-[1.02] transition shadow-sm">
                         <div class="flex items-center gap-3 mb-3">
-                            <div class="w-16 h-16 rounded-2xl bg-slate-900 border border-slate-700 p-1.5 shadow flex-shrink-0">
+                            <div class="w-16 h-16 rounded-2xl bg-slate-50 border border-slate-200 p-1.5 shadow-sm flex-shrink-0">
                                 <img src="${l.file}" alt="${l.name}" class="w-full h-full object-contain">
                             </div>
                             <div>
-                                <h4 class="text-sm font-black text-white">${l.name}</h4>
-                                <div class="text-[11px] text-amber-300 font-semibold">${l.sub}</div>
-                                <p class="text-[10px] text-slate-400 mt-1 line-clamp-2">${l.desc}</p>
+                                <h4 class="text-sm font-black text-slate-900">${l.name}</h4>
+                                <div class="text-[11px] text-amber-700 font-bold">${l.sub}</div>
+                                <p class="text-[10px] text-slate-500 mt-1 line-clamp-2">${l.desc}</p>
                             </div>
                         </div>
-                        <div class="flex gap-2 mt-2 pt-2 border-t border-slate-700/60">
+                        <div class="flex gap-2 mt-2 pt-2 border-t border-slate-100">
                             <button onclick="window.app.applyLogo('${l.file}')" class="flex-1 py-1.5 px-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black text-xs transition shadow flex items-center justify-center gap-1">
                                 <i class="fa-solid fa-check"></i> Đặt làm Logo
                             </button>
-                            <a href="${l.file}" download="${l.id}-logo.svg" class="py-1.5 px-3 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-200 font-bold text-xs transition flex items-center justify-center gap-1" title="Tải file vector SVG gốc">
+                            <a href="${l.file}" download="${l.id}-logo.svg" class="py-1.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition flex items-center justify-center gap-1 border border-slate-200" title="Tải file vector SVG gốc">
                                 <i class="fa-solid fa-download"></i> SVG
                             </a>
                         </div>
@@ -477,8 +608,8 @@ class App {
                 `).join('')}
             </div>
 
-            <div class="mt-4 pt-3 border-t border-slate-800 flex justify-end">
-                <button onclick="window.app.closeAllModals()" class="px-5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm">
+            <div class="mt-4 pt-3 border-t border-slate-200 flex justify-end">
+                <button onclick="window.app.closeAllModals()" class="px-5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm border border-slate-200">
                     Đóng
                 </button>
             </div>
@@ -516,4 +647,17 @@ class App {
 }
 
 window.app = new App();
-window.addEventListener('DOMContentLoaded', () => window.app.init());
+window.addEventListener('DOMContentLoaded', () => {
+    window.app.init();
+
+    // Dismiss splash screen / preloader smoothly
+    setTimeout(() => {
+        const preloader = document.getElementById('page-preloader');
+        if (preloader) {
+            preloader.classList.add('opacity-0', 'pointer-events-none');
+            setTimeout(() => {
+                if (preloader.parentNode) preloader.parentNode.removeChild(preloader);
+            }, 550);
+        }
+    }, 800);
+});

@@ -1,5 +1,5 @@
 /**
- * Game 2: Đào Vàng Tri Thức (Gold Miner Educational Game)
+ * Game 2: Đào Vàng Tri Thức (Gold Miner) - Light & Crisp Theme
  */
 class GoldMinerGame {
     constructor() {
@@ -12,8 +12,6 @@ class GoldMinerGame {
         this.timeLeft = 25;
         this.targetScore = 1000;
         this.currentTeamIdx = 0;
-
-        // Gold nuggets pool
         this.nuggets = [];
     }
 
@@ -29,11 +27,11 @@ class GoldMinerGame {
 
     generateNuggets() {
         const types = [
-            { type: 'big_gold', name: 'Cục Vàng Khổng Lồ', value: 250, size: 'w-24 h-24', icon: 'fa-cubes-stacked', color: 'text-amber-400 bg-amber-500/20 border-amber-400' },
-            { type: 'gold', name: 'Thỏi Vàng Hoàng Kim', value: 150, size: 'w-20 h-20', icon: 'fa-coins', color: 'text-yellow-400 bg-yellow-500/20 border-yellow-400' },
-            { type: 'diamond', name: 'Kim Cương Xanh', value: 300, size: 'w-16 h-16', icon: 'fa-gem', color: 'text-cyan-300 bg-cyan-500/20 border-cyan-300 animate-pulse' },
-            { type: 'mystery', name: 'Túi Bí Ẩn May Mắn', value: 200, size: 'w-18 h-18', icon: 'fa-sack-dollar', color: 'text-purple-400 bg-purple-500/20 border-purple-400' },
-            { type: 'ruby', name: 'Hồng Ngọc Lửa', value: 200, size: 'w-16 h-16', icon: 'fa-ring', color: 'text-rose-400 bg-rose-500/20 border-rose-400' }
+            { type: 'big_gold', name: 'Cục Vàng Khổng Lồ', value: 250, icon: 'fa-cubes-stacked', color: 'text-amber-600 bg-amber-50 border-amber-300' },
+            { type: 'gold', name: 'Thỏi Vàng Hoàng Kim', value: 150, icon: 'fa-coins', color: 'text-yellow-600 bg-yellow-50 border-yellow-300' },
+            { type: 'diamond', name: 'Kim Cương Xanh', value: 300, icon: 'fa-gem', color: 'text-cyan-600 bg-cyan-50 border-cyan-300' },
+            { type: 'mystery', name: 'Túi Bí Ẩn May Mắn', value: 200, icon: 'fa-sack-dollar', color: 'text-purple-600 bg-purple-50 border-purple-300' },
+            { type: 'ruby', name: 'Hồng Ngọc Lửa', value: 200, icon: 'fa-ring', color: 'text-rose-600 bg-rose-50 border-rose-300' }
         ];
 
         this.nuggets = [];
@@ -45,7 +43,6 @@ class GoldMinerGame {
                 questionIndex: i,
                 name: t.name,
                 value: t.value,
-                size: t.size,
                 icon: t.icon,
                 color: t.color,
                 mined: false
@@ -61,18 +58,18 @@ class GoldMinerGame {
 
         container.innerHTML = `
             <div class="relative w-full max-w-6xl mx-auto flex flex-col gap-6 p-4">
-                <!-- Top HUD Bar -->
-                <div class="bg-slate-900/90 backdrop-blur border border-amber-500/30 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-xl">
+                <!-- Top HUD Bar (Crisp White) -->
+                <div class="bg-white border border-slate-200 rounded-3xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-sm">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-amber-500 to-yellow-400 flex items-center justify-center text-slate-950 font-black text-2xl shadow-lg shadow-amber-500/20">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-100 border border-amber-300 flex items-center justify-center text-amber-700 font-black text-2xl shadow-sm">
                             <i class="fa-solid fa-person-digging"></i>
                         </div>
                         <div>
-                            <div class="text-xs font-semibold text-amber-400 uppercase tracking-wider">Trò chơi Đào Vàng Tri Thức</div>
-                            <div class="text-lg font-bold text-white flex items-center gap-2">
-                                Lượt chơi: <span id="gold-team-name" class="${currentTeam ? currentTeam.text : 'text-amber-400'} font-black">${currentTeam ? currentTeam.name : 'Cả Lớp'}</span>
-                                <button onclick="window.goldMinerGame.nextTeamTurn()" title="Chuyển lượt đội tiếp theo" class="text-xs bg-slate-800 hover:bg-slate-700 text-amber-300 px-2.5 py-1 rounded-lg border border-amber-500/40">
-                                    <i class="fa-solid fa-rotate mr-1"></i>Đổi đội
+                            <div class="text-xs font-bold text-amber-800 uppercase tracking-wider">Trò chơi Đào Vàng Tri Thức</div>
+                            <div class="text-lg font-black text-slate-900 flex items-center gap-2">
+                                Lượt chơi: <span id="gold-team-name" class="${currentTeam ? currentTeam.text : 'text-amber-600'} font-black">${currentTeam ? currentTeam.name : 'Cả Lớp'}</span>
+                                <button onclick="window.goldMinerGame.nextTeamTurn()" title="Chuyển lượt đội tiếp theo" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold px-2.5 py-1 rounded-lg border border-slate-200 transition">
+                                    <i class="fa-solid fa-rotate mr-1 text-amber-600"></i>Đổi đội
                                 </button>
                             </div>
                         </div>
@@ -80,11 +77,11 @@ class GoldMinerGame {
 
                     <!-- Score Counter -->
                     <div class="flex items-center gap-6">
-                        <div class="bg-slate-800/80 px-4 py-2 rounded-xl border border-slate-700 flex items-center gap-3">
-                            <i class="fa-solid fa-coins text-amber-400 text-xl"></i>
+                        <div class="bg-amber-50 px-4 py-2 rounded-2xl border border-amber-200 flex items-center gap-3 shadow-sm">
+                            <i class="fa-solid fa-coins text-amber-500 text-2xl"></i>
                             <div>
-                                <div class="text-[10px] uppercase font-bold text-slate-400">Tổng Vàng Đào Được</div>
-                                <div id="gold-total-score" class="text-2xl font-black text-amber-400 font-mono">${this.score} $</div>
+                                <div class="text-[10px] uppercase font-bold text-slate-500">Tổng Vàng Đào Được</div>
+                                <div id="gold-total-score" class="text-2xl font-black text-amber-700 font-mono">${this.score} $</div>
                             </div>
                         </div>
                     </div>
@@ -92,24 +89,24 @@ class GoldMinerGame {
                     <!-- Teams Mini-Scoreboard -->
                     <div class="flex items-center gap-2">
                         ${window.classManager.teams.map((t, idx) => `
-                            <div class="px-3 py-1.5 rounded-xl bg-slate-800/80 border ${idx === this.currentTeamIdx ? t.border + ' ring-2 ring-amber-400' : 'border-slate-700'} text-xs font-bold flex flex-col items-center">
+                            <div class="px-3 py-1.5 rounded-xl bg-white border ${idx === this.currentTeamIdx ? 'border-amber-500 ring-2 ring-amber-400 bg-amber-50/50' : 'border-slate-200'} text-xs font-bold flex flex-col items-center shadow-sm">
                                 <span class="${t.text}">${t.name.split(' ')[1] || t.name}</span>
-                                <span class="text-white font-mono text-sm">${t.score}</span>
+                                <span class="text-slate-900 font-mono text-sm font-black">${t.score}</span>
                             </div>
                         `).join('')}
                     </div>
                 </div>
 
-                <!-- Underground Minefield Scene -->
-                <div class="relative bg-gradient-to-b from-amber-950/80 via-stone-900 to-stone-950 border-2 border-amber-500/40 rounded-3xl p-6 md:p-8 shadow-2xl min-h-[460px] flex flex-col justify-between overflow-hidden">
+                <!-- Sunny Underground Minefield Scene (Bright Sand Palette) -->
+                <div class="relative bg-gradient-to-b from-amber-50/80 via-orange-50/40 to-amber-100/60 border-2 border-amber-300 rounded-3xl p-6 md:p-8 shadow-sm min-h-[460px] flex flex-col justify-between overflow-hidden">
                     <!-- Surface ground line with Miner -->
-                    <div class="flex items-center justify-between border-b-2 border-amber-700/60 pb-3 mb-4">
-                        <div class="flex items-center gap-3 text-amber-300 font-semibold text-sm">
-                            <i class="fa-solid fa-mountain-sun text-emerald-400 text-lg"></i>
-                            <span>Khu vực mỏ quặng tri thức</span>
+                    <div class="flex items-center justify-between border-b-2 border-amber-200 pb-3 mb-4">
+                        <div class="flex items-center gap-2 text-amber-900 font-bold text-sm">
+                            <i class="fa-solid fa-mountain-sun text-emerald-600 text-lg"></i>
+                            <span>Bãi quặng tri thức lớp học</span>
                         </div>
-                        <div class="flex items-center gap-2 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-400/30 text-amber-300 text-xs">
-                            <i class="fa-solid fa-hand-pointer animate-bounce mr-1"></i> Click vào thỏi vàng hoặc kim cương để đào!
+                        <div class="flex items-center gap-2 bg-white px-3.5 py-1 rounded-full border border-amber-300 text-amber-800 text-xs font-bold shadow-sm">
+                            <i class="fa-solid fa-hand-pointer text-amber-500 animate-bounce mr-1"></i> Nhấn vào thỏi vàng hoặc kim cương để đào!
                         </div>
                     </div>
 
@@ -119,11 +116,11 @@ class GoldMinerGame {
                     </div>
 
                     <!-- Bottom Controls -->
-                    <div class="flex items-center justify-between pt-4 border-t border-slate-800">
-                        <button onclick="window.app.showGameSelection()" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold border border-slate-700 flex items-center gap-2">
-                            <i class="fa-solid fa-arrow-left"></i> Quay lại
+                    <div class="flex items-center justify-between pt-4 border-t border-amber-200">
+                        <button onclick="window.app.showGameSelection()" class="px-5 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-bold border border-slate-200 shadow-sm flex items-center gap-2 transition">
+                            <i class="fa-solid fa-arrow-left"></i> Quay lại menu
                         </button>
-                        <button onclick="window.goldMinerGame.start(window.goldMinerGame.questions)" class="px-5 py-2.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-semibold border border-amber-500/40 flex items-center gap-2">
+                        <button onclick="window.goldMinerGame.start(window.goldMinerGame.questions)" class="px-5 py-2.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold border border-amber-300 shadow-sm flex items-center gap-2 transition">
                             <i class="fa-solid fa-rotate-right"></i> Đặt lại bãi quặng
                         </button>
                     </div>
@@ -131,8 +128,8 @@ class GoldMinerGame {
             </div>
 
             <!-- Question Modal Popup when Gold is Clicked -->
-            <div id="gold-modal-overlay" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-                <div class="bg-slate-900 border-2 border-amber-400 rounded-3xl max-w-2xl w-full p-6 md:p-8 shadow-2xl relative animate-scale-up" id="gold-modal-body">
+            <div id="gold-modal-overlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+                <div class="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full p-6 md:p-8 shadow-2xl relative animate-scale-up text-slate-900" id="gold-modal-body">
                     <!-- Loaded dynamically on nugget click -->
                 </div>
             </div>
@@ -143,19 +140,19 @@ class GoldMinerGame {
         return this.nuggets.map(nugget => {
             if (nugget.mined) {
                 return `
-                    <div class="w-20 h-20 rounded-2xl border-2 border-dashed border-slate-700/60 flex items-center justify-center text-slate-600 font-mono text-xs opacity-40">
-                        <i class="fa-solid fa-check"></i> Đã đào
+                    <div class="w-24 h-24 rounded-3xl border-2 border-dashed border-slate-300 bg-white/50 flex flex-col items-center justify-center text-slate-400 font-bold text-xs opacity-60">
+                        <i class="fa-solid fa-check text-emerald-500 text-lg mb-1"></i> Đã đào
                     </div>
                 `;
             }
             return `
                 <button onclick="window.goldMinerGame.openNugget(${nugget.id})"
-                    class="group relative flex flex-col items-center justify-center p-4 rounded-3xl border-2 ${nugget.color} shadow-lg hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer">
-                    <span class="absolute -top-3 px-2 py-0.5 rounded-full bg-slate-900 border ${nugget.color} text-[11px] font-black font-mono">
+                    class="group relative flex flex-col items-center justify-center p-5 w-24 h-24 rounded-3xl bg-white border-2 ${nugget.color} shadow-sm hover:shadow-xl hover:scale-110 active:scale-95 transition-all duration-200 cursor-pointer">
+                    <span class="absolute -top-3 px-2 py-0.5 rounded-full bg-white border ${nugget.color} text-[11px] font-black font-mono shadow-sm">
                         +${nugget.value} $
                     </span>
-                    <i class="fa-solid ${nugget.icon} text-3xl md:text-4xl my-2 group-hover:rotate-12 transition-transform"></i>
-                    <span class="text-xs font-bold text-white text-center line-clamp-1">${nugget.name}</span>
+                    <i class="fa-solid ${nugget.icon} text-3xl md:text-4xl my-1 group-hover:rotate-12 transition-transform"></i>
+                    <span class="text-[10px] font-black text-slate-700 text-center line-clamp-1 mt-1">${nugget.name}</span>
                 </button>
             `;
         }).join('');
@@ -188,27 +185,27 @@ class GoldMinerGame {
         this.startTimer();
 
         modalBody.innerHTML = `
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-4">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl ${nugget.color} border flex items-center justify-center text-lg">
+                    <div class="w-10 h-10 rounded-2xl ${nugget.color} border flex items-center justify-center text-lg shadow-sm">
                         <i class="fa-solid ${nugget.icon}"></i>
                     </div>
                     <div>
-                        <div class="text-xs text-amber-400 font-bold uppercase">${nugget.name} (+${nugget.value} $)</div>
-                        <div class="text-sm font-semibold text-white">Đội đang trả lời: <span class="${currentTeam ? currentTeam.text : 'text-amber-400'}">${currentTeam ? currentTeam.name : 'Lớp học'}</span></div>
+                        <div class="text-xs text-amber-700 font-black uppercase">${nugget.name} (+${nugget.value} $)</div>
+                        <div class="text-sm font-bold text-slate-800">Đội đang trả lời: <span class="${currentTeam ? currentTeam.text : 'text-amber-600'} font-black">${currentTeam ? currentTeam.name : 'Lớp học'}</span></div>
                     </div>
                 </div>
                 <!-- Countdown -->
-                <div class="flex items-center gap-2 bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-700">
-                    <i class="fa-solid fa-stopwatch text-amber-400"></i>
-                    <span id="gold-timer" class="font-mono font-bold text-lg text-amber-400">${this.timeLeft}s</span>
+                <div class="flex items-center gap-2 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-200 shadow-sm">
+                    <i class="fa-solid fa-stopwatch text-amber-600"></i>
+                    <span id="gold-timer" class="font-mono font-black text-lg text-amber-700">${this.timeLeft}s</span>
                 </div>
             </div>
 
             <!-- Question -->
-            <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-5 mb-5 text-center">
-                <div class="text-xs text-cyan-400 font-bold uppercase mb-2">Câu hỏi thử thách</div>
-                <h3 class="text-lg md:text-xl font-bold text-white leading-relaxed" id="gold-q-text">
+            <div class="bg-blue-50/60 border border-blue-200 rounded-2xl p-5 mb-5 text-center">
+                <div class="text-xs text-blue-700 font-black uppercase mb-1">Câu hỏi thử thách</div>
+                <h3 class="text-lg md:text-xl font-bold text-slate-900 leading-relaxed" id="gold-q-text">
                     ${q.question}
                 </h3>
             </div>
@@ -217,11 +214,11 @@ class GoldMinerGame {
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="gold-options-container">
                 ${['A', 'B', 'C', 'D'].map(l => `
                     <button onclick="window.goldMinerGame.checkAnswer('${l}')" id="gold-opt-${l}"
-                        class="p-4 rounded-xl bg-slate-800 hover:bg-slate-700/80 border-2 border-slate-700 hover:border-amber-400 text-left transition flex items-center gap-3">
-                        <span class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-300 font-black flex items-center justify-center text-sm border border-amber-400/40">
+                        class="p-4 rounded-2xl bg-white hover:bg-slate-50 border-2 border-slate-200 hover:border-amber-400 text-left transition flex items-center gap-3 shadow-sm">
+                        <span class="w-9 h-9 rounded-xl bg-amber-50 text-amber-800 font-black flex items-center justify-center text-sm border border-amber-300">
                             ${l}
                         </span>
-                        <span class="text-white font-medium text-sm md:text-base flex-1">
+                        <span class="text-slate-800 font-semibold text-sm md:text-base flex-1">
                             ${q.options[l] || ''}
                         </span>
                     </button>
@@ -229,7 +226,7 @@ class GoldMinerGame {
             </div>
 
             <!-- Explanation & Feedback -->
-            <div id="gold-feedback" class="hidden mt-4 p-4 rounded-2xl"></div>
+            <div id="gold-feedback" class="hidden mt-4 p-4 rounded-2xl shadow-sm"></div>
         `;
 
         modal.classList.remove('hidden');
@@ -288,8 +285,10 @@ class GoldMinerGame {
 
         const correctBtn = document.getElementById(`gold-opt-${q.answer}`);
         if (correctBtn) {
-            correctBtn.classList.remove('bg-slate-800', 'border-slate-700');
-            correctBtn.classList.add('bg-emerald-600', 'border-emerald-400', 'text-white');
+            correctBtn.classList.remove('bg-white', 'border-slate-200');
+            correctBtn.classList.add('bg-emerald-500', 'border-emerald-600', 'text-white');
+            const badge = correctBtn.querySelector('span');
+            if (badge) badge.className = 'w-9 h-9 rounded-xl bg-white text-emerald-800 font-black flex items-center justify-center text-sm';
         }
 
         if (isCorrect) {
@@ -306,13 +305,13 @@ class GoldMinerGame {
             }
 
             if (feedback) {
-                feedback.className = "mt-4 p-4 rounded-2xl bg-emerald-950/80 border border-emerald-500/50 text-emerald-200 text-center";
+                feedback.className = "mt-4 p-4 rounded-2xl bg-emerald-50 border border-emerald-300 text-emerald-900 text-center";
                 feedback.innerHTML = `
-                    <div class="font-black text-lg text-emerald-300 mb-1">
+                    <div class="font-black text-lg text-emerald-700 mb-1">
                         <i class="fa-solid fa-circle-check mr-1"></i> CHÍNH XÁC! KÉO ĐƯỢC VÀNG LÊN!
                     </div>
                     <p class="text-sm">+${nugget.value} $ đã cộng vào điểm của <strong>${currentTeam ? currentTeam.name : 'đội'}</strong>!</p>
-                    <button onclick="window.goldMinerGame.closeModalAndRefresh()" class="mt-3 px-6 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold transition">
+                    <button onclick="window.goldMinerGame.closeModalAndRefresh()" class="mt-3 px-6 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold transition shadow">
                         Tiếp tục đào quặng
                     </button>
                 `;
@@ -324,19 +323,19 @@ class GoldMinerGame {
             if (letter) {
                 const wrongBtn = document.getElementById(`gold-opt-${letter}`);
                 if (wrongBtn) {
-                    wrongBtn.classList.remove('bg-slate-800', 'border-slate-700');
-                    wrongBtn.classList.add('bg-rose-600', 'border-rose-400', 'text-white');
+                    wrongBtn.classList.remove('bg-white', 'border-slate-200');
+                    wrongBtn.classList.add('bg-rose-500', 'border-rose-600', 'text-white');
                 }
             }
 
             if (feedback) {
-                feedback.className = "mt-4 p-4 rounded-2xl bg-rose-950/80 border border-rose-500/50 text-rose-200 text-center";
+                feedback.className = "mt-4 p-4 rounded-2xl bg-rose-50 border border-rose-300 text-rose-900 text-center";
                 feedback.innerHTML = `
-                    <div class="font-black text-lg text-rose-300 mb-1">
+                    <div class="font-black text-lg text-rose-700 mb-1">
                         <i class="fa-solid fa-bomb mr-1"></i> ${isTimeOut ? 'HẾT GIỜ!' : 'SAI RỒI! MẮC DÂY TỜI!'}
                     </div>
                     <p class="text-sm">Đáp án đúng là: <strong>${q.answer}. ${q.options[q.answer]}</strong></p>
-                    <button onclick="window.goldMinerGame.closeModalAndRefresh()" class="mt-3 px-6 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold border border-slate-600 transition">
+                    <button onclick="window.goldMinerGame.closeModalAndRefresh()" class="mt-3 px-6 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold border border-slate-300 transition">
                         Đổi lượt đội tiếp
                     </button>
                 `;
@@ -349,7 +348,6 @@ class GoldMinerGame {
         const modal = document.getElementById('gold-modal-overlay');
         if (modal) modal.classList.add('hidden');
 
-        // Check if all nuggets mined
         const remain = this.nuggets.filter(n => !n.mined);
         if (remain.length === 0) {
             this.showVictory();
@@ -368,20 +366,20 @@ class GoldMinerGame {
         if (modal && modalBody) {
             modalBody.innerHTML = `
                 <div class="text-center py-4">
-                    <div class="w-20 h-20 rounded-full bg-amber-500/20 border-2 border-amber-400 mx-auto flex items-center justify-center text-amber-400 text-4xl mb-4 animate-bounce">
+                    <div class="w-20 h-20 rounded-full bg-amber-100 border-2 border-amber-400 mx-auto flex items-center justify-center text-amber-600 text-4xl mb-4 animate-bounce">
                         <i class="fa-solid fa-trophy"></i>
                     </div>
-                    <h2 class="text-3xl font-black text-amber-400 mb-2">ĐÃ ĐÀO HẾT MỎ QUẶNG!</h2>
-                    <p class="text-slate-300 mb-4">Tổng số quặng vàng thu hoạch được: <strong class="text-white font-mono text-xl">${this.score} $</strong></p>
+                    <h2 class="text-3xl font-black text-amber-700 mb-2">ĐÃ ĐÀO HẾT MỎ QUẶNG!</h2>
+                    <p class="text-slate-600 mb-4">Tổng số quặng vàng thu hoạch được: <strong class="text-amber-800 font-mono text-xl">${this.score} $</strong></p>
                     <div class="grid grid-cols-2 gap-3 mb-6">
                         ${window.classManager.teams.map(t => `
-                            <div class="p-3 rounded-2xl bg-slate-800/80 border ${t.border} text-center">
+                            <div class="p-3 rounded-2xl bg-white border ${t.border} text-center shadow-sm">
                                 <div class="text-xs font-bold ${t.text}">${t.name}</div>
-                                <div class="text-xl font-black text-white font-mono mt-1">${t.score} $</div>
+                                <div class="text-xl font-black text-slate-900 font-mono mt-1">${t.score} $</div>
                             </div>
                         `).join('')}
                     </div>
-                    <button onclick="window.app.showGameSelection()" class="px-8 py-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-lg">
+                    <button onclick="window.app.showGameSelection()" class="px-8 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black text-lg shadow transition">
                         Trở về màn hình chính
                     </button>
                 </div>

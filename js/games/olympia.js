@@ -1,6 +1,5 @@
 /**
- * Game 3: Đường Lên Đỉnh Olympia (Road to Mount Olympia)
- * Includes: Khởi Động, Vượt Chướng Ngại Vật, Tăng Tốc, Về Đích
+ * Game 3: Đường Lên Đỉnh Olympia - Light & Crisp Theme
  */
 class OlympiaGame {
     constructor() {
@@ -12,7 +11,6 @@ class OlympiaGame {
         this.currentTeamIdx = 0;
         this.starOfHope = false;
 
-        // CNV state
         this.cnv = {
             keyword: "VIỆT NAM",
             rows: [
@@ -39,34 +37,34 @@ class OlympiaGame {
 
         container.innerHTML = `
             <div class="relative w-full max-w-6xl mx-auto flex flex-col gap-6 p-4">
-                <!-- Top Header & Olympia Round Navigation -->
-                <div class="bg-slate-900/90 backdrop-blur border border-amber-500/30 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-xl">
+                <!-- Top Header & Olympia Round Navigation (Clean White) -->
+                <div class="bg-white border border-slate-200 rounded-3xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-sm">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-amber-500 to-red-600 flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-amber-500/20">
+                        <div class="w-12 h-12 rounded-2xl bg-rose-100 border border-rose-300 flex items-center justify-center text-rose-600 font-black text-2xl shadow-sm">
                             <i class="fa-solid fa-laurel-wreath"></i>
                         </div>
                         <div>
-                            <div class="text-xs font-semibold text-amber-400 uppercase tracking-wider">Đường Lên Đỉnh Olympia</div>
-                            <div class="text-lg font-bold text-white flex items-center gap-2">
-                                Vòng thi: <span id="oly-round-title" class="text-amber-300 font-black">Khởi Động</span>
+                            <div class="text-xs font-bold text-rose-700 uppercase tracking-wider">Đường Lên Đỉnh Olympia</div>
+                            <div class="text-lg font-black text-slate-900 flex items-center gap-2">
+                                Vòng thi: <span id="oly-round-title" class="text-rose-600 font-black">Khởi Động</span>
                             </div>
                         </div>
                     </div>
 
                     <!-- Round Navigation Tabs -->
-                    <div class="flex items-center gap-2 bg-slate-800/80 p-1.5 rounded-xl border border-slate-700">
-                        <button onclick="window.olympiaGame.switchRound('khoi_dong')" id="tab-khoi_dong" class="oly-tab px-3 py-1.5 rounded-lg text-xs font-bold transition">1. Khởi Động</button>
-                        <button onclick="window.olympiaGame.switchRound('vuot_cnv')" id="tab-vuot_cnv" class="oly-tab px-3 py-1.5 rounded-lg text-xs font-bold transition">2. Vượt CNV</button>
-                        <button onclick="window.olympiaGame.switchRound('tang_toc')" id="tab-tang_toc" class="oly-tab px-3 py-1.5 rounded-lg text-xs font-bold transition">3. Tăng Tốc</button>
-                        <button onclick="window.olympiaGame.switchRound('ve_dich')" id="tab-ve_dich" class="oly-tab px-3 py-1.5 rounded-lg text-xs font-bold transition">4. Về Đích</button>
+                    <div class="flex items-center gap-2 bg-slate-100 p-1.5 rounded-2xl border border-slate-200">
+                        <button onclick="window.olympiaGame.switchRound('khoi_dong')" id="tab-khoi_dong" class="oly-tab px-3.5 py-2 rounded-xl text-xs font-bold transition">1. Khởi Động</button>
+                        <button onclick="window.olympiaGame.switchRound('vuot_cnv')" id="tab-vuot_cnv" class="oly-tab px-3.5 py-2 rounded-xl text-xs font-bold transition">2. Vượt CNV</button>
+                        <button onclick="window.olympiaGame.switchRound('tang_toc')" id="tab-tang_toc" class="oly-tab px-3.5 py-2 rounded-xl text-xs font-bold transition">3. Tăng Tốc</button>
+                        <button onclick="window.olympiaGame.switchRound('ve_dich')" id="tab-ve_dich" class="oly-tab px-3.5 py-2 rounded-xl text-xs font-bold transition">4. Về Đích</button>
                     </div>
 
                     <!-- Scoreboard -->
                     <div class="flex items-center gap-2">
                         ${window.classManager.teams.map(t => `
-                            <div class="px-3 py-1 rounded-xl bg-slate-800 border ${t.border} text-center">
+                            <div class="px-3 py-1.5 rounded-xl bg-white border ${t.border} text-center shadow-sm">
                                 <div class="text-[10px] font-bold ${t.text}">${t.name.split(' ')[1] || t.name}</div>
-                                <div class="text-base font-black text-white font-mono">${t.score}</div>
+                                <div class="text-base font-black text-slate-900 font-mono">${t.score}</div>
                             </div>
                         `).join('')}
                     </div>
@@ -79,10 +77,10 @@ class OlympiaGame {
 
                 <!-- Bottom Back Button -->
                 <div class="flex items-center justify-between">
-                    <button onclick="window.app.showGameSelection()" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold border border-slate-700 flex items-center gap-2">
+                    <button onclick="window.app.showGameSelection()" class="px-5 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-bold border border-slate-200 shadow-sm flex items-center gap-2 transition">
                         <i class="fa-solid fa-arrow-left"></i> Quay lại menu trò chơi
                     </button>
-                    <div class="text-xs text-slate-400">
+                    <div class="text-xs text-slate-500 font-medium">
                         Hệ thống tự động cộng điểm cho các đội khi trả lời chính xác
                     </div>
                 </div>
@@ -101,9 +99,9 @@ class OlympiaGame {
             const tab = document.getElementById(`tab-${r}`);
             if (tab) {
                 if (r === round) {
-                    tab.className = "oly-tab px-3 py-1.5 rounded-lg text-xs font-black bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 shadow";
+                    tab.className = "oly-tab px-3.5 py-2 rounded-xl text-xs font-black bg-gradient-to-r from-red-600 to-rose-600 text-white shadow";
                 } else {
-                    tab.className = "oly-tab px-3 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white";
+                    tab.className = "oly-tab px-3.5 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white/60";
                 }
             }
         });
@@ -133,23 +131,23 @@ class OlympiaGame {
         this.roundIndex = 0;
 
         container.innerHTML = `
-            <div class="bg-gradient-to-b from-slate-900 to-blue-950 border-2 border-amber-400/40 rounded-3xl p-6 md:p-8 shadow-2xl flex flex-col justify-between min-h-[460px]">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+            <div class="bg-white border-2 border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm flex flex-col justify-between min-h-[460px]">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
                     <div class="flex items-center gap-3">
-                        <span class="px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 font-bold text-xs border border-blue-400/30">
+                        <span class="px-3.5 py-1.5 rounded-full bg-blue-50 text-blue-700 font-bold text-xs border border-blue-200 shadow-sm">
                             Trả lời nhanh nhiều câu hỏi nhất trong 60 giây (+10 điểm/câu)
                         </span>
                     </div>
-                    <div class="flex items-center gap-2 bg-slate-800 px-4 py-2 rounded-xl border border-slate-700">
-                        <i class="fa-solid fa-stopwatch text-amber-400 text-xl"></i>
-                        <span id="kd-timer" class="font-mono text-2xl font-black text-amber-400">60s</span>
+                    <div class="flex items-center gap-2 bg-amber-50 px-4 py-2 rounded-2xl border border-amber-200 shadow-sm">
+                        <i class="fa-solid fa-stopwatch text-amber-600 text-xl"></i>
+                        <span id="kd-timer" class="font-mono text-2xl font-black text-amber-700">60s</span>
                     </div>
                 </div>
 
                 <!-- Question Box -->
                 <div class="my-6 text-center">
-                    <div class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2" id="kd-q-counter">Câu hỏi số 1</div>
-                    <h3 id="kd-question-text" class="text-xl md:text-2xl font-bold text-white max-w-3xl mx-auto leading-relaxed">
+                    <div class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2" id="kd-q-counter">Câu hỏi số 1</div>
+                    <h3 id="kd-question-text" class="text-xl md:text-2xl font-black text-slate-900 max-w-3xl mx-auto leading-relaxed">
                         Nhấn nút "Bắt đầu tính giờ" bên dưới để khởi động lượt thi!
                     </h3>
                 </div>
@@ -160,13 +158,13 @@ class OlympiaGame {
                 </div>
 
                 <!-- Bottom Controller -->
-                <div class="flex items-center justify-between pt-6 border-t border-slate-800">
-                    <button id="kd-start-btn" onclick="window.olympiaGame.startKhoiDongClock()" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-400 hover:to-green-500 text-slate-950 font-black shadow-lg">
-                        <i class="fa-solid fa-play mr-1"></i> Bắt đầu tính giờ
+                <div class="flex items-center justify-between pt-6 border-t border-slate-100">
+                    <button id="kd-start-btn" onclick="window.olympiaGame.startKhoiDongClock()" class="px-7 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-black shadow transition">
+                        <i class="fa-solid fa-play mr-2"></i> Bắt đầu tính giờ 60s
                     </button>
                     <div class="flex items-center gap-2">
-                        <span class="text-xs text-slate-400">Cộng điểm cho:</span>
-                        <select id="kd-assign-team" class="bg-slate-800 text-white text-xs font-bold px-3 py-2 rounded-lg border border-slate-700">
+                        <span class="text-xs text-slate-500 font-bold">Cộng điểm cho:</span>
+                        <select id="kd-assign-team" class="bg-slate-50 text-slate-800 text-xs font-bold px-3 py-2 rounded-xl border border-slate-200 shadow-sm">
                             ${window.classManager.teams.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}
                         </select>
                     </div>
@@ -214,9 +212,9 @@ class OlympiaGame {
 
         if (grid) {
             grid.innerHTML = ['A', 'B', 'C', 'D'].map(l => `
-                <button onclick="window.olympiaGame.checkKhoiDong('${l}')" class="p-3.5 rounded-xl bg-slate-800 hover:bg-slate-700/80 border border-slate-700 hover:border-amber-400 text-left transition flex items-center gap-3">
-                    <span class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-300 font-bold flex items-center justify-center text-sm">${l}</span>
-                    <span class="text-white text-sm md:text-base font-medium flex-1">${q.options[l]}</span>
+                <button onclick="window.olympiaGame.checkKhoiDong('${l}')" class="p-4 rounded-2xl bg-white hover:bg-slate-50 border-2 border-slate-200 hover:border-blue-500 text-left transition flex items-center gap-3 shadow-sm">
+                    <span class="w-9 h-9 rounded-xl bg-blue-50 text-blue-700 font-black flex items-center justify-center text-sm border border-blue-200">${l}</span>
+                    <span class="text-slate-800 text-base font-semibold flex-1">${q.options[l]}</span>
                 </button>
             `).join('');
         }
@@ -242,46 +240,45 @@ class OlympiaGame {
             window.soundFX.playWrong();
         }
 
-        // Advance to next question immediately
         this.loadKhoiDongQuestion(this.roundIndex + 1);
     }
 
     /* ---------------- ROUND 2: VƯỢT CHƯỚNG NGẠI VẬT ---------------- */
     renderVuotCNV(container) {
         container.innerHTML = `
-            <div class="bg-slate-900/90 border-2 border-amber-400/40 rounded-3xl p-6 md:p-8 shadow-2xl flex flex-col justify-between min-h-[460px]">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
+            <div class="bg-white border-2 border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm flex flex-col justify-between min-h-[460px]">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
                     <div class="flex items-center gap-3">
-                        <span class="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 font-bold text-xs border border-purple-400/30">
+                        <span class="px-3.5 py-1.5 rounded-full bg-purple-50 text-purple-700 font-bold text-xs border border-purple-200 shadow-sm">
                             Trả lời 4 hàng ngang để tìm từ khóa chướng ngại vật (+10 điểm/hàng ngang, +40 điểm từ khóa)
                         </span>
                     </div>
-                    <button onclick="window.olympiaGame.solveCNVModal()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-black text-sm shadow animate-pulse">
-                        <i class="fa-solid fa-bell mr-1"></i> Bấm chuông giải CNV!
+                    <button onclick="window.olympiaGame.solveCNVModal()" class="px-5 py-2.5 rounded-2xl bg-gradient-to-r from-red-600 to-rose-700 hover:from-red-500 hover:to-rose-600 text-white font-black text-sm shadow animate-pulse">
+                        <i class="fa-solid fa-bell mr-1.5"></i> Bấm chuông giải CNV!
                     </button>
                 </div>
 
                 <!-- 4 Horizontal Rows -->
                 <div class="flex flex-col gap-3 my-4">
                     ${this.cnv.rows.map((row, idx) => `
-                        <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
                             <div class="flex items-center gap-3">
-                                <span class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-300 font-bold flex items-center justify-center text-sm border border-amber-400/30">
+                                <span class="w-9 h-9 rounded-xl bg-amber-100 text-amber-800 font-black flex items-center justify-center text-sm border border-amber-300">
                                     ${idx + 1}
                                 </span>
                                 <div class="text-left">
-                                    <div class="text-xs text-slate-400 uppercase font-semibold">Hàng ngang số ${idx + 1} (${row.a.replace(/\s+/g, '').length} chữ cái)</div>
-                                    <div class="text-sm md:text-base font-bold text-white">${row.q}</div>
+                                    <div class="text-xs text-slate-500 uppercase font-bold">Hàng ngang số ${idx + 1} (${row.a.replace(/\s+/g, '').length} chữ cái)</div>
+                                    <div class="text-sm md:text-base font-bold text-slate-900">${row.q}</div>
                                 </div>
                             </div>
 
                             <div class="flex items-center gap-2">
                                 ${row.solved ? `
-                                    <span class="font-mono font-black text-emerald-400 tracking-widest px-4 py-1.5 rounded-lg bg-emerald-500/20 border border-emerald-500/40">
+                                    <span class="font-mono font-black text-emerald-700 tracking-widest px-4 py-2 rounded-xl bg-emerald-50 border border-emerald-300">
                                         ${row.a}
                                     </span>
                                 ` : `
-                                    <button onclick="window.olympiaGame.openCNVRow(${idx})" class="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs transition">
+                                    <button onclick="window.olympiaGame.openCNVRow(${idx})" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition shadow">
                                         Trả lời hàng này
                                     </button>
                                 `}
@@ -291,9 +288,9 @@ class OlympiaGame {
                 </div>
 
                 <!-- Secret Keyword Reveal Box -->
-                <div class="bg-gradient-to-r from-amber-500/10 via-yellow-500/10 to-amber-500/10 border-2 border-dashed border-amber-400/50 rounded-2xl p-4 text-center">
-                    <div class="text-xs text-amber-400 uppercase font-bold tracking-widest mb-1">Chướng Ngại Vật Ẩn Số</div>
-                    <div class="text-2xl font-black font-mono tracking-widest text-amber-300">
+                <div class="bg-amber-50/70 border-2 border-dashed border-amber-300 rounded-2xl p-5 text-center shadow-sm">
+                    <div class="text-xs text-amber-800 uppercase font-black tracking-widest mb-1">Chướng Ngại Vật Ẩn Số</div>
+                    <div class="text-2xl md:text-3xl font-black font-mono tracking-widest text-amber-600">
                         ${this.cnv.revealedKeyword ? this.cnv.keyword : '• • • • • • • •'}
                     </div>
                 </div>
@@ -303,11 +300,10 @@ class OlympiaGame {
 
     openCNVRow(idx) {
         const row = this.cnv.rows[idx];
-        const ans = prompt(`HÀNG NGANG SỐ ${idx + 1}:\n${row.q}\n\nNhập câu trả lời (hoặc nhấn OK để giáo viên xác nhận đúng):`);
+        const ans = prompt(`HÀNG NGANG SỐ ${idx + 1}:\n${row.q}\n\nNhập câu trả lời (hoặc nhấn OK để xác nhận đúng):`);
         if (ans !== null) {
             row.solved = true;
             window.soundFX.playCorrect();
-            // Award 10 points
             window.classManager.teams[0].score += 10;
             this.switchRound('vuot_cnv');
         }
@@ -331,44 +327,43 @@ class OlympiaGame {
     /* ---------------- ROUND 3: TĂNG TỐC ---------------- */
     renderTangToc(container) {
         const subIndex = this.roundIndex % 4;
-        const speedPoints = [40, 30, 20, 10];
         const speedTimes = [30, 20, 20, 10];
         const q = this.questions[this.roundIndex] || this.questions[0];
 
         container.innerHTML = `
-            <div class="bg-gradient-to-b from-slate-900 to-indigo-950 border-2 border-amber-400/40 rounded-3xl p-6 md:p-8 shadow-2xl flex flex-col justify-between min-h-[460px]">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+            <div class="bg-white border-2 border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm flex flex-col justify-between min-h-[460px]">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
                     <div class="flex items-center gap-3">
-                        <span class="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 font-bold text-xs border border-amber-400/30">
+                        <span class="px-3.5 py-1.5 rounded-full bg-amber-50 text-amber-800 font-bold text-xs border border-amber-300 shadow-sm">
                             Câu hỏi Tăng Tốc số ${subIndex + 1} / 4 (Mức thưởng: 40 - 30 - 20 - 10 điểm)
                         </span>
                     </div>
-                    <div class="flex items-center gap-2 bg-slate-800 px-4 py-2 rounded-xl border border-slate-700">
-                        <i class="fa-solid fa-stopwatch text-amber-400 text-xl"></i>
-                        <span id="tt-timer" class="font-mono text-2xl font-black text-amber-400">${speedTimes[subIndex]}s</span>
+                    <div class="flex items-center gap-2 bg-amber-50 px-4 py-2 rounded-2xl border border-amber-200 shadow-sm">
+                        <i class="fa-solid fa-stopwatch text-amber-600 text-xl"></i>
+                        <span id="tt-timer" class="font-mono text-2xl font-black text-amber-700">${speedTimes[subIndex]}s</span>
                     </div>
                 </div>
 
                 <div class="my-6 text-center">
-                    <h3 class="text-xl md:text-2xl font-bold text-white max-w-3xl mx-auto leading-relaxed">
+                    <h3 class="text-xl md:text-2xl font-black text-slate-900 max-w-3xl mx-auto leading-relaxed">
                         ${q.question}
                     </h3>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto w-full">
                     ${['A', 'B', 'C', 'D'].map(l => `
-                        <button onclick="window.olympiaGame.checkTangToc('${l}')" class="p-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-amber-400 text-left transition flex items-center gap-3">
-                            <span class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-300 font-bold flex items-center justify-center text-sm">${l}</span>
-                            <span class="text-white text-base font-medium flex-1">${q.options[l]}</span>
+                        <button onclick="window.olympiaGame.checkTangToc('${l}')" class="p-4 rounded-2xl bg-white hover:bg-slate-50 border-2 border-slate-200 hover:border-amber-400 text-left transition flex items-center gap-3 shadow-sm">
+                            <span class="w-9 h-9 rounded-xl bg-amber-50 text-amber-800 font-black flex items-center justify-center text-sm border border-amber-300">${l}</span>
+                            <span class="text-slate-800 text-base font-semibold flex-1">${q.options[l]}</span>
                         </button>
                     `).join('')}
                 </div>
 
-                <div class="flex items-center justify-between pt-6 border-t border-slate-800">
-                    <button onclick="window.olympiaGame.roundIndex++; window.olympiaGame.switchRound('tang_toc');" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-sm">
+                <div class="flex items-center justify-between pt-6 border-t border-slate-100">
+                    <button onclick="window.olympiaGame.roundIndex++; window.olympiaGame.switchRound('tang_toc');" class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm border border-slate-200 transition">
                         Chuyển câu tiếp theo <i class="fa-solid fa-forward ml-1"></i>
                     </button>
-                    <div class="text-xs text-slate-400">Đội trả lời nhanh nhất nhận điểm tối đa!</div>
+                    <div class="text-xs text-slate-500 font-bold">Đội trả lời nhanh nhất nhận điểm tối đa!</div>
                 </div>
             </div>
         `;
@@ -394,42 +389,42 @@ class OlympiaGame {
         const q = this.questions[this.roundIndex] || this.questions[0];
 
         container.innerHTML = `
-            <div class="bg-gradient-to-b from-slate-900 to-rose-950/70 border-2 border-amber-400/40 rounded-3xl p-6 md:p-8 shadow-2xl flex flex-col justify-between min-h-[460px]">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+            <div class="bg-white border-2 border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm flex flex-col justify-between min-h-[460px]">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-4">
                     <div class="flex items-center gap-3">
-                        <span class="px-3 py-1 rounded-full bg-rose-500/20 text-rose-300 font-bold text-xs border border-rose-400/30">
+                        <span class="px-3.5 py-1.5 rounded-full bg-rose-50 text-rose-700 font-bold text-xs border border-rose-200 shadow-sm">
                             Phần thi Về Đích - Chọn gói câu hỏi & Ngôi sao hy vọng
                         </span>
                     </div>
 
                     <!-- Star of Hope toggle button -->
-                    <button id="star-btn" onclick="window.olympiaGame.toggleStar()" class="px-4 py-2 rounded-xl border-2 ${this.starOfHope ? 'bg-amber-400 border-yellow-200 text-slate-950 font-black shadow-lg shadow-amber-400/40' : 'bg-slate-800 border-amber-400/40 text-amber-400 font-bold'} flex items-center gap-2 transition">
+                    <button id="star-btn" onclick="window.olympiaGame.toggleStar()" class="px-5 py-2.5 rounded-2xl border-2 ${this.starOfHope ? 'bg-amber-400 border-amber-500 text-slate-950 font-black shadow-lg shadow-amber-400/40' : 'bg-amber-50 border-amber-300 text-amber-800 font-bold'} flex items-center gap-2 transition">
                         <i class="fa-solid fa-star text-lg ${this.starOfHope ? 'animate-spin' : ''}"></i>
                         <span>${this.starOfHope ? 'ĐÃ ĐẶT NGÔI SAO HY VỌNG (X2 ĐIỂM)' : 'Đặt Ngôi Sao Hy Vọng'}</span>
                     </button>
                 </div>
 
                 <div class="my-6 text-center">
-                    <div class="text-xs text-amber-400 font-bold uppercase tracking-widest mb-2">Câu hỏi 20 Điểm</div>
-                    <h3 class="text-xl md:text-2xl font-bold text-white max-w-3xl mx-auto leading-relaxed">
+                    <div class="text-xs text-amber-700 font-black uppercase tracking-widest mb-2">Câu hỏi 20 Điểm</div>
+                    <h3 class="text-xl md:text-2xl font-black text-slate-900 max-w-3xl mx-auto leading-relaxed">
                         ${q.question}
                     </h3>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto w-full">
                     ${['A', 'B', 'C', 'D'].map(l => `
-                        <button onclick="window.olympiaGame.checkVeDich('${l}')" class="p-4 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 hover:border-amber-400 text-left transition flex items-center gap-3">
-                            <span class="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-300 font-bold flex items-center justify-center text-sm">${l}</span>
-                            <span class="text-white text-base font-medium flex-1">${q.options[l]}</span>
+                        <button onclick="window.olympiaGame.checkVeDich('${l}')" class="p-4 rounded-2xl bg-white hover:bg-slate-50 border-2 border-slate-200 hover:border-amber-400 text-left transition flex items-center gap-3 shadow-sm">
+                            <span class="w-9 h-9 rounded-xl bg-amber-50 text-amber-800 font-black flex items-center justify-center text-sm border border-amber-300">${l}</span>
+                            <span class="text-slate-800 text-base font-semibold flex-1">${q.options[l]}</span>
                         </button>
                     `).join('')}
                 </div>
 
-                <div class="flex items-center justify-between pt-6 border-t border-slate-800">
-                    <button onclick="window.olympiaGame.roundIndex++; window.olympiaGame.switchRound('ve_dich');" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-sm">
+                <div class="flex items-center justify-between pt-6 border-t border-slate-100">
+                    <button onclick="window.olympiaGame.roundIndex++; window.olympiaGame.switchRound('ve_dich');" class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm border border-slate-200 transition">
                         Đổi câu hỏi khác <i class="fa-solid fa-forward ml-1"></i>
                     </button>
-                    <div class="text-xs text-slate-400">Đúng nhân đôi nếu có Sao Hy Vọng, sai bị trừ điểm!</div>
+                    <div class="text-xs text-slate-500 font-bold">Đúng nhân đôi nếu có Sao Hy Vọng, sai bị trừ điểm!</div>
                 </div>
             </div>
         `;

@@ -1,5 +1,5 @@
 /**
- * Game 1: Ai Là Triệu Phú (Who Wants to Be a Millionaire)
+ * Game 1: Ai Là Triệu Phú (Who Wants to Be a Millionaire) - Light & Crisp Theme
  */
 class MillionaireGame {
     constructor() {
@@ -47,16 +47,16 @@ class MillionaireGame {
                 <!-- Main Game Zone -->
                 <div class="flex-1 flex flex-col justify-between">
                     <!-- Top Bar: Player, Timer, Controls -->
-                    <div class="bg-slate-900/90 backdrop-blur border border-cyan-500/30 rounded-2xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-xl">
+                    <div class="bg-white border border-slate-200 rounded-3xl p-4 flex flex-wrap items-center justify-between gap-4 shadow-sm">
                         <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/20 font-bold text-xl">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-100 border border-blue-200 flex items-center justify-center text-blue-600 shadow-sm font-bold text-xl">
                                 <i class="fa-solid fa-graduation-cap"></i>
                             </div>
                             <div>
-                                <div class="text-xs font-semibold text-cyan-400 uppercase tracking-wider">Người chơi hiện tại</div>
-                                <div class="text-lg font-bold text-white flex items-center gap-2" id="mil-player-name">
+                                <div class="text-xs font-bold text-blue-700 uppercase tracking-wider">Người chơi hiện tại</div>
+                                <div class="text-lg font-black text-slate-900 flex items-center gap-2" id="mil-player-name">
                                     ${this.currentPlayer ? this.currentPlayer.name : 'Đại diện lớp'}
-                                    <button onclick="window.millionaireGame.pickNewPlayer()" title="Chọn ngẫu nhiên học sinh khác" class="text-xs bg-slate-800 hover:bg-slate-700 text-cyan-400 px-2 py-1 rounded border border-cyan-500/40">
+                                    <button onclick="window.millionaireGame.pickNewPlayer()" title="Chọn ngẫu nhiên học sinh khác" class="text-xs bg-slate-100 hover:bg-slate-200 text-blue-700 font-bold px-2.5 py-1 rounded-lg border border-slate-200 transition">
                                         <i class="fa-solid fa-shuffle mr-1"></i>Đổi bạn
                                     </button>
                                 </div>
@@ -67,37 +67,37 @@ class MillionaireGame {
                         <div class="flex items-center gap-3">
                             <div class="relative w-14 h-14 flex items-center justify-center">
                                 <svg class="w-full h-full transform -rotate-90">
-                                    <circle cx="28" cy="28" r="24" stroke="currentColor" stroke-width="4" class="text-slate-700 fill-none" />
+                                    <circle cx="28" cy="28" r="24" stroke="currentColor" stroke-width="4" class="text-slate-200 fill-none" />
                                     <circle id="mil-timer-circle" cx="28" cy="28" r="24" stroke="currentColor" stroke-width="4" 
                                         stroke-dasharray="150" stroke-dashoffset="0"
-                                        class="text-amber-400 fill-none transition-all duration-1000 ease-linear" />
+                                        class="text-amber-500 fill-none transition-all duration-1000 ease-linear" />
                                 </svg>
-                                <span id="mil-timer-text" class="absolute text-xl font-black text-amber-400">30</span>
+                                <span id="mil-timer-text" class="absolute text-xl font-black text-amber-600">30</span>
                             </div>
                         </div>
 
                         <!-- Lifelines -->
                         <div class="flex items-center gap-2">
-                            <button id="btn-life-half" onclick="window.millionaireGame.use5050()" class="lifeline-btn relative px-3 py-2 rounded-xl font-bold text-sm bg-gradient-to-b from-blue-700 to-indigo-900 border border-cyan-400/50 text-white shadow hover:scale-105 active:scale-95 transition" title="Trợ giúp 50:50">
+                            <button id="btn-life-half" onclick="window.millionaireGame.use5050()" class="lifeline-btn px-3.5 py-2 rounded-xl font-black text-xs bg-blue-50 border border-blue-300 text-blue-700 shadow-sm hover:bg-blue-100 active:scale-95 transition" title="Trợ giúp 50:50">
                                 <span>50:50</span>
                             </button>
-                            <button id="btn-life-audience" onclick="window.millionaireGame.useAudience()" class="lifeline-btn relative px-3 py-2 rounded-xl font-bold text-sm bg-gradient-to-b from-blue-700 to-indigo-900 border border-cyan-400/50 text-white shadow hover:scale-105 active:scale-95 transition" title="Hỏi ý kiến cả lớp">
+                            <button id="btn-life-audience" onclick="window.millionaireGame.useAudience()" class="lifeline-btn px-3.5 py-2 rounded-xl font-black text-xs bg-purple-50 border border-purple-300 text-purple-700 shadow-sm hover:bg-purple-100 active:scale-95 transition" title="Hỏi ý kiến cả lớp">
                                 <i class="fa-solid fa-users"></i>
                             </button>
-                            <button id="btn-life-call" onclick="window.millionaireGame.useCall()" class="lifeline-btn relative px-3 py-2 rounded-xl font-bold text-sm bg-gradient-to-b from-blue-700 to-indigo-900 border border-cyan-400/50 text-white shadow hover:scale-105 active:scale-95 transition" title="Gọi cố vấn / Thầy cô">
+                            <button id="btn-life-call" onclick="window.millionaireGame.useCall()" class="lifeline-btn px-3.5 py-2 rounded-xl font-black text-xs bg-amber-50 border border-amber-300 text-amber-800 shadow-sm hover:bg-amber-100 active:scale-95 transition" title="Gọi cố vấn / Thầy cô">
                                 <i class="fa-solid fa-phone"></i>
                             </button>
-                            <button id="btn-life-change" onclick="window.millionaireGame.useChange()" class="lifeline-btn relative px-3 py-2 rounded-xl font-bold text-sm bg-gradient-to-b from-blue-700 to-indigo-900 border border-cyan-400/50 text-white shadow hover:scale-105 active:scale-95 transition" title="Đổi câu hỏi mới">
+                            <button id="btn-life-change" onclick="window.millionaireGame.useChange()" class="lifeline-btn px-3.5 py-2 rounded-xl font-black text-xs bg-emerald-50 border border-emerald-300 text-emerald-700 shadow-sm hover:bg-emerald-100 active:scale-95 transition" title="Đổi câu hỏi mới">
                                 <i class="fa-solid fa-arrows-rotate"></i>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Question Container -->
+                    <!-- Question Container (High-Contrast Dramatic Blue on White) -->
                     <div class="my-6">
-                        <div class="relative bg-gradient-to-r from-slate-900 via-blue-950 to-slate-900 border-2 border-amber-400/60 rounded-3xl p-6 md:p-8 shadow-2xl text-center min-h-[160px] flex flex-col justify-center items-center">
-                            <span class="inline-block px-4 py-1 rounded-full bg-amber-500/20 text-amber-300 font-bold text-sm border border-amber-400/40 mb-3" id="mil-q-num">
-                                Câu hỏi 1 / 15
+                        <div class="relative bg-gradient-to-r from-blue-900 via-indigo-950 to-blue-900 border-4 border-amber-400 rounded-3xl p-6 md:p-8 shadow-xl text-center min-h-[160px] flex flex-col justify-center items-center">
+                            <span class="inline-block px-4 py-1 rounded-full bg-amber-400/20 text-amber-300 font-black text-xs border border-amber-400/50 mb-3 tracking-wider" id="mil-q-num">
+                                CÂU HỎI 1 / 15
                             </span>
                             <h2 id="mil-question-text" class="text-xl md:text-2xl font-bold text-white tracking-wide leading-relaxed">
                                 Đang tải câu hỏi...
@@ -105,34 +105,34 @@ class MillionaireGame {
                         </div>
                     </div>
 
-                    <!-- Options Grid -->
+                    <!-- Options Grid (Crisp White Cards with Bold Colored Badges) -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="mil-options-grid">
                         <!-- Rendered dynamically -->
                     </div>
 
                     <!-- Explanation Card (Hidden by default) -->
-                    <div id="mil-explanation" class="hidden mt-4 bg-emerald-950/80 border border-emerald-500/40 rounded-2xl p-4 text-emerald-200 text-sm">
-                        <div class="font-bold flex items-center gap-2 mb-1 text-emerald-300">
-                            <i class="fa-solid fa-lightbulb"></i> Giải thích chi tiết:
+                    <div id="mil-explanation" class="hidden mt-4 bg-emerald-50 border border-emerald-200 rounded-2xl p-4 text-emerald-900 text-sm shadow-sm">
+                        <div class="font-bold flex items-center gap-2 mb-1 text-emerald-800">
+                            <i class="fa-solid fa-lightbulb text-amber-500"></i> Giải thích chi tiết:
                         </div>
                         <div id="mil-explanation-text"></div>
                     </div>
 
                     <!-- Action Bar -->
                     <div class="mt-6 flex items-center justify-between">
-                        <button onclick="window.app.showGameSelection()" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold border border-slate-700 flex items-center gap-2">
-                            <i class="fa-solid fa-arrow-left"></i> Quay lại
+                        <button onclick="window.app.showGameSelection()" class="px-5 py-2.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 font-bold border border-slate-200 shadow-sm flex items-center gap-2 transition">
+                            <i class="fa-solid fa-arrow-left"></i> Quay lại menu
                         </button>
-                        <button id="mil-next-btn" onclick="window.millionaireGame.nextQuestion()" class="hidden px-7 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-slate-950 font-black shadow-lg shadow-amber-500/30 flex items-center gap-2 animate-bounce">
+                        <button id="mil-next-btn" onclick="window.millionaireGame.nextQuestion()" class="hidden px-7 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black shadow-lg shadow-amber-500/20 flex items-center gap-2 animate-bounce">
                             Câu tiếp theo <i class="fa-solid fa-forward"></i>
                         </button>
                     </div>
                 </div>
 
-                <!-- Money Ladder Sidebar -->
-                <div class="w-full lg:w-72 bg-slate-900/90 backdrop-blur border border-amber-400/30 rounded-2xl p-4 shadow-xl flex flex-col">
-                    <div class="text-center font-black text-amber-400 text-sm tracking-widest uppercase mb-3 pb-2 border-b border-slate-800">
-                        <i class="fa-solid fa-trophy mr-1"></i> Bậc Thang Điểm Thưởng
+                <!-- Money Ladder Sidebar (Clean White) -->
+                <div class="w-full lg:w-72 bg-white border border-slate-200 rounded-3xl p-4 shadow-sm flex flex-col">
+                    <div class="text-center font-black text-slate-900 text-xs tracking-widest uppercase mb-3 pb-2 border-b border-slate-100 flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-trophy text-amber-500"></i> Bậc Thang Điểm Thưởng
                     </div>
                     <div class="flex-1 flex flex-col-reverse gap-1.5 overflow-y-auto pr-1" id="mil-ladder-list">
                         <!-- Ladder steps 1 to 15 -->
@@ -141,8 +141,8 @@ class MillionaireGame {
             </div>
 
             <!-- Lifeline Modal Container -->
-            <div id="mil-modal-overlay" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-                <div class="bg-slate-900 border-2 border-cyan-400 rounded-3xl max-w-lg w-full p-6 shadow-2xl relative animate-scale-up" id="mil-modal-body">
+            <div id="mil-modal-overlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+                <div class="bg-white border border-slate-200 rounded-3xl max-w-lg w-full p-6 md:p-8 shadow-2xl relative animate-scale-up text-slate-900" id="mil-modal-body">
                     <!-- Dynamic modal content -->
                 </div>
             </div>
@@ -158,12 +158,12 @@ class MillionaireGame {
         ladderList.innerHTML = this.moneyLevels.map((val, idx) => {
             const isMilestone = idx === 4 || idx === 9 || idx === 14;
             return `
-                <div id="ladder-step-${idx}" class="flex items-center justify-between px-3 py-1.5 rounded-lg text-xs font-bold transition-all duration-300 ${
-                    isMilestone ? 'text-amber-300 bg-amber-500/10 border border-amber-500/30' : 'text-slate-400 hover:bg-slate-800/50'
+                <div id="ladder-step-${idx}" class="flex items-center justify-between px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-300 ${
+                    isMilestone ? 'text-amber-800 bg-amber-50 border border-amber-300' : 'text-slate-600 hover:bg-slate-50'
                 }">
                     <span class="flex items-center gap-2">
-                        <span class="w-5 text-right opacity-70">${idx + 1}</span>
-                        ${isMilestone ? '<i class="fa-solid fa-star text-amber-400 text-[10px]"></i>' : '•'}
+                        <span class="w-5 text-right opacity-60">${idx + 1}</span>
+                        ${isMilestone ? '<i class="fa-solid fa-star text-amber-500 text-[10px]"></i>' : '•'}
                     </span>
                     <span class="font-mono text-sm">${val} VNĐ</span>
                 </div>
@@ -177,7 +177,7 @@ class MillionaireGame {
         if (pElem && this.currentPlayer) {
             pElem.innerHTML = `
                 ${this.currentPlayer.name}
-                <button onclick="window.millionaireGame.pickNewPlayer()" title="Chọn ngẫu nhiên bạn khác" class="text-xs bg-slate-800 hover:bg-slate-700 text-cyan-400 px-2 py-1 rounded border border-cyan-500/40">
+                <button onclick="window.millionaireGame.pickNewPlayer()" title="Chọn ngẫu nhiên bạn khác" class="text-xs bg-slate-100 hover:bg-slate-200 text-blue-700 font-bold px-2 py-1 rounded-lg border border-slate-200">
                     <i class="fa-solid fa-shuffle mr-1"></i>Đổi bạn
                 </button>
             `;
@@ -206,7 +206,7 @@ class MillionaireGame {
         if (expCard) expCard.classList.add('hidden');
 
         if (numElem) {
-            numElem.textContent = `CÂU HỎI ${index + 1} / ${Math.min(this.questions.length, 15)} • Mức: ${this.moneyLevels[index] || '150.000.000'} VNĐ`;
+            numElem.textContent = `CÂU HỎI ${index + 1} / ${Math.min(this.questions.length, 15)} • MỨC: ${this.moneyLevels[index] || '150.000.000'} VNĐ`;
         }
         if (qTextElem) {
             qTextElem.innerHTML = q.question;
@@ -216,9 +216,9 @@ class MillionaireGame {
         for (let i = 0; i < 15; i++) {
             const step = document.getElementById(`ladder-step-${i}`);
             if (step) {
-                step.classList.remove('bg-amber-400', 'text-slate-950', 'scale-105', 'shadow-lg');
+                step.classList.remove('bg-amber-400', 'text-slate-950', 'scale-105', 'shadow-md', 'font-black');
                 if (i === index) {
-                    step.classList.add('bg-amber-400', 'text-slate-950', 'scale-105', 'shadow-lg', 'font-black');
+                    step.classList.add('bg-amber-400', 'text-slate-950', 'scale-105', 'shadow-md', 'font-black');
                 }
             }
         }
@@ -250,13 +250,13 @@ class MillionaireGame {
             return `
                 <button id="mil-opt-${letter}" 
                     onclick="window.millionaireGame.selectAnswer('${letter}')"
-                    class="mil-option group relative p-4 rounded-2xl bg-gradient-to-r from-slate-900 to-blue-950 border-2 border-cyan-500/40 hover:border-amber-400 hover:from-blue-900 hover:to-indigo-950 text-left transition-all duration-200 flex items-center gap-3 shadow-lg ${
+                    class="mil-option group relative p-4 rounded-2xl bg-white hover:bg-blue-50/60 border-2 border-slate-200 hover:border-blue-500 text-left transition-all duration-200 flex items-center gap-3.5 shadow-sm ${
                         isHidden ? 'invisible pointer-events-none' : ''
                     }">
-                    <span class="w-9 h-9 rounded-xl bg-cyan-500/20 border border-cyan-400/50 flex items-center justify-center font-black text-amber-300 text-base group-hover:bg-amber-400 group-hover:text-slate-950 transition">
+                    <span class="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center font-black text-blue-700 text-base group-hover:bg-blue-600 group-hover:text-white transition">
                         ${letter}
                     </span>
-                    <span class="flex-1 text-white font-medium text-base md:text-lg group-hover:text-amber-100">
+                    <span class="flex-1 text-slate-800 font-semibold text-base md:text-lg group-hover:text-blue-900 leading-snug">
                         ${optText}
                     </span>
                 </button>
@@ -294,11 +294,11 @@ class MillionaireGame {
             const offset = 150 - (150 * (30 - this.timeLeft)) / 30;
             circle.style.strokeDashoffset = offset;
             if (this.timeLeft <= 5) {
-                circle.classList.remove('text-amber-400');
-                circle.classList.add('text-red-500');
+                circle.classList.remove('text-amber-500');
+                circle.classList.add('text-rose-600');
             } else {
-                circle.classList.remove('text-red-500');
-                circle.classList.add('text-amber-400');
+                circle.classList.remove('text-rose-600');
+                circle.classList.add('text-amber-500');
             }
         }
     }
@@ -322,8 +322,8 @@ class MillionaireGame {
         // Highlight selected answer orange
         const selectedBtn = document.getElementById(`mil-opt-${letter}`);
         if (selectedBtn) {
-            selectedBtn.classList.remove('border-cyan-500/40', 'from-slate-900', 'to-blue-950');
-            selectedBtn.classList.add('bg-gradient-to-r', 'from-amber-600', 'to-yellow-500', 'border-amber-300', 'scale-[1.02]', 'animate-pulse');
+            selectedBtn.classList.remove('border-slate-200', 'bg-white');
+            selectedBtn.classList.add('bg-amber-400', 'border-amber-500', 'text-slate-950', 'scale-[1.02]', 'animate-pulse');
         }
 
         // 2 seconds suspense delay before revealing answer
@@ -340,7 +340,7 @@ class MillionaireGame {
         const chosenBtn = document.getElementById(`mil-opt-${letter}`);
 
         if (chosenBtn) {
-            chosenBtn.classList.remove('from-amber-600', 'to-yellow-500', 'animate-pulse');
+            chosenBtn.classList.remove('bg-amber-400', 'border-amber-500', 'animate-pulse');
         }
 
         if (isCorrect) {
@@ -350,7 +350,9 @@ class MillionaireGame {
                 window.confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
             }
             if (correctBtn) {
-                correctBtn.classList.add('bg-gradient-to-r', 'from-emerald-600', 'to-green-500', 'border-green-300', 'text-white', 'scale-105');
+                correctBtn.classList.add('bg-emerald-500', 'border-emerald-600', 'text-white', 'scale-105');
+                const badge = correctBtn.querySelector('span');
+                if (badge) badge.className = 'w-10 h-10 rounded-xl bg-white text-emerald-700 font-black flex items-center justify-center text-base';
             }
 
             // Award points to current player
@@ -379,10 +381,10 @@ class MillionaireGame {
             // Wrong answer
             window.soundFX.playWrong();
             if (chosenBtn) {
-                chosenBtn.classList.add('bg-gradient-to-r', 'from-red-600', 'to-rose-700', 'border-red-400');
+                chosenBtn.classList.add('bg-rose-500', 'border-rose-600', 'text-white');
             }
             if (correctBtn) {
-                correctBtn.classList.add('bg-gradient-to-r', 'from-emerald-600', 'to-green-500', 'border-green-300');
+                correctBtn.classList.add('bg-emerald-500', 'border-emerald-600', 'text-white');
             }
 
             // Show game over modal after delay
@@ -398,7 +400,7 @@ class MillionaireGame {
         const q = this.questions[this.currentQuestionIdx];
         const correctBtn = document.getElementById(`mil-opt-${q.answer}`);
         if (correctBtn) {
-            correctBtn.classList.add('bg-gradient-to-r', 'from-emerald-600', 'to-green-500', 'border-green-300');
+            correctBtn.classList.add('bg-emerald-500', 'border-emerald-600', 'text-white');
         }
         setTimeout(() => this.showGameOver(q, true), 1200);
     }
@@ -462,23 +464,23 @@ class MillionaireGame {
 
         this.showModal(`
             <div class="text-center">
-                <div class="w-16 h-16 rounded-full bg-cyan-500/20 border border-cyan-400 mx-auto flex items-center justify-center text-cyan-400 text-2xl mb-3">
+                <div class="w-16 h-16 rounded-full bg-purple-100 border border-purple-200 mx-auto flex items-center justify-center text-purple-700 text-2xl mb-3 shadow-sm">
                     <i class="fa-solid fa-chart-column"></i>
                 </div>
-                <h3 class="text-xl font-bold text-white mb-2">Ý Kiến Của Các Bạn Trong Lớp</h3>
-                <p class="text-sm text-slate-400 mb-6">Biểu đồ tổng hợp bình chọn của khán giả học sinh:</p>
-                <div class="grid grid-cols-4 gap-3 items-end h-48 px-4 pb-4 border-b border-slate-700">
+                <h3 class="text-xl font-black text-slate-900 mb-1">Ý Kiến Của Các Bạn Trong Lớp</h3>
+                <p class="text-xs text-slate-500 mb-6">Biểu đồ tổng hợp bình chọn của khán giả học sinh:</p>
+                <div class="grid grid-cols-4 gap-3 items-end h-48 px-4 pb-4 border-b border-slate-200">
                     ${['A', 'B', 'C', 'D'].map(col => `
                         <div class="flex flex-col items-center gap-2">
-                            <span class="text-xs font-bold text-cyan-300">${pollData[col]}%</span>
-                            <div class="w-full bg-slate-800 rounded-t-lg overflow-hidden flex flex-col justify-end" style="height: 120px;">
+                            <span class="text-xs font-bold text-slate-700">${pollData[col]}%</span>
+                            <div class="w-full bg-slate-100 rounded-t-xl overflow-hidden flex flex-col justify-end" style="height: 120px;">
                                 <div class="bg-gradient-to-t ${col === q.answer ? 'from-emerald-500 to-green-400' : 'from-blue-600 to-cyan-500'} transition-all duration-1000 rounded-t" style="height: ${pollData[col]}%;"></div>
                             </div>
-                            <span class="font-black text-sm text-white">${col}</span>
+                            <span class="font-black text-sm text-slate-800">${col}</span>
                         </div>
                     `).join('')}
                 </div>
-                <button onclick="window.millionaireGame.closeModal()" class="mt-6 px-6 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold transition">
+                <button onclick="window.millionaireGame.closeModal()" class="mt-6 px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold transition shadow">
                     Đã xem xong
                 </button>
             </div>
@@ -503,15 +505,15 @@ class MillionaireGame {
 
         this.showModal(`
             <div class="text-center">
-                <div class="w-16 h-16 rounded-full bg-amber-500/20 border border-amber-400 mx-auto flex items-center justify-center text-amber-400 text-2xl mb-3 animate-bounce">
+                <div class="w-16 h-16 rounded-full bg-amber-100 border border-amber-200 mx-auto flex items-center justify-center text-amber-700 text-2xl mb-3 shadow-sm animate-bounce">
                     <i class="fa-solid fa-phone"></i>
                 </div>
-                <h3 class="text-xl font-bold text-white mb-1">Kết Nối Với ${advisor.name}</h3>
-                <div class="text-xs text-cyan-400 uppercase font-semibold mb-4">${advisor.role}</div>
-                <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-4 text-slate-200 text-base italic leading-relaxed mb-6">
+                <h3 class="text-xl font-black text-slate-900 mb-1">Kết Nối Với ${advisor.name}</h3>
+                <div class="text-xs text-amber-700 uppercase font-bold mb-4">${advisor.role}</div>
+                <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-slate-800 text-base italic leading-relaxed mb-6 shadow-sm">
                     "${advisor.quote}"
                 </div>
-                <button onclick="window.millionaireGame.closeModal()" class="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold transition">
+                <button onclick="window.millionaireGame.closeModal()" class="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold transition shadow">
                     Cảm ơn cố vấn!
                 </button>
             </div>
@@ -525,7 +527,6 @@ class MillionaireGame {
         if (btn) btn.classList.add('opacity-40', 'pointer-events-none', 'line-through');
 
         window.soundFX.playCorrect();
-        // Replace current question with a fresh one from bank if available
         const backupPool = QuestionParser.getSampleBank('chung');
         const newQ = backupPool[Math.floor(Math.random() * backupPool.length)];
         this.questions[this.currentQuestionIdx] = newQ;
@@ -547,30 +548,29 @@ class MillionaireGame {
     }
 
     showGameOver(q, isTimeOut = false) {
-        const milestonePrizes = { 0: "0 VNĐ", 4: "2.000.000 VNĐ", 9: "22.000.000 VNĐ", 14: "150.000.000 VNĐ" };
         let finalPrize = "0 VNĐ";
         if (this.currentQuestionIdx >= 10) finalPrize = "22.000.000 VNĐ";
         else if (this.currentQuestionIdx >= 5) finalPrize = "2.000.000 VNĐ";
 
         this.showModal(`
             <div class="text-center">
-                <div class="w-16 h-16 rounded-full bg-rose-500/20 border border-rose-500 mx-auto flex items-center justify-center text-rose-400 text-3xl mb-3">
+                <div class="w-16 h-16 rounded-full bg-rose-100 border border-rose-200 mx-auto flex items-center justify-center text-rose-600 text-3xl mb-3 shadow-sm">
                     <i class="fa-solid fa-heart-crack"></i>
                 </div>
-                <h3 class="text-2xl font-black text-white mb-2">${isTimeOut ? 'Hết Thời Gian!' : 'Rất Tiếc! Chưa Chính Xác'}</h3>
-                <p class="text-slate-300 text-sm mb-4">
-                    Đáp án đúng là: <strong class="text-emerald-400 font-bold">${q.answer}. ${q.options[q.answer]}</strong>
+                <h3 class="text-2xl font-black text-slate-900 mb-2">${isTimeOut ? 'Hết Thời Gian!' : 'Rất Tiếc! Chưa Chính Xác'}</h3>
+                <p class="text-slate-600 text-sm mb-4">
+                    Đáp án đúng là: <strong class="text-emerald-700 font-bold">${q.answer}. ${q.options[q.answer]}</strong>
                 </p>
-                <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-4 mb-6">
-                    <div class="text-xs text-slate-400 uppercase font-semibold">Phần thưởng đạt được</div>
-                    <div class="text-2xl font-black text-amber-400 mt-1">${finalPrize}</div>
-                    <div class="text-xs text-slate-500 mt-1">Người chơi: ${this.currentPlayer ? this.currentPlayer.name : 'Đại diện lớp'}</div>
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 mb-6 shadow-sm">
+                    <div class="text-xs text-slate-500 uppercase font-bold">Phần thưởng đạt được</div>
+                    <div class="text-2xl font-black text-amber-600 mt-1 font-mono">${finalPrize}</div>
+                    <div class="text-xs text-slate-600 mt-1">Người chơi: <strong>${this.currentPlayer ? this.currentPlayer.name : 'Đại diện lớp'}</strong></div>
                 </div>
                 <div class="flex gap-3 justify-center">
-                    <button onclick="window.millionaireGame.start(window.millionaireGame.questions)" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold">
+                    <button onclick="window.millionaireGame.start(window.millionaireGame.questions)" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold shadow transition">
                         <i class="fa-solid fa-rotate-left mr-1"></i> Chơi lại lượt mới
                     </button>
-                    <button onclick="window.millionaireGame.closeModal(); window.app.showGameSelection();" class="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold border border-slate-700">
+                    <button onclick="window.millionaireGame.closeModal(); window.app.showGameSelection();" class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold border border-slate-200 transition">
                         Chọn trò chơi khác
                     </button>
                 </div>
@@ -585,17 +585,17 @@ class MillionaireGame {
         }
         this.showModal(`
             <div class="text-center py-4">
-                <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-amber-400 to-yellow-300 border-2 border-white mx-auto flex items-center justify-center text-slate-950 text-4xl mb-4 shadow-xl shadow-amber-500/30 animate-bounce">
+                <div class="w-20 h-20 rounded-full bg-amber-100 border-2 border-amber-400 mx-auto flex items-center justify-center text-amber-600 text-4xl mb-4 shadow-md animate-bounce">
                     <i class="fa-solid fa-crown"></i>
                 </div>
-                <h2 class="text-3xl font-black text-amber-400 mb-2">CHIẾN THẮNG TUYỆT ĐỐI!</h2>
-                <p class="text-slate-200 text-lg mb-4">Chúc mừng <strong class="text-cyan-400 font-bold">${this.currentPlayer ? this.currentPlayer.name : 'Lớp Chúng Ta'}</strong> đã vượt qua 15 câu hỏi!</p>
-                <div class="bg-gradient-to-r from-amber-500/20 via-yellow-500/20 to-amber-500/20 border-2 border-amber-400/50 rounded-2xl p-6 mb-6">
-                    <div class="text-sm font-semibold text-amber-300 uppercase">Phần thưởng tối cao</div>
-                    <div class="text-4xl font-black text-amber-400 my-2 font-mono">150.000.000 VNĐ</div>
-                    <div class="text-sm text-slate-300">+150 Điểm tích lũy cho lớp học!</div>
+                <h2 class="text-3xl font-black text-amber-600 mb-2">CHIẾN THẮNG TUYỆT ĐỐI!</h2>
+                <p class="text-slate-700 text-lg mb-4">Chúc mừng <strong class="text-blue-700 font-bold">${this.currentPlayer ? this.currentPlayer.name : 'Lớp Chúng Ta'}</strong> đã vượt qua 15 câu hỏi!</p>
+                <div class="bg-amber-50 border-2 border-amber-300 rounded-2xl p-6 mb-6 shadow-sm">
+                    <div class="text-xs font-bold text-amber-800 uppercase">Phần thưởng tối cao</div>
+                    <div class="text-4xl font-black text-amber-600 my-2 font-mono">150.000.000 VNĐ</div>
+                    <div class="text-sm text-slate-600 font-medium">+150 Điểm tích lũy cho lớp học!</div>
                 </div>
-                <button onclick="window.millionaireGame.closeModal(); window.app.showGameSelection();" class="px-8 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black text-lg shadow-xl shadow-amber-500/30">
+                <button onclick="window.millionaireGame.closeModal(); window.app.showGameSelection();" class="px-8 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-black text-lg shadow-md transition">
                     Trở về màn hình chính
                 </button>
             </div>
