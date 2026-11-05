@@ -157,6 +157,13 @@
                             <span>Phòng chờ trực tuyến</span>
                         </button>
 
+                        <button onclick="window.roomManager.openJudgeSpectatorMode(); window.app.setActiveSidebar(this)" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 text-left">
+                            <div class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm">
+                                <i class="fa-solid fa-users-viewfinder"></i>
+                            </div>
+                            <span>Màn hình các đội (Chiếu BGK)</span>
+                        </button>
+
                         <button onclick="window.app.openClassListModal(); window.app.setActiveSidebar(this)" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 text-left">
                             <div class="w-7 h-7 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center text-sm">
                                 <i class="fa-solid fa-trophy"></i>
@@ -173,88 +180,26 @@
                     </div>
                 </div>
 
-                <!-- Section 2: TRÒ CHƠI -->
+                <!-- Section 2: ĐẤU TRƯỜNG CHÍNH -->
                 <div>
                     <div class="text-[10px] font-black uppercase text-slate-400 tracking-wider px-3 mb-1.5 flex items-center justify-between">
-                        <span>Trò Chơi</span>
-                        <span class="text-[9px] bg-purple-50 text-purple-600 px-1.5 py-0.5 rounded font-bold">5 sẵn sàng</span>
+                        <span>Đấu Trường Học Tập</span>
+                        <span class="text-[9px] bg-rose-50 text-rose-600 px-1.5 py-0.5 rounded font-bold">Trọng tâm</span>
                     </div>
                     
-                    <div class="space-y-1" id="sidebar-games-list">
-                        <!-- Game 1: Olympia -->
-                        <button onclick="window.app.selectGame('olympia'); window.app.setActiveSidebar(this)" class="sidebar-link w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 text-left group">
+                    <div class="space-y-1">
+                        <!-- Game Duy Nhất: Đường Lên Đỉnh Olympia -->
+                        <button onclick="window.app.selectGame('olympia'); window.app.setActiveSidebar(this)" class="sidebar-link active w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold text-slate-900 bg-rose-50/70 border border-rose-200 text-left group">
                             <div class="flex items-center gap-2.5 truncate">
-                                <div class="w-7 h-7 rounded-lg bg-rose-100 text-rose-600 flex items-center justify-center text-xs flex-shrink-0">
+                                <div class="w-8 h-8 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-sm flex-shrink-0 shadow-xs">
                                     <i class="fa-solid fa-mountain"></i>
                                 </div>
-                                <span class="truncate">Đường lên đỉnh Olympia</span>
-                            </div>
-                            <span class="badge-online flex-shrink-0">Online</span>
-                        </button>
-
-                        <!-- Game 2: Ai là triệu phú -->
-                        <button onclick="window.app.selectGame('millionaire'); window.app.setActiveSidebar(this)" class="sidebar-link w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 text-left group">
-                            <div class="flex items-center gap-2.5 truncate">
-                                <div class="w-7 h-7 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-xs flex-shrink-0">
-                                    <i class="fa-solid fa-circle-question"></i>
+                                <div>
+                                    <div class="truncate font-black text-rose-700">Đường Lên Đỉnh Olympia</div>
+                                    <div class="text-[10px] text-slate-500 font-normal">4 Vòng thi đấu kịch tính</div>
                                 </div>
-                                <span class="truncate">Ai là triệu phú</span>
                             </div>
-                            <span class="badge-online flex-shrink-0">Online</span>
-                        </button>
-
-                        <!-- Game 3: Đào vàng tri thức -->
-                        <button onclick="window.app.selectGame('goldminer'); window.app.setActiveSidebar(this)" class="sidebar-link w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 text-left group">
-                            <div class="flex items-center gap-2.5 truncate">
-                                <div class="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center text-xs flex-shrink-0">
-                                    <i class="fa-solid fa-person-digging"></i>
-                                </div>
-                                <span class="truncate">Đào vàng tri thức</span>
-                            </div>
-                            <span class="badge-online flex-shrink-0">Online</span>
-                        </button>
-
-                        <!-- Game 4: Vòng quay may mắn -->
-                        <button onclick="window.app.selectGame('wheel'); window.app.setActiveSidebar(this)" class="sidebar-link w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 text-left group">
-                            <div class="flex items-center gap-2.5 truncate">
-                                <div class="w-7 h-7 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-xs flex-shrink-0">
-                                    <i class="fa-solid fa-dharmachakra"></i>
-                                </div>
-                                <span class="truncate">Vòng quay may mắn</span>
-                            </div>
-                            <span class="badge-online flex-shrink-0">Online</span>
-                        </button>
-
-                        <!-- Game 5: Hộp quà bí mật -->
-                        <button onclick="window.app.selectGame('mystery'); window.app.setActiveSidebar(this)" class="sidebar-link w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 text-left group">
-                            <div class="flex items-center gap-2.5 truncate">
-                                <div class="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs flex-shrink-0">
-                                    <i class="fa-solid fa-gift"></i>
-                                </div>
-                                <span class="truncate">Hộp quà bí mật</span>
-                            </div>
-                            <span class="badge-online flex-shrink-0">Online</span>
-                        </button>
-
-                        <!-- Extra Fun Games -->
-                        <button onclick="alert('Trò chơi Đua xe tốc độ đang tích hợp bộ câu hỏi của bạn!')" class="sidebar-link w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 text-left group">
-                            <div class="flex items-center gap-2.5 truncate">
-                                <div class="w-7 h-7 rounded-lg bg-orange-100 text-orange-600 flex items-center justify-center text-xs flex-shrink-0">
-                                    <i class="fa-solid fa-car-side"></i>
-                                </div>
-                                <span class="truncate">Đua xe tốc độ</span>
-                            </div>
-                            <span class="badge-online flex-shrink-0">Online</span>
-                        </button>
-
-                        <button onclick="alert('Trò chơi Kéo co tri thức đang tích hợp bộ câu hỏi của bạn!')" class="sidebar-link w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold text-slate-700 text-left group">
-                            <div class="flex items-center gap-2.5 truncate">
-                                <div class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs flex-shrink-0">
-                                    <i class="fa-solid fa-people-robbery"></i>
-                                </div>
-                                <span class="truncate">Kéo co tri thức</span>
-                            </div>
-                            <span class="badge-online flex-shrink-0">Online</span>
+                            <span class="badge-online flex-shrink-0">Trực tiếp</span>
                         </button>
                     </div>
                 </div>
@@ -362,34 +307,44 @@
                         <div class="lg:col-span-7 space-y-4">
                             <!-- New Badge Pill -->
                             <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-3.5 py-1 rounded-full text-xs font-bold text-white border border-white/30 shadow-sm">
-                                <span class="bg-white text-purple-700 px-1.5 py-0.2 rounded font-black text-[10px]">MỚI</span>
-                                <span>17 trò chơi • 1 hoạt động • Chơi trực tiếp / Chiếu máy chiếu</span>
+                                <span class="bg-white text-rose-700 px-1.5 py-0.2 rounded font-black text-[10px]">CHUYÊN DỤNG</span>
+                                <span>Tối ưu cho Máy chiếu, TV thông minh & Bảng tương tác lớp học</span>
                             </div>
 
                             <!-- Main Title -->
                             <h1 class="text-4xl md:text-5xl lg:text-6xl font-black leading-tight font-heading tracking-tight drop-shadow-sm">
-                                Học mà chơi<br>
-                                — Chơi mà học!
+                                ĐẤU TRƯỜNG TRI THỨC<br>
+                                ĐƯỜNG LÊN ĐỈNH OLYMPIA
                             </h1>
 
                             <!-- Subtitle -->
-                            <p class="text-white/90 text-sm md:text-base leading-relaxed max-w-xl font-medium">
-                                EDU GAME biến bài ôn tập thành những trận thi đấu sôi động: <strong>Ai là triệu phú, Đào vàng, Olympia, Kéo co, Đua xe...</strong> Câu hỏi trắc nghiệm, đúng/sai, phân dạng Dễ/Khó — giáo viên soạn một lần, chơi được mọi game.
+                            <p class="text-white/95 text-sm md:text-base leading-relaxed max-w-xl font-medium">
+                                Biến tiết học ôn tập thành trận thi tài sôi động cho cả lớp với <strong>4 Vòng thi kinh điển</strong>: Khởi Động (+10đ), Tăng Tốc 1 & 2 (tính điểm tốc độ sát nút), Về Đích (gói 60đ - 80đ - 100đ, Ngôi sao hy vọng & Chuông cướp điểm).
                             </p>
 
                             <!-- Hero Action Buttons -->
                             <div class="flex flex-wrap items-center gap-3 pt-2">
-                                <button onclick="document.getElementById('games-showcase-section').scrollIntoView({behavior: 'smooth'})" class="px-6 py-3 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-black text-sm shadow-md flex items-center gap-2 transition active:scale-95">
-                                    <i class="fa-solid fa-gamepad text-amber-400"></i>
-                                    <span>Chọn trò chơi</span>
+                                <button onclick="window.app.startSelectedGameFullscreen('olympia')" class="px-7 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-black text-sm shadow-xl flex items-center gap-2 transform active:scale-95 transition">
+                                    <i class="fa-solid fa-play text-amber-400"></i>
+                                    <span>Bắt Đầu Chiếu Olympia Ngay</span>
                                 </button>
 
-                                <button onclick="window.app.toggleTeacherDrawer()" class="px-5 py-3 rounded-2xl bg-white/25 hover:bg-white/35 backdrop-blur-md text-white font-bold text-sm border border-white/40 shadow-sm flex items-center gap-2 transition">
-                                    <i class="fa-solid fa-cloud-arrow-up"></i>
-                                    <span>Nạp file Word & Excel</span>
+                                <button onclick="window.roomManager.openClassDivideModal()" class="px-5 py-3.5 rounded-2xl bg-white/25 hover:bg-white/35 backdrop-blur-md text-white font-bold text-sm border border-white/40 shadow-sm flex items-center gap-2 transition">
+                                    <i class="fa-solid fa-users-gear"></i>
+                                    <span>Chia 4/6/8 Đội</span>
                                 </button>
 
-                                <button onclick="window.app.quickPickStudent()" class="px-4 py-3 rounded-2xl bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-bold text-sm border border-white/30 shadow-sm flex items-center gap-2 transition" title="Gọi ngẫu nhiên 1 học sinh">
+                                <button onclick="window.roomManager.openJudgeSpectatorMode()" class="px-5 py-3.5 rounded-2xl bg-indigo-600/85 hover:bg-indigo-600 text-white font-black text-sm border border-indigo-400/50 shadow-md flex items-center gap-2 transition">
+                                    <i class="fa-solid fa-users-viewfinder"></i>
+                                    <span>Chiếu Màn Hình Đội (BGK)</span>
+                                </button>
+
+                                <button onclick="window.app.toggleTeacherDrawer()" class="px-5 py-3.5 rounded-2xl bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-bold text-sm border border-white/30 shadow-sm flex items-center gap-2 transition">
+                                    <i class="fa-solid fa-folder-open"></i>
+                                    <span>Nạp File Word & Excel</span>
+                                </button>
+
+                                <button onclick="window.app.quickPickStudent()" class="px-4 py-3.5 rounded-2xl bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-bold text-sm border border-white/30 shadow-sm flex items-center gap-2 transition" title="Gọi ngẫu nhiên 1 học sinh">
                                     <i class="fa-solid fa-shuffle"></i>
                                     <span class="hidden sm:inline">Gọi học sinh</span>
                                 </button>
@@ -598,19 +553,15 @@
                                     <i class="fa-solid fa-door-open text-emerald-600"></i>
                                     <span>Mở Phòng Chờ Trực Tuyến</span>
                                 </button>
+
+                                <button onclick="window.roomManager.openJudgeSpectatorMode()"
+                                    class="px-6 py-2.5 rounded-2xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-black text-xs border border-indigo-200 shadow-sm flex items-center justify-center gap-2 transition"
+                                    title="Chiếu góc nhìn của từng đội học sinh cho Ban Giám Khảo xem">
+                                    <i class="fa-solid fa-users-viewfinder text-indigo-600"></i>
+                                    <span>Chiếu Màn Hình Đội (Cho BGK Xem)</span>
+                                </button>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Temporarily Hidden Games Note (As requested by user) -->
-                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-slate-500 text-xs flex items-center justify-between shadow-xs">
-                        <div class="flex items-center gap-2">
-                            <i class="fa-solid fa-lock text-purple-600"></i>
-                            <span>Các trò chơi khác (<strong>Ai Là Triệu Phú, Đào Vàng Tri Thức, Vòng Quay May Mắn, Hộp Quà Bí Mật</strong>) đang tạm ẩn để tập trung tối đa cho Đường Lên Đỉnh Olympia.</span>
-                        </div>
-                        <span class="text-[11px] font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200">
-                            Sẽ mở lại khi có yêu cầu
-                        </span>
                     </div>
 
                     </div>
@@ -654,6 +605,12 @@
 
             <!-- Arena Controls -->
             <div class="flex items-center gap-2 md:gap-3">
+                <button onclick="window.roomManager.openJudgeSpectatorMode(null, window.olympiaGame ? window.olympiaGame.currentRound : 1)" class="px-3.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-black text-xs flex items-center gap-2 transition shadow-sm" title="Chiếu màn hình của các đội học sinh cho Ban Giám Khảo xem">
+                    <i class="fa-solid fa-users-viewfinder text-indigo-600"></i>
+                    <span class="hidden md:inline">Màn Hình Các Đội (Chiếu BGK)</span>
+                    <span class="md:hidden">Chiếu BGK</span>
+                </button>
+
                 <button onclick="window.app.quickPickStudent()" class="px-3.5 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold text-xs flex items-center gap-2 transition shadow-sm" title="Gọi ngẫu nhiên học sinh">
                     <i class="fa-solid fa-shuffle"></i>
                     <span class="hidden sm:inline">Gọi Học Sinh</span>
@@ -687,15 +644,19 @@
         </div>
     </div>
 
-    <!-- Core App Scripts -->
+    <!-- DEDICATED JUDGE SPECTATOR THEATER (MÀN HÌNH HỌC SINH CHIẾU CHO BAN GIÁM KHẢO) -->
+    <div id="judge-spectator-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[60] hidden overflow-y-auto p-2 sm:p-4 md:p-6 flex items-center justify-center">
+        <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-7xl max-h-[96vh] shadow-2xl relative flex flex-col overflow-hidden text-slate-900 animate-scale-up" id="judge-spectator-body">
+            <!-- Dynamic content rendered by roomManager.openJudgeSpectatorMode() -->
+        </div>
+    </div>
+
+    <!-- Core App Scripts (Exclusively Olympia) -->
     <script src="js/audio.js"></script>
     <script src="js/docx-parser.js"></script>
     <script src="js/excel-parser.js"></script>
     <script src="js/room-manager.js"></script>
-    <script src="js/games/millionaire.js"></script>
-    <script src="js/games/goldminer.js"></script>
     <script src="js/games/olympia.js"></script>
-    <script src="js/games/wheel.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>
