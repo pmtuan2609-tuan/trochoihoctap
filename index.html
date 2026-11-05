@@ -47,46 +47,24 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="min-h-screen flex bg-[#f8fafc] text-slate-800 antialiased selection:bg-purple-200 selection:text-purple-900">
+<body class="w-full min-h-screen flex flex-col lg:flex-row bg-[#f8fafc] text-slate-800 antialiased selection:bg-purple-200 selection:text-purple-900 overflow-x-hidden">
 
-    <!-- ==================== SPLASH SCREEN / PRELOADER ==================== -->
-    <div id="page-preloader" class="fixed inset-0 z-50 bg-white/95 backdrop-blur-md flex flex-col items-center justify-center transition-all duration-500 ease-out">
+    <!-- ==================== SPLASH SCREEN / PRELOADER (Instant Dismiss & Non-blocking) ==================== -->
+    <div id="page-preloader" class="fixed inset-0 z-50 bg-white/95 backdrop-blur-md flex flex-col items-center justify-center transition-all duration-300 ease-out pointer-events-none opacity-0 hidden">
         <div class="flex flex-col items-center text-center p-6 max-w-sm">
-            <!-- Animated Glowing Logo -->
-            <div class="relative w-24 h-24 mb-4">
-                <div class="absolute inset-0 rounded-3xl bg-gradient-to-tr from-purple-500 via-pink-500 to-amber-400 blur-xl opacity-60 animate-pulse"></div>
-                <div class="relative w-full h-full rounded-3xl bg-gradient-to-tr from-purple-600 via-pink-500 to-amber-400 p-1 shadow-xl animate-bounce">
-                    <div class="w-full h-full bg-white rounded-[22px] flex items-center justify-center text-purple-600 text-4xl font-black shadow-inner">
-                        <i class="fa-solid fa-gamepad"></i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Brand Title in Preloader -->
-            <div class="text-xs font-black tracking-widest uppercase text-purple-600 mb-1">
-                EDU GAME
-            </div>
-
-            <!-- "Đang tải" Heading with 4 jumping bouncing dots -->
-            <div class="flex items-baseline justify-center gap-0.5 mb-1.5">
-                <span class="text-3xl font-black text-slate-900 tracking-tight font-heading">Đang tải</span>
-                <span class="inline-flex items-baseline text-purple-600 font-black text-4xl leading-none select-none ml-1">
-                    <span class="dot-jump" style="animation-delay: 0s;">.</span>
-                    <span class="dot-jump" style="animation-delay: 0.18s;">.</span>
-                    <span class="dot-jump" style="animation-delay: 0.36s;">.</span>
-                    <span class="dot-jump" style="animation-delay: 0.54s;">.</span>
-                </span>
-            </div>
-
-            <!-- "Vui lòng đợi trong giây lát...." Subtitle -->
-            <p class="text-sm text-slate-500 font-semibold tracking-wide">Vui lòng đợi trong giây lát....</p>
-
-            <!-- Sleek Loading Bar -->
-            <div class="w-48 h-1.5 bg-slate-100 rounded-full overflow-hidden mt-5 border border-slate-200">
-                <div class="h-full bg-gradient-to-r from-purple-600 via-pink-500 to-amber-400 rounded-full animate-indeterminate"></div>
-            </div>
+            <div class="text-xs font-black tracking-widest uppercase text-purple-600 mb-1">EDU GAME</div>
+            <p class="text-sm text-slate-500 font-semibold tracking-wide">Đang khởi động...</p>
         </div>
     </div>
+    <script>
+        (function() {
+            var pl = document.getElementById('page-preloader');
+            if (pl) {
+                pl.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(function() { if (pl && pl.parentNode) pl.parentNode.removeChild(pl); }, 200);
+            }
+        })();
+    </script>
 
     <!-- ==================== LEFT SIDEBAR (GIAO DIỆN CỘT DỌC) ==================== -->
     <aside id="sidebar" class="w-60 xl:w-64 flex-shrink-0 bg-white border-r border-slate-200/90 flex flex-col justify-between h-screen sticky top-0 z-40 transition-all duration-300 shadow-sm -translate-x-full lg:translate-x-0 fixed lg:static">
@@ -256,9 +234,12 @@
             </div>
 
             <!-- Right Actions -->
-            <div class="flex items-center gap-2 md:gap-3">
+            <div class="flex items-center gap-2 md:gap-2.5">
+                <!-- Admin Auth Badge / Login Button Slot -->
+                <div id="admin-auth-header-slot"></div>
+
                 <!-- Enter Room Button (Purple gradient) -->
-                <button onclick="window.app.openPinRoomModal()" class="px-3 md:px-4 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs shadow-sm flex items-center gap-2 transition active:scale-95">
+                <button onclick="window.app.openPinRoomModal()" class="px-3 md:px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition active:scale-95">
                     <i class="fa-solid fa-arrow-right-to-bracket text-xs"></i>
                     <span>Vào phòng</span>
                 </button>
@@ -278,11 +259,6 @@
                 <!-- Fullscreen button -->
                 <button onclick="window.app.toggleFullscreen()" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center text-xs transition hidden sm:flex" title="Chiếu máy chiếu">
                     <i class="fa-solid fa-expand"></i>
-                </button>
-
-                <!-- Quick Sun Day Toggle -->
-                <button onclick="alert('Đang áp dụng giao diện nền sáng tối ưu cho máy chiếu')" class="w-8 h-8 rounded-lg bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center text-xs shadow-sm" title="Giao diện sáng">
-                    <i class="fa-solid fa-sun"></i>
                 </button>
 
                 <!-- Teacher Login / Manage Button -->
@@ -390,31 +366,31 @@
                                     <span class="text-xs font-black uppercase tracking-wider text-amber-300">1. Khởi Động</span>
                                     <i class="fa-solid fa-bolt text-amber-300 text-xs"></i>
                                 </div>
-                                <div class="text-sm font-black text-white">+10 Điểm / Câu</div>
+                                <div class="text-sm font-black text-white">+10 Điểm / Câu • 45s</div>
                                 <div class="text-[11px] text-white/85 mt-0.5 leading-snug">
-                                    5-7 câu. Đảo câu và 4 phương án độc lập từng đội chống nhìn bài.
+                                    7 câu hỏi. Đảo đề & đảo đáp án A, B, C, D độc lập từng đội chống nhìn bài.
                                 </div>
                             </div>
 
                             <div class="bg-white/15 backdrop-blur-md p-3.5 rounded-2xl border border-white/25 shadow-sm text-left">
                                 <div class="flex items-center justify-between mb-1">
-                                    <span class="text-xs font-black uppercase tracking-wider text-emerald-300">2. Tăng Tốc 1</span>
-                                    <i class="fa-solid fa-gauge-high text-emerald-300 text-xs"></i>
+                                    <span class="text-xs font-black uppercase tracking-wider text-emerald-300">2. Vượt Chướng Ngại Vật</span>
+                                    <i class="fa-solid fa-puzzle-piece text-emerald-300 text-xs"></i>
                                 </div>
-                                <div class="text-sm font-black text-white">20đ - 15đ - 10đ - 5đ</div>
+                                <div class="text-sm font-black text-white">4 Hàng Ngang + Đoán CNV</div>
                                 <div class="text-[11px] text-white/85 mt-0.5 leading-snug">
-                                    5-7 câu. Đo phản xạ mili-giây, xếp hạng tốc độ trả lời đúng.
+                                    Mở hàng ngang +10đ. Chuông đoán CNV nhận 80đ - 60đ - 40đ - 20đ.
                                 </div>
                             </div>
 
                             <div class="bg-white/15 backdrop-blur-md p-3.5 rounded-2xl border border-white/25 shadow-sm text-left">
                                 <div class="flex items-center justify-between mb-1">
-                                    <span class="text-xs font-black uppercase tracking-wider text-sky-300">3. Tăng Tốc 2</span>
-                                    <i class="fa-solid fa-stopwatch text-sky-300 text-xs"></i>
+                                    <span class="text-xs font-black uppercase tracking-wider text-sky-300">3. Tăng Tốc</span>
+                                    <i class="fa-solid fa-gauge-high text-sky-300 text-xs"></i>
                                 </div>
-                                <div class="text-sm font-black text-white">Sát Nút Mili-giây</div>
+                                <div class="text-sm font-black text-white">40đ - 30đ - 20đ - 10đ</div>
                                 <div class="text-[11px] text-white/85 mt-0.5 leading-snug">
-                                    5-7 câu. Tăng tốc chặng 2, bứt phá bảng xếp hạng lớp.
+                                    4 câu 30s. Xếp hạng tốc độ mili-giây trả lời đúng chuẩn VTV3.
                                 </div>
                             </div>
 
@@ -425,7 +401,7 @@
                                 </div>
                                 <div class="text-sm font-black text-white">Gói 60 - 80 - 100đ</div>
                                 <div class="text-[11px] text-white/85 mt-0.5 leading-snug">
-                                    4 câu/đội. Ngôi sao hy vọng (×2) & Chuông cướp điểm 5 giây.
+                                    Chọn gói điểm, Ngôi sao hy vọng (×2) & Chuông cướp điểm 5 giây.
                                 </div>
                             </div>
                         </div>
@@ -442,18 +418,23 @@
                             </div>
                             <div>
                                 <h3 class="text-base font-black text-slate-900">Khu Vực Quản Lý Của Giáo Viên</h3>
-                                <p class="text-xs text-slate-500">Nạp đề thi Word và danh sách lớp Excel để chơi cho mọi trò chơi</p>
+                                <p class="text-xs text-slate-500">Nạp đề thi Word & danh sách lớp Excel - Tự động lưu vĩnh viễn trên trình duyệt</p>
                             </div>
                         </div>
                         <div class="flex flex-wrap gap-2">
-                            <button onclick="window.app.openGuideModal()" class="px-3.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-black border border-amber-300 flex items-center gap-1.5 shadow-sm transition">
+                            <button onclick="window.app.openGuideModal()" class="px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-black border border-amber-300 flex items-center gap-1.5 shadow-sm transition">
                                 <i class="fa-solid fa-book-open text-amber-600"></i>
                                 <span>Hướng dẫn soạn đề & Tải mẫu</span>
                             </button>
-                            <button onclick="window.app.openQuestionPreviewModal()" class="px-3.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold border border-slate-200">
-                                <i class="fa-solid fa-eye text-blue-600 mr-1"></i> Xem câu hỏi (<span id="q-total-count">15</span>)
+                            <button onclick="window.app.openQuestionsBankModal()" class="px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-800 text-xs font-bold border border-blue-200 flex items-center gap-1.5 transition">
+                                <i class="fa-solid fa-list-check text-blue-600"></i>
+                                <span>Quản lý JSON Đề Thi (<span id="q-total-count">15</span>)</span>
                             </button>
-                            <button onclick="window.app.openClassListModal()" class="px-3.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs font-bold border border-amber-200">
+                            <button onclick="window.app.openClassJsonModal()" class="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-800 text-xs font-bold border border-purple-200 flex items-center gap-1.5 transition">
+                                <i class="fa-solid fa-code text-purple-600"></i>
+                                <span>Quản lý JSON Lớp & Chia Đội</span>
+                            </button>
+                            <button onclick="window.app.openClassListModal()" class="px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs font-bold border border-amber-200">
                                 <i class="fa-solid fa-trophy text-amber-600 mr-1"></i> Điểm lớp (<span id="class-student-count">20 HS</span>)
                             </button>
                         </div>
@@ -643,15 +624,15 @@
         </div>
     </div>
 
-    <!-- GLOBAL MODAL (Used for Pin Room, Question Bank, Class Roster, Logo Picker, Game Intro) -->
-    <div id="global-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden overflow-y-auto p-3 sm:p-6 flex items-start sm:items-center justify-center">
-        <div class="bg-white border border-slate-200 rounded-3xl max-w-2xl w-full my-auto shadow-2xl relative animate-scale-up text-slate-900 max-h-[90vh] flex flex-col overflow-hidden" id="global-modal-body">
+    <!-- GLOBAL MODAL (Used for Pin Room, Question Bank, Class Roster, Logo Picker, Admin Login, Guides) -->
+    <div id="global-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[80] hidden overflow-y-auto p-3 sm:p-6 flex items-start sm:items-center justify-center">
+        <div class="bg-white border border-slate-200 rounded-3xl max-w-3xl w-full my-auto shadow-2xl relative animate-scale-up text-slate-900 max-h-[92vh] flex flex-col overflow-hidden" id="global-modal-body">
             <!-- Dynamic modal content -->
         </div>
     </div>
 
     <!-- DEDICATED JUDGE SPECTATOR THEATER (MÀN HÌNH HỌC SINH CHIẾU CHO BAN GIÁM KHẢO) -->
-    <div id="judge-spectator-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[60] hidden overflow-y-auto p-2 sm:p-4 md:p-6 flex items-center justify-center">
+    <div id="judge-spectator-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[90] hidden overflow-y-auto p-2 sm:p-4 md:p-6 flex items-center justify-center">
         <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-7xl max-h-[96vh] shadow-2xl relative flex flex-col overflow-hidden text-slate-900 animate-scale-up" id="judge-spectator-body">
             <!-- Dynamic content rendered by roomManager.openJudgeSpectatorMode() -->
         </div>
