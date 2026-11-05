@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Trò chơi lớp học</title>
+<title>EDU Champions – Trò chơi lớp học</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='1' x2='1' y2='0'%3E%3Cstop offset='0' stop-color='%239333ea'/%3E%3Cstop offset='.55' stop-color='%23ec4899'/%3E%3Cstop offset='1' stop-color='%23f59e0b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url%28%23g%29'/%3E%3Cpath d='M19 20h26c5 0 9.2 3.5 10.2 8.4l2.9 13.5c.9 4.4-4.6 7.3-7.7 4L44 39H20l-6.4 6.9c-3.1 3.3-8.6.4-7.7-4l2.9-13.5C9.8 23.5 14 20 19 20z' fill='%23fff'/%3E%3Crect x='14.5' y='28' width='12' height='3.6' rx='1.8' fill='%239333ea'/%3E%3Crect x='18.7' y='23.8' width='3.6' height='12' rx='1.8' fill='%239333ea'/%3E%3Ccircle cx='42' cy='26.5' r='2.6' fill='%23ec4899'/%3E%3Ccircle cx='47.5' cy='32' r='2.6' fill='%23f59e0b'/%3E%3Ccircle cx='36.5' cy='32' r='2.6' fill='%23f59e0b'/%3E%3Ccircle cx='42' cy='37.2' r='2.6' fill='%23ec4899'/%3E%3C/svg%3E">
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -75,7 +75,7 @@
   #page-loader{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:radial-gradient(circle at 15% 10%,#fce7f3 0,transparent 40%),radial-gradient(circle at 90% 90%,#fef3c7 0,transparent 40%),linear-gradient(135deg,#f5f3ff,#eef2ff);transition:opacity .45s ease,visibility .45s ease;font-family:'Be Vietnam Pro',system-ui,-apple-system,'Segoe UI',sans-serif}
   #page-loader.pl-hide{opacity:0;visibility:hidden}
   #page-loader .pl-box{display:flex;flex-direction:column;align-items:center;gap:14px}
-  #page-loader .pl-logo{transform:rotate(-6deg);filter:drop-shadow(0 10px 18px rgba(219,39,119,.35));animation:pl-float 1.6s ease-in-out infinite}
+  #page-loader .pl-logo{filter:drop-shadow(0 10px 18px rgba(219,39,119,.35));animation:pl-float 1.6s ease-in-out infinite}
   #page-loader .pl-word{font-weight:900;font-size:30px;letter-spacing:-.035em;line-height:1;color:#0f172a}
   #page-loader .pl-word span{background:linear-gradient(90deg,#7c3aed,#db2777 55%,#f59e0b);-webkit-background-clip:text;background-clip:text;color:transparent}
   #page-loader .pl-row{display:flex;align-items:flex-end;gap:10px;margin-top:4px;color:#64748b;font-weight:800;font-size:15px;letter-spacing:.02em}
@@ -86,7 +86,7 @@
   #page-loader .pl-dots i:nth-child(3){background:#f59e0b;animation-delay:.24s}
   #page-loader .pl-dots i:nth-child(4){background:#10b981;animation-delay:.36s}
   @keyframes pl-bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-12px)}}
-  @keyframes pl-float{0%,100%{transform:rotate(-6deg) translateY(0)}50%{transform:rotate(-6deg) translateY(-6px)}}
+  @keyframes pl-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
   @media (prefers-reduced-motion:reduce){#page-loader .pl-dots i,#page-loader .pl-logo{animation:none}}
 </style>
 </head>
@@ -94,8 +94,8 @@
 <!-- Màn hình "Đang tải" -->
 <div id="page-loader" role="status" aria-live="polite">
   <div class="pl-box">
-    <div class="pl-logo"><svg viewBox="0 0 64 64" width="64" height="64" aria-hidden="true"><defs><linearGradient id="plg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#6d28d9"/><stop offset=".6" stop-color="#db2777"/><stop offset="1" stop-color="#f59e0b"/></linearGradient></defs><rect width="64" height="64" rx="18" fill="url(#plg)"/><path d="M19 20h26c5 0 9.2 3.5 10.2 8.4l2.9 13.5c.9 4.4-4.6 7.3-7.7 4L44 39H20l-6.4 6.9c-3.1 3.3-8.6.4-7.7-4l2.9-13.5C9.8 23.5 14 20 19 20z" fill="#fff"/><rect x="14.5" y="28" width="12" height="3.6" rx="1.8" fill="#7c3aed"/><rect x="18.7" y="23.8" width="3.6" height="12" rx="1.8" fill="#7c3aed"/><circle cx="42" cy="26.5" r="2.6" fill="#db2777"/><circle cx="47.5" cy="32" r="2.6" fill="#f59e0b"/><circle cx="36.5" cy="32" r="2.6" fill="#f59e0b"/><circle cx="42" cy="37.2" r="2.6" fill="#db2777"/></svg></div>
-    <div class="pl-word">EDU <span>GAME</span></div>
+    <div class="pl-logo" style="width:84px;height:84px"><svg width="84" height="84" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="plb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset=".55" stop-color="#6d28d9"/><stop offset="1" stop-color="#312e81"/></linearGradient><linearGradient id="plg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fef3c7"/><stop offset=".35" stop-color="#fcd34d"/><stop offset="1" stop-color="#d97706"/></linearGradient><linearGradient id="plr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fde68a"/><stop offset=".5" stop-color="#f59e0b"/><stop offset="1" stop-color="#db2777"/></linearGradient></defs><path d="M32 3.5 L55.5 11.5 V29.5 C55.5 45.5 45 55.5 32 60.5 C19 55.5 8.5 45.5 8.5 29.5 V11.5 Z" fill="url(#plb)" stroke="url(#plr)" stroke-width="3" stroke-linejoin="round"/><path d="M32 7.5 L51.5 14.2 V29.5 C51.5 43 43 51.6 32 56 Z" fill="#fff" opacity=".08"/><path d="M22.5 17.5 C22.5 17.5 18 17.5 17.6 18.2 C16.8 24.5 19.6 29.4 24.6 30.2" fill="none" stroke="url(#plg)" stroke-width="2.8" stroke-linecap="round"/><path d="M41.5 17.5 C41.5 17.5 46 17.5 46.4 18.2 C47.2 24.5 44.4 29.4 39.4 30.2" fill="none" stroke="url(#plg)" stroke-width="2.8" stroke-linecap="round"/><path d="M21.5 15.5 H42.5 V25 C42.5 31.4 37.8 36.2 32 36.2 C26.2 36.2 21.5 31.4 21.5 25 Z" fill="url(#plg)"/><path d="M29.3 36 H34.7 L35.6 41.2 H28.4 Z" fill="#d97706"/><rect x="23.5" y="41" width="17" height="4.6" rx="1.6" fill="url(#plg)"/><rect x="26.5" y="45.2" width="11" height="2.6" rx="1.2" fill="#b45309"/><path d="M32.00,20.00 L33.32,23.58 L37.14,23.73 L34.14,26.10 L35.17,29.77 L32.00,27.65 L28.83,29.77 L29.86,26.10 L26.86,23.73 L30.68,23.58Z" fill="#7c3aed"/><path d="M14.5,9.9 Q15.508000000000001,12.491999999999999 18.1,13.5 Q15.508000000000001,14.508000000000001 14.5,17.1 Q13.491999999999999,14.508000000000001 10.9,13.5 Q13.491999999999999,12.491999999999999 14.5,9.9Z" fill="#fde68a"/><path d="M50.5,40.2 Q51.284,42.216 53.3,43 Q51.284,43.784 50.5,45.8 Q49.716,43.784 47.7,43 Q49.716,42.216 50.5,40.2Z" fill="#fff" opacity=".9"/><path d="M47.5,7.3 Q48.116,8.884 49.7,9.5 Q48.116,10.116 47.5,11.7 Q46.884,10.116 45.3,9.5 Q46.884,8.884 47.5,7.3Z" fill="#fff" opacity=".8"/></svg></div>
+    <div class="pl-word">EDU <span>CHAMPIONS</span></div>
     <div class="pl-row"><span>Đang tải</span><span class="pl-dots"><i></i><i></i><i></i><i></i></span></div>
   </div>
 </div>
@@ -141,7 +141,7 @@ const RULES = {
   PACKAGES: { 60: [20, 20, 20], 80: [20, 30, 30], 100: [20, 40, 40] },
   BUZZ_TIME: 5, STEAL_TIME: 10,
   TB_BUZZ_TIME: 15, TB_ANSWER_TIME: 10,   // Câu hỏi phụ (khi bằng điểm): giây bấm chuông / giây trả lời
-  STEAL_TAKES_FROM_MAIN: true   // true: đội cướp đúng lấy điểm của đội đang thi (luật VTV3)
+  STEAL_TAKES_FROM_MAIN: true   // true: đội cướp đúng lấy điểm của đội đang thi (luật gameshow)
 };
 const ROUND_NAMES = ['', 'Khởi Động', 'Vượt Chướng Ngại Vật', 'Tăng Tốc', 'Về Đích', 'Câu Hỏi Phụ'];
 const ROUND_ICONS = ['', 'fa-bolt', 'fa-puzzle-piece', 'fa-gauge-high', 'fa-flag-checkered', 'fa-scale-balanced'];
@@ -718,7 +718,7 @@ const SAMPLE_TEX = String.raw`\documentclass[12pt,a4paper]{article}
 \usetikzlibrary{arrows.meta}
 \begin{document}
 %==========================================================================
-% ĐỀ THI ĐƯỜNG LÊN ĐỈNH OLYMPIA – MẪU (gói ex_test)
+% ĐỀ THI EDU CHAMPIONS – MẪU (gói ex_test)
 % MÃ VÒNG THI – ghi ngay sau \begin{ex} dạng %[MÃ]  (được kèm mã ID riêng: %[8H1Y1-2][TT])
 %   [KD]   Khởi động (7 câu)            [VCNV] Vượt CNV – 4 hàng ngang
 %   [CNV]  Câu đoán từ khóa CNV (1 câu)  [TT]   Tăng tốc (4 câu)
@@ -829,7 +829,7 @@ Kí hiệu hóa học của nguyên tố sodium là
 
 \end{document}
 `;
-function h_sampleTex() { dl(new Blob([SAMPLE_TEX], { type: 'text/x-tex;charset=utf-8' }), 'Mau_de_Olympia.tex'); }
+function h_sampleTex() { dl(new Blob([SAMPLE_TEX], { type: 'text/x-tex;charset=utf-8' }), 'Mau_de_EDU_Champions.tex'); }
 
 /* ========================= ĐỌC FILE CÂU HỎI =========================
    Cấu trúc: các mục [KHỞI ĐỘNG] [VƯỢT CHƯỚNG NGẠI VẬT] [CNV] [TĂNG TỐC]
@@ -1132,7 +1132,7 @@ function reviewTeam(p, t) {
 }
 function finalBoard(p, me = -1) {
   const rk = rankOf(p.teams), medal = ['🥇', '🥈', '🥉', '🎖️', '🎖️', '🎖️'];
-  return `<div class="card p-6 sm:p-10 text-center pop"><div class="text-sm font-black text-violet-600 uppercase tracking-wider">Kết quả chung cuộc</div>
+  return `<div class="card p-6 sm:p-10 text-center pop"><div class="flex justify-center mb-3">${champMark('w-20 h-20')}</div><div class="text-sm font-black text-violet-600 uppercase tracking-wider">EDU Champions • Kết quả chung cuộc</div>
     <div class="text-3xl sm:text-4xl font-black mt-2">🏆 ${esc(rk[0].name)} về nhất!</div>
     <div class="mt-6 space-y-2 max-w-xl mx-auto">${rk.map((x, k) => `<div class="flex items-center justify-between rounded-2xl px-4 py-3 border-2 ${x.i === me ? 'bg-violet-50' : 'bg-white'}" style="border-color:${x.color}">
       <div class="flex items-center gap-3 font-black"><span class="text-2xl">${medal[k]}</span>${esc(x.name)}${x.tb > 0 ? '<span class="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-100 text-amber-700"><i class="fa-solid fa-scale-balanced"></i> thắng câu hỏi phụ</span>' : ''}${rk.some(y => y.i !== x.i && y.score === x.score && (y.tb || 0) === (x.tb || 0)) ? '<span class="text-[10px] font-black px-2 py-0.5 rounded-full bg-slate-100 text-slate-500">đồng hạng</span>' : ''}</div><div class="text-2xl font-black tabular-nums">${x.score}</div></div>`).join('')}</div></div>`;
@@ -1510,7 +1510,7 @@ function h_sampleBank() { H.bankText = SAMPLE_BANK; H.bankName = 'Bộ câu hỏ
 function h_downloadTemplate() {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob(['\ufeff' + SAMPLE_BANK], { type: 'text/plain;charset=utf-8' }));
-  a.download = 'Mau_de_Olympia.txt'; a.click();
+  a.download = 'Mau_de_EDU_Champions.txt'; a.click();
 }
 
 /* ---------- Vẽ màn hình GV ---------- */
@@ -1528,7 +1528,7 @@ function renderHost() {
           <button onclick="h_side()" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition flex-shrink-0"><i class="fa-solid fa-bars text-sm"></i></button>
           <div class="flex items-center gap-2 text-xs font-semibold text-slate-500 min-w-0">
             <a href="index.html" class="text-slate-900 font-bold flex items-center gap-1.5"><i class="fa-solid fa-gamepad text-purple-600"></i> EDU GAME</a>
-            <span>/</span><span class="text-rose-600 font-bold hidden sm:inline">Đường Lên Đỉnh Olympia</span><span class="hidden sm:inline">/</span>
+            <span>/</span><span class="text-violet-700 font-black hidden sm:inline"><i class="fa-solid fa-trophy text-amber-500"></i> EDU Champions</span><span class="hidden sm:inline">/</span>
             <span class="text-slate-400 truncate">${crumb}</span>
           </div>
         </div>
@@ -1550,6 +1550,20 @@ function renderHost() {
     </div>
   </div>`;
   renderMath($('#app')); updateTimers();
+}
+/* ===== Logo trò chơi EDU Champions: khiên tím – cúp vàng – ngôi sao ===== */
+let _cm = 0;
+function champMark(cls = 'w-12 h-12') { const u = 'cm' + (++_cm); return `<span class="inline-block flex-shrink-0 ${cls}"><svg class="w-full h-full" xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><defs><linearGradient id='${u}b' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='#8b5cf6'/><stop offset='.55' stop-color='#6d28d9'/><stop offset='1' stop-color='#312e81'/></linearGradient><linearGradient id='${u}g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='#fef3c7'/><stop offset='.35' stop-color='#fcd34d'/><stop offset='1' stop-color='#d97706'/></linearGradient><linearGradient id='${u}r' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='#fde68a'/><stop offset='.5' stop-color='#f59e0b'/><stop offset='1' stop-color='#db2777'/></linearGradient></defs><path d='M32 3.5 L55.5 11.5 V29.5 C55.5 45.5 45 55.5 32 60.5 C19 55.5 8.5 45.5 8.5 29.5 V11.5 Z' fill='url(#${u}b)' stroke='url(#${u}r)' stroke-width='3' stroke-linejoin='round'/><path d='M32 7.5 L51.5 14.2 V29.5 C51.5 43 43 51.6 32 56 Z' fill='#fff' opacity='.08'/><path d='M22.5 17.5 C22.5 17.5 18 17.5 17.6 18.2 C16.8 24.5 19.6 29.4 24.6 30.2' fill='none' stroke='url(#${u}g)' stroke-width='2.8' stroke-linecap='round'/><path d='M41.5 17.5 C41.5 17.5 46 17.5 46.4 18.2 C47.2 24.5 44.4 29.4 39.4 30.2' fill='none' stroke='url(#${u}g)' stroke-width='2.8' stroke-linecap='round'/><path d='M21.5 15.5 H42.5 V25 C42.5 31.4 37.8 36.2 32 36.2 C26.2 36.2 21.5 31.4 21.5 25 Z' fill='url(#${u}g)'/><path d='M29.3 36 H34.7 L35.6 41.2 H28.4 Z' fill='#d97706'/><rect x='23.5' y='41' width='17' height='4.6' rx='1.6' fill='url(#${u}g)'/><rect x='26.5' y='45.2' width='11' height='2.6' rx='1.2' fill='#b45309'/><path d='M32.00,20.00 L33.32,23.58 L37.14,23.73 L34.14,26.10 L35.17,29.77 L32.00,27.65 L28.83,29.77 L29.86,26.10 L26.86,23.73 L30.68,23.58Z' fill='#7c3aed'/><path d='M14.5,9.9 Q15.508000000000001,12.491999999999999 18.1,13.5 Q15.508000000000001,14.508000000000001 14.5,17.1 Q13.491999999999999,14.508000000000001 10.9,13.5 Q13.491999999999999,12.491999999999999 14.5,9.9Z' fill='#fde68a'/><path d='M50.5,40.2 Q51.284,42.216 53.3,43 Q51.284,43.784 50.5,45.8 Q49.716,43.784 47.7,43 Q49.716,42.216 50.5,40.2Z' fill='#fff' opacity='.9'/><path d='M47.5,7.3 Q48.116,8.884 49.7,9.5 Q48.116,10.116 47.5,11.7 Q46.884,10.116 45.3,9.5 Q46.884,8.884 47.5,7.3Z' fill='#fff' opacity='.8'/></svg></span>`; }
+function champStackHTML() {   // logo xếp dọc – dùng cho màn hình hẹp (điện thoại)
+  return `<span class="inline-flex flex-col items-center select-none">${champMark('w-20 h-20')}
+    <span class="logo-word text-[32px] sm:text-[38px] whitespace-nowrap mt-3"><span class="text-slate-900">EDU</span> <span class="logo-grad">CHAMPIONS</span></span>
+    <span class="text-[10px] mt-2 font-extrabold uppercase tracking-[.25em] whitespace-nowrap text-slate-400">Đấu trường tri thức</span></span>`;
+}
+function champLogoHTML(size = 'md', dark = false) {
+  const z = { lg: ['w-20 h-20', 'text-[40px]', 'text-[11px]'], md: ['w-12 h-12', 'text-[26px]', 'text-[9px]'], sm: ['w-9 h-9', 'text-[17px]', 'text-[8px]'] }[size];
+  return `<span class="inline-flex items-center gap-3 select-none">${champMark(z[0])}<span class="flex flex-col items-start">
+    <span class="logo-word ${z[1]} whitespace-nowrap"><span class="${dark ? 'text-white' : 'text-slate-900'}">EDU</span> <span class="logo-grad">CHAMPIONS</span></span>
+    <span class="${z[2]} mt-1.5 font-extrabold uppercase tracking-[.22em] whitespace-nowrap ${dark ? 'text-violet-200' : 'text-slate-400'}">Đấu trường tri thức</span></span></span>`;
 }
 function logoHTML(size = 'md') {
   const L = size === 'lg' ? { b: 'w-20 h-20 text-4xl rounded-[1.6rem]', w: 'text-[44px]', t: 'text-[11px] mt-2', bar: 'h-1.5 w-16' }
@@ -1598,9 +1612,9 @@ function sidebarHTML() {
       </div>
       <div>
         <div class="text-[10px] font-black uppercase text-slate-400 tracking-wider px-3 mb-1.5 flex items-center justify-between"><span>Đấu trường học tập</span><span class="text-[9px] bg-rose-50 text-rose-600 px-1.5 py-0.5 rounded font-bold">Trọng tâm</span></div>
-        <div class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold bg-rose-50/70 border border-rose-200 mb-2">
-          <div class="flex items-center gap-2.5 min-w-0"><div class="w-8 h-8 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-sm flex-shrink-0"><i class="fa-solid fa-mountain"></i></div>
-          <div class="min-w-0"><div class="font-black text-rose-700 leading-tight">Đường Lên Đỉnh Olympia</div><div class="text-[10px] text-slate-500 font-normal">4 Vòng thi đấu kịch tính</div></div></div>
+        <div class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold bg-violet-50/70 border border-violet-200 mb-2">
+          <div class="flex items-center gap-2.5 min-w-0">${champMark('w-9 h-9')}
+          <div class="min-w-0"><div class="font-black text-violet-800 leading-tight">EDU Champions</div><div class="text-[10px] text-slate-500 font-normal">4 Vòng thi đấu kịch tính</div></div></div>
           <span class="badge-live ml-1">${ph === 'game' ? 'Đang thi' : 'Trực tiếp'}</span></div>
         <div class="space-y-1">${rounds}</div>
       </div>
@@ -1696,7 +1710,7 @@ CÔNG THỨC (LaTeX) – viết trong cặp dấu $ ... $ :
   $25^\\circ C$ → độ C     $\\Delta$, $\\alpha$ → kí hiệu Hy Lạp
 Dùng được cả trong câu hỏi lẫn đáp án A, B, C, D.</pre></details>`;
   const ready = H.students.length && H.teams.every(t => t.members.length);
-  return heroHTML('ĐẤU TRƯỜNG TRI THỨC • ĐƯỜNG LÊN ĐỈNH OLYMPIA', 'Bước 1–3: nạp danh sách lớp, chia đội và chọn bộ câu hỏi. Sau đó hệ thống cấp <strong>mã PIN riêng cho từng đội</strong> – mỗi mã chỉ vào được 1 thiết bị.', 'THIẾT LẬP') + `<div class="space-y-5">
+  return heroHTML('ĐẤU TRƯỜNG TRI THỨC • EDU CHAMPIONS', 'Bước 1–3: nạp danh sách lớp, chia đội và chọn bộ câu hỏi. Sau đó hệ thống cấp <strong>mã PIN riêng cho từng đội</strong> – mỗi mã chỉ vào được 1 thiết bị.', 'THIẾT LẬP') + `<div class="space-y-5">
     ${step(1, 'Danh sách lớp', 'fa-users', roster)}
     ${step(2, `Chia ${H.teams.length} đội`, 'fa-users-gear', teams)}
     ${step(3, 'Bộ câu hỏi 4 vòng thi', 'fa-list-check', bank)}
@@ -1751,7 +1765,7 @@ function roundStepper(g) {
   return `<div class="stage rounded-3xl p-5 sm:p-6 text-white shadow-xl flex flex-wrap items-center justify-between gap-4">
     <div class="flex items-center gap-4 min-w-0">
       <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/15 border border-white/25 backdrop-blur grid place-items-center text-2xl sm:text-3xl flex-shrink-0" style="color:${colors[g.round]}"><i class="fa-solid ${ROUND_ICONS[g.round]}"></i></div>
-      <div class="min-w-0"><div class="text-[11px] font-black uppercase tracking-[.2em] text-white/60">Đường lên đỉnh Olympia • ${g.round === 5 ? 'Phân định các đội bằng điểm' : `Vòng ${g.round}/4`}</div>
+      <div class="min-w-0"><div class="text-[11px] font-black uppercase tracking-[.2em] text-white/60">EDU Champions • ${g.round === 5 ? 'Phân định các đội bằng điểm' : `Vòng ${g.round}/4`}</div>
         <div class="text-2xl sm:text-4xl font-black tracking-tight leading-tight">${ROUND_NAMES[g.round].toUpperCase()}</div>
         <div class="text-xs text-white/75 mt-1 max-w-2xl hidden md:block">${roundRule(g.round)}</div></div></div>
     <div class="flex gap-1.5">${[1, 2, 3, 4].map(r => `<div title="${ROUND_NAMES[r]}" class="w-10 h-10 rounded-xl grid place-items-center text-sm font-black border ${r === g.round ? 'bg-white text-slate-900 border-white' : r < g.round ? 'bg-emerald-400/90 text-white border-emerald-300' : 'bg-white/10 text-white/50 border-white/20'}">${r < g.round ? '<i class="fa-solid fa-check"></i>' : r}</div>`).join('')}</div>
@@ -1968,8 +1982,8 @@ function renderTeam() {
   if (T.t < 0 || !T.p) {
     root.innerHTML = `<div class="min-h-screen grid place-items-center p-4 bg-gradient-to-br from-rose-50 via-violet-50 to-amber-50">
       <div class="card p-7 sm:p-9 w-full max-w-md text-center pop">
-        <div class="flex justify-center">${logoHTML()}</div>
-        <div class="mt-5 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-50 border border-rose-200 text-rose-700 text-xs font-black"><i class="fa-solid fa-mountain"></i> ĐƯỜNG LÊN ĐỈNH OLYMPIA</div>
+        <div class="flex justify-center">${champStackHTML()}</div>
+        <div class="mt-5 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-50 border border-violet-200 text-violet-700 text-[11px] font-black"><i class="fa-solid fa-gamepad"></i> Trò chơi lớp học của EDU GAME</div>
         <div class="text-2xl font-black mt-3">Vào phòng thi</div><div class="text-sm text-slate-500 font-semibold">Nhập mã PIN của đội bạn</div>
         ${T.connecting ? `<div class="mt-8 text-violet-600 font-black"><i class="fa-solid fa-spinner fa-spin"></i> Đang xác nhận mã PIN…</div>` : `
         <form onsubmit="event.preventDefault();teamJoin(this.pin.value)" class="mt-6 space-y-3">
@@ -2015,7 +2029,7 @@ function h_sampleExcel() {
 function h_sampleDocx() {
   if (!window.XLSX || !XLSX.CFB) return h_downloadTemplate();
   const x = t => String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-  const head = ['ĐỀ THI ĐƯỜNG LÊN ĐỈNH OLYMPIA – MẪU', 'Giữ nguyên các dòng [TÊN VÒNG]. Mỗi câu: "Câu n: …", 4 dòng A. B. C. D. và dòng "Đáp án: X". Công thức viết trong $…$, ví dụ $x^2$, $\\ce{H2SO4}$.', ''];
+  const head = ['ĐỀ THI EDU CHAMPIONS – MẪU', 'Giữ nguyên các dòng [TÊN VÒNG]. Mỗi câu: "Câu n: …", 4 dòng A. B. C. D. và dòng "Đáp án: X". Công thức viết trong $…$, ví dụ $x^2$, $\\ce{H2SO4}$.', ''];
   const para = l => {
     const sec = /^\[.+\]$/.test(l.trim()), q = /^Câu\s*\d+/.test(l), ans = /^Đáp án/.test(l), title = l === head[0];
     const rpr = title ? '<w:rPr><w:b/><w:color w:val="7C3AED"/><w:sz w:val="32"/></w:rPr>' : sec ? '<w:rPr><w:b/><w:color w:val="E11D48"/><w:sz w:val="28"/></w:rPr>' : q ? '<w:rPr><w:b/></w:rPr>' : ans ? '<w:rPr><w:i/><w:color w:val="059669"/></w:rPr>' : '';
@@ -2033,11 +2047,11 @@ function h_sampleDocx() {
     CFB.utils.cfb_add(z, '[Content_Types].xml', enc(ct)); CFB.utils.cfb_add(z, '_rels/.rels', enc(rels));
     CFB.utils.cfb_add(z, 'word/document.xml', enc(doc)); CFB.utils.cfb_add(z, 'word/styles.xml', enc(styles)); CFB.utils.cfb_add(z, 'word/_rels/document.xml.rels', enc(drels));
     const out = CFB.write(z, { fileType: 'zip', type: 'array' });
-    dl(new Blob([new Uint8Array(out)], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }), 'Mau_de_Olympia.docx');
+    dl(new Blob([new Uint8Array(out)], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' }), 'Mau_de_EDU_Champions.docx');
   } catch (e) { h_downloadTemplate(); }
 }
 const HELP_SECTIONS = [
-  ['intro', 'fa-mountain', 'Giới thiệu cuộc thi'], ['start', 'fa-rocket', 'Bắt đầu nhanh'], ['count', 'fa-calculator', 'Số câu của 1 đề'], ['word', 'fa-file-word', 'File Word câu hỏi'], ['latex', 'fa-square-root-variable', 'File LaTeX (ex_test, TikZ)'], ['excel', 'fa-file-excel', 'File Excel danh sách lớp'],
+  ['intro', 'fa-trophy', 'Giới thiệu cuộc thi'], ['start', 'fa-rocket', 'Bắt đầu nhanh'], ['count', 'fa-calculator', 'Số câu của 1 đề'], ['word', 'fa-file-word', 'File Word câu hỏi'], ['latex', 'fa-square-root-variable', 'File LaTeX (ex_test, TikZ)'], ['excel', 'fa-file-excel', 'File Excel danh sách lớp'],
   ['teams', 'fa-users-gear', 'Chia đội & mã PIN'], ['rounds', 'fa-flag-checkered', 'Luật & điều khiển 4 vòng'], ['students', 'fa-mobile-screen', 'Học sinh vào thi'],
   ['custom', 'fa-sliders', 'Tùy chỉnh'], ['trouble', 'fa-life-ring', 'Xử lý sự cố']];
 function helpContent(k) {
@@ -2056,9 +2070,9 @@ function helpContent(k) {
           <div><div class="text-[11px] font-black uppercase tracking-wider" style="color:${col}">Vòng ${no}</div><div class="text-lg font-black text-slate-900 leading-tight">${name}</div></div></div>
         <div class="mt-3 text-sm font-black text-slate-800">${big}</div><div class="mt-1 text-sm text-slate-600 leading-relaxed">${txt}</div></div>`;
       return `<div class="relative overflow-hidden rounded-3xl hero-gradient text-white p-6 sm:p-8"><div class="relative z-10">
-          <div class="inline-flex items-center gap-2 bg-white/20 border border-white/30 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider"><i class="fa-solid fa-mountain"></i> Sân chơi trí tuệ trong lớp học</div>
-          <h3 class="text-3xl sm:text-4xl font-black mt-3 leading-tight">ĐƯỜNG LÊN ĐỈNH OLYMPIA</h3>
-          <p class="mt-2 text-white/95 max-w-3xl leading-relaxed">Mô phỏng chương trình truyền hình nổi tiếng <b>“Đường lên đỉnh Olympia”</b>, được thiết kế lại cho tiết học: cả lớp chia thành <b>${n} đội</b>, mỗi đội thi trên một điện thoại/máy tính, vượt qua <b>4 vòng thi</b> để giành vị trí cao nhất trên bảng xếp hạng.</p>
+          <div class="inline-flex items-center gap-2 bg-white/20 border border-white/30 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider"><i class="fa-solid fa-trophy"></i> Sân chơi trí tuệ trong lớp học</div>
+          <div class="mt-4 inline-flex rounded-3xl bg-white/95 px-5 py-4 shadow-lg max-w-full overflow-hidden"><span class="hidden sm:inline-flex">${champLogoHTML('lg')}</span><span class="sm:hidden">${champStackHTML()}</span></div>
+          <p class="mt-2 text-white/95 max-w-3xl leading-relaxed"><b>EDU Champions</b> là gameshow trí tuệ dành cho lớp học, lấy cảm hứng từ các cuộc thi kiến thức trên truyền hình: cả lớp chia thành <b>${n} đội</b>, mỗi đội thi trên một điện thoại/máy tính, vượt qua <b>4 vòng thi</b> để giành vị trí cao nhất trên bảng xếp hạng.</p>
           <div class="mt-4 flex flex-wrap gap-2 text-xs font-black">${[['fa-users', `${n} đội thi đấu`], ['fa-mobile-screen', 'Mỗi đội 1 thiết bị'], ['fa-display', 'GV điều khiển trên máy chiếu'], ['fa-list-check', 'Trắc nghiệm 4 đáp án'], ['fa-square-root-variable', 'Hỗ trợ công thức & hình vẽ']].map(([i, t]) => `<span class="px-3 py-1.5 rounded-xl bg-white/20 border border-white/30"><i class="fa-solid ${i}"></i> ${t}</span>`).join('')}</div>
         </div></div>` +
         `<h3 class="text-xl font-black text-slate-900 mt-6">Mục tiêu</h3>` +
@@ -2128,7 +2142,7 @@ function helpContent(k) {
       `<div class="mt-3 rounded-2xl border-2 border-purple-200 bg-purple-50/50 p-4"><div class="font-black text-purple-800"><i class="fa-solid fa-upload"></i> Cách nạp file .tex lên trò chơi</div>` +
       step(1, 'Soạn đề & gắn mã vòng', 'Soạn bằng gói <b>ex_test</b> như bình thường; ghi mã vòng ngay sau mỗi <code>\\begin{ex}</code> (bảng mã bên dưới). Nên biên dịch thử để chắc file không lỗi.') +
       step(2, 'Lưu file đuôi .tex', 'Lưu bằng mã hóa <b>UTF-8</b> (mặc định của TeXstudio, VS Code, Overleaf: Menu → Download → Source).') +
-      step(3, 'Đăng nhập trang giáo viên', 'Vào trang Olympia → <b>Dành cho giáo viên</b> → đăng nhập.') +
+      step(3, 'Đăng nhập trang giáo viên', 'Vào trang EDU Champions → <b>Dành cho giáo viên</b> → đăng nhập.') +
       step(4, 'Mở bước 3 “Bộ câu hỏi 4 vòng thi”', 'Ở trang Danh sách & Chia đội, kéo xuống bước 3.') +
       step(5, 'Kéo thả file .tex vào ô “Kéo thả hoặc chọn file câu hỏi”', 'Hoặc bấm vào ô đó và chọn file. Trang báo: <i>“Đã đọc … câu trắc nghiệm từ file LaTeX”</i>.') +
       step(6, 'Kiểm tra số câu từng vòng', 'Các ô <b>Khởi động 7/7, Hàng ngang 4/4, Từ khóa CNV 1/1, Tăng tốc 4/4, Về đích…</b> phải đủ. Ô đỏ = thiếu câu hoặc có câu chưa gắn mã.') +
@@ -2210,7 +2224,7 @@ function helpHTML() {
     <div class="w-full max-w-[1500px] h-full mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden pop flex flex-col">
       <div class="hero-gradient text-white px-5 sm:px-7 py-4 flex items-center justify-between gap-3 flex-shrink-0"><div class="relative z-10 flex items-center gap-3">
           <div class="w-12 h-12 rounded-2xl bg-white/20 border border-white/30 grid place-items-center text-xl"><i class="fa-solid fa-book-open"></i></div>
-          <div><div class="text-xl sm:text-2xl font-black">Hướng dẫn sử dụng</div><div class="text-xs text-white/80">EDU GAME • Đường lên đỉnh Olympia • thi đấu theo đội</div></div></div>
+          <div><div class="text-xl sm:text-2xl font-black">Hướng dẫn sử dụng</div><div class="text-xs text-white/80">EDU GAME • EDU Champions • thi đấu theo đội</div></div></div>
         <button class="relative z-10 w-10 h-10 rounded-xl bg-white/20 hover:bg-white/30 border border-white/30" onclick="h_help(null)" title="Đóng"><i class="fa-solid fa-xmark"></i></button></div>
       <div class="flex-1 min-h-0 flex flex-col md:flex-row">
         <nav class="md:w-[250px] flex-shrink-0 p-3 border-b md:border-b-0 md:border-r border-slate-100 bg-slate-50/70 flex md:flex-col gap-1.5 overflow-x-auto md:overflow-y-auto">
@@ -2323,7 +2337,7 @@ function previewHTML() {
       <div class="text-center text-[11px] font-black uppercase tracking-wider text-slate-400 mb-2"><i class="fa-solid fa-display"></i> Màn hình máy chiếu của giáo viên</div>
       <div class="rounded-[1.6rem] bg-slate-900 p-2.5 shadow-2xl">
         <div class="flex items-center gap-1.5 px-2 pb-2"><span class="w-2.5 h-2.5 rounded-full bg-rose-400"></span><span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span><span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span>
-          <span class="ml-3 text-[10px] font-bold text-slate-400 truncate">EDU GAME / Đường Lên Đỉnh Olympia / ${k === 'lobby' ? 'Phòng chờ' : k === 'end' ? 'Kết quả' : `Vòng ${p.round}: ${ROUND_NAMES[p.round]}`}</span></div>
+          <span class="ml-3 text-[10px] font-bold text-slate-400 truncate">EDU GAME / EDU Champions / ${k === 'lobby' ? 'Phòng chờ' : k === 'end' ? 'Kết quả' : `Vòng ${p.round}: ${ROUND_NAMES[p.round]}`}</span></div>
         <div class="rounded-[1.1rem] bg-[#f8fafc] h-[640px] overflow-y-auto p-4">${screen}</div></div>
       <div class="w-24 h-3 bg-slate-800 mx-auto rounded-b-xl"></div><div class="w-48 h-2 bg-slate-300 mx-auto rounded-full"></div></div>`;
   return `<div class="fixed inset-0 z-[90] bg-slate-950/75 backdrop-blur-sm p-3 sm:p-6 overflow-y-auto" onclick="if(event.target===this)h_preview(null)">
