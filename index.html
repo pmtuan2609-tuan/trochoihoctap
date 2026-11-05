@@ -71,8 +71,47 @@
   .pop{animation:pop .35s ease-out}@keyframes pop{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
   .tabular-nums{font-variant-numeric:tabular-nums}
 </style>
+<style id="page-loader-css">
+  #page-loader{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:radial-gradient(circle at 15% 10%,#fce7f3 0,transparent 40%),radial-gradient(circle at 90% 90%,#fef3c7 0,transparent 40%),linear-gradient(135deg,#f5f3ff,#eef2ff);transition:opacity .45s ease,visibility .45s ease;font-family:'Be Vietnam Pro',system-ui,-apple-system,'Segoe UI',sans-serif}
+  #page-loader.pl-hide{opacity:0;visibility:hidden}
+  #page-loader .pl-box{display:flex;flex-direction:column;align-items:center;gap:14px}
+  #page-loader .pl-logo{transform:rotate(-6deg);filter:drop-shadow(0 10px 18px rgba(219,39,119,.35));animation:pl-float 1.6s ease-in-out infinite}
+  #page-loader .pl-word{font-weight:900;font-size:30px;letter-spacing:-.035em;line-height:1;color:#0f172a}
+  #page-loader .pl-word span{background:linear-gradient(90deg,#7c3aed,#db2777 55%,#f59e0b);-webkit-background-clip:text;background-clip:text;color:transparent}
+  #page-loader .pl-row{display:flex;align-items:flex-end;gap:10px;margin-top:4px;color:#64748b;font-weight:800;font-size:15px;letter-spacing:.02em}
+  #page-loader .pl-dots{display:flex;gap:7px;height:22px;align-items:flex-end;padding-bottom:2px}
+  #page-loader .pl-dots i{display:block;width:10px;height:10px;border-radius:50%;animation:pl-bounce 1s cubic-bezier(.3,0,.3,1) infinite}
+  #page-loader .pl-dots i:nth-child(1){background:#7c3aed}
+  #page-loader .pl-dots i:nth-child(2){background:#db2777;animation-delay:.12s}
+  #page-loader .pl-dots i:nth-child(3){background:#f59e0b;animation-delay:.24s}
+  #page-loader .pl-dots i:nth-child(4){background:#10b981;animation-delay:.36s}
+  @keyframes pl-bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-12px)}}
+  @keyframes pl-float{0%,100%{transform:rotate(-6deg) translateY(0)}50%{transform:rotate(-6deg) translateY(-6px)}}
+  @media (prefers-reduced-motion:reduce){#page-loader .pl-dots i,#page-loader .pl-logo{animation:none}}
+</style>
 </head>
 <body class="min-h-screen text-slate-800 antialiased">
+<!-- Màn hình "Đang tải" -->
+<div id="page-loader" role="status" aria-live="polite">
+  <div class="pl-box">
+    <div class="pl-logo"><svg viewBox="0 0 64 64" width="64" height="64" aria-hidden="true"><defs><linearGradient id="plg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#6d28d9"/><stop offset=".6" stop-color="#db2777"/><stop offset="1" stop-color="#f59e0b"/></linearGradient></defs><rect width="64" height="64" rx="18" fill="url(#plg)"/><path d="M19 20h26c5 0 9.2 3.5 10.2 8.4l2.9 13.5c.9 4.4-4.6 7.3-7.7 4L44 39H20l-6.4 6.9c-3.1 3.3-8.6.4-7.7-4l2.9-13.5C9.8 23.5 14 20 19 20z" fill="#fff"/><rect x="14.5" y="28" width="12" height="3.6" rx="1.8" fill="#7c3aed"/><rect x="18.7" y="23.8" width="3.6" height="12" rx="1.8" fill="#7c3aed"/><circle cx="42" cy="26.5" r="2.6" fill="#db2777"/><circle cx="47.5" cy="32" r="2.6" fill="#f59e0b"/><circle cx="36.5" cy="32" r="2.6" fill="#f59e0b"/><circle cx="42" cy="37.2" r="2.6" fill="#db2777"/></svg></div>
+    <div class="pl-word">EDU <span>GAME</span></div>
+    <div class="pl-row"><span>Đang tải</span><span class="pl-dots"><i></i><i></i><i></i><i></i></span></div>
+  </div>
+</div>
+<script>
+(function () {
+  var t0 = Date.now(), done = false;
+  function hide() {
+    if (done) return; done = true;
+    var el = document.getElementById('page-loader'); if (!el) return;
+    setTimeout(function () { el.classList.add('pl-hide'); setTimeout(function () { el.remove(); }, 500); }, Math.max(0, 700 - (Date.now() - t0)));
+  }
+  if (document.readyState === 'complete') hide(); else window.addEventListener('load', hide);
+  setTimeout(hide, 8000);   // phòng khi một thư viện tải quá lâu
+})();
+</script>
+
 <div id="app"></div>
 
 <script>
@@ -1449,13 +1488,20 @@ function setupHTML() {
       </div>`).join('')}</div>`;
   const cnt = b.count;
   const bank = `
-    <div class="flex flex-wrap items-center justify-between gap-2 mb-3"><div class="font-bold text-sm"><i class="fa-solid fa-file-lines text-blue-600"></i> ${esc(H.bankName)} <span class="text-slate-400">(${b.total} câu)</span></div>
-      <div class="flex flex-wrap gap-2">
-        <label class="btn btn-soft cursor-pointer"><i class="fa-solid fa-file-word text-blue-600"></i> Nạp file Word / LaTeX<input type="file" accept=".docx,.txt,.tex" class="hidden" onchange="h_bankFile(this.files[0])"></label>
-        <button class="btn btn-soft" onclick="h_sampleBank()"><i class="fa-solid fa-flask"></i> Dùng bộ mẫu KHTN 8</button>
-        <button class="btn btn-soft" onclick="h_sampleDocx()"><i class="fa-solid fa-file-word text-blue-600"></i> Tải file Word mẫu</button>
-        <button class="btn btn-soft" onclick="h_sampleTex()"><i class="fa-solid fa-file-code text-purple-600"></i> Tải .tex mẫu</button>
-        <button class="btn btn-soft" onclick="h_help('word')"><i class="fa-solid fa-circle-question text-amber-600"></i> Cách soạn đề</button></div></div>
+    <div class="grid md:grid-cols-2 gap-3 mb-4">
+      <label class="relative border-2 border-dashed border-blue-300 hover:border-blue-500 rounded-2xl p-5 text-center cursor-pointer bg-blue-50/40 transition" ondragover="event.preventDefault();this.classList.add('drop-hot')" ondragleave="this.classList.remove('drop-hot')" ondrop="event.preventDefault();this.classList.remove('drop-hot');h_bankFile(event.dataTransfer.files[0])">
+        <input type="file" accept=".docx,.tex,.txt" class="absolute inset-0 opacity-0 cursor-pointer" onchange="h_bankFile(this.files[0])">
+        <div class="flex justify-center gap-3 text-2xl"><i class="fa-solid fa-file-word text-blue-600"></i><i class="fa-solid fa-file-code text-purple-600"></i></div>
+        <div class="font-black text-sm mt-1">Kéo thả hoặc chọn file câu hỏi</div>
+        <div class="text-[11px] text-slate-500 mt-0.5">Word <b>.docx</b> · LaTeX <b>.tex</b> (gói ex_test, TikZ, \immini) · <b>.txt</b></div></label>
+      <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 flex flex-col justify-between gap-2">
+        <div class="font-bold text-sm"><i class="fa-solid fa-file-lines text-blue-600"></i> Đang dùng: ${esc(H.bankName)} <span class="text-slate-400">(${b.total} câu)</span></div>
+        <div class="flex flex-wrap gap-2">
+          <button class="btn btn-soft !py-1.5 !text-xs" onclick="h_sampleBank()"><i class="fa-solid fa-flask"></i> Bộ mẫu KHTN 8</button>
+          <button class="btn btn-soft !py-1.5 !text-xs" onclick="h_sampleDocx()"><i class="fa-solid fa-file-word text-blue-600"></i> Word mẫu</button>
+          <button class="btn btn-soft !py-1.5 !text-xs" onclick="h_sampleTex()"><i class="fa-solid fa-file-code text-purple-600"></i> .tex mẫu</button>
+          <button class="btn btn-soft !py-1.5 !text-xs" onclick="h_help('word')"><i class="fa-solid fa-circle-question text-amber-600"></i> Soạn đề Word</button>
+          <button class="btn btn-soft !py-1.5 !text-xs" onclick="h_help('latex')"><i class="fa-solid fa-circle-question text-purple-600"></i> Soạn đề LaTeX</button></div></div></div>
     <div class="grid grid-cols-2 sm:grid-cols-4 ${cnt.pool ? 'lg:grid-cols-8' : 'lg:grid-cols-7'} gap-2 text-center">${[['Khởi động', cnt.r1, RULES.R1_COUNT], ['Hàng ngang', cnt.r2, 4], ['Từ khóa CNV', cnt.cnv, 1], ['Tăng tốc', cnt.r3, 4], ['Về đích 20đ', cnt.v20, 0], ['Về đích 30đ', cnt.v30, 0], ['Về đích 40đ', cnt.v40, 0]].concat(cnt.pool ? [['Chưa có mã (bỏ)', cnt.pool, -1]] : []).map(([n, c, need]) =>
       `<div class="rounded-xl p-2 border ${need < 0 || (need && c < need) ? 'border-rose-200 bg-rose-50' : 'border-slate-200 bg-slate-50'}"><div class="text-[11px] font-bold text-slate-500">${n}</div><div class="text-xl font-black ${need < 0 ? 'text-rose-600' : ''}">${c}${need > 0 ? `<span class="text-xs text-slate-400">/${need}</span>` : ''}</div></div>`).join('')}</div>
     ${b.warn.length ? `<div class="mt-3 text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3">${b.warn.map(esc).join('<br>')}</div>` : ''}
@@ -1805,7 +1851,7 @@ function helpContent(k) {
     case 'start': return H2('Bắt đầu nhanh – 6 bước') + P('Trang này gồm 2 phần: <b>máy giáo viên</b> (trang bạn đang xem – chiếu lên máy chiếu/TV) và <b>máy của các đội</b> (điện thoại hoặc máy tính của học sinh).') +
       step(1, 'Nạp danh sách lớp', 'Chọn file Excel (hoặc dán danh sách tên) ở bước 1 của trang chính.') +
       step(2, 'Chia 4 đội', 'Bấm <b>Chia ngẫu nhiên</b>, <b>Chia xen kẽ</b> hoặc <b>Chia theo tổ</b>; kéo thả tên để đổi đội; bấm vào tên đội để đổi tên.') +
-      step(3, 'Chọn bộ câu hỏi', 'Nạp file Word theo mẫu, hoặc dùng bộ câu hỏi mẫu KHTN 8 có sẵn.') +
+      step(3, 'Chọn bộ câu hỏi', 'Kéo thả file <b>Word (.docx)</b> hoặc <b>LaTeX (.tex)</b> vào ô ở bước 3, hoặc dùng bộ câu hỏi mẫu KHTN 8 có sẵn. Mỗi câu phải có mã vòng (KD, VCNV, CNV, TT, VD20/30/40).') +
       step(4, 'Tạo mã PIN & mở phòng chờ', 'Mỗi đội nhận 1 mã PIN 6 số riêng. Phát mã riêng cho từng đội.') +
       step(5, 'Học sinh nhập PIN', 'Học sinh mở trang web → nhập PIN → đội hiện <b>SẴN SÀNG</b> trên màn hình giáo viên.') +
       step(6, 'Bấm BẮT ĐẦU', 'Khi đủ 4 đội, nút BẮT ĐẦU sáng lên. Cả 4 đội cùng vào Vòng 1 – Khởi động.') +
@@ -1831,7 +1877,15 @@ function helpContent(k) {
         ['<code>$\\ce{H2SO4}$</code> (hóa học, tự hạ chỉ số)', '$\\ce{H2SO4}$'], ['<code>$\\ce{2H2 + O2 -> 2H2O}$</code>', '$\\ce{2H2 + O2 -> 2H2O}$'], ['<code>$25^\\circ C$</code>', '$25^\\circ C$']]) +
       tip('<b>Lưu ý:</b> Công thức tạo bằng <i>Insert → Equation</i> của Word sẽ bị mất khi nạp – hãy gõ dạng <code>$…$</code>. Câu không nằm dưới mục nào sẽ được tự chia vào vòng còn thiếu. Sau khi nạp, ô đếm số câu từng vòng hiện đỏ nếu còn thiếu.');
     case 'latex': return H2('File LaTeX (.tex) – gói ex_test, hình TikZ, \\immini') +
-      P('Nạp thẳng file <b>.tex</b> soạn theo gói <b>ex_test</b> ở nút <b>Nạp file Word / LaTeX</b>. Trang đọc các câu <code>\\begin{ex} … \\end{ex}</code> có <code>\\choice</code> 4 đáp án; đáp án đúng đánh dấu <code>\\True</code>; <code>\\loigiai{…}</code> được bỏ qua.') +
+      `<div class="mt-3 rounded-2xl border-2 border-purple-200 bg-purple-50/50 p-4"><div class="font-black text-purple-800"><i class="fa-solid fa-upload"></i> Cách nạp file .tex lên trò chơi</div>` +
+      step(1, 'Soạn đề & gắn mã vòng', 'Soạn bằng gói <b>ex_test</b> như bình thường; ghi mã vòng ngay sau mỗi <code>\\begin{ex}</code> (bảng mã bên dưới). Nên biên dịch thử để chắc file không lỗi.') +
+      step(2, 'Lưu file đuôi .tex', 'Lưu bằng mã hóa <b>UTF-8</b> (mặc định của TeXstudio, VS Code, Overleaf: Menu → Download → Source).') +
+      step(3, 'Đăng nhập trang giáo viên', 'Vào trang Olympia → <b>Dành cho giáo viên</b> → đăng nhập.') +
+      step(4, 'Mở bước 3 “Bộ câu hỏi 4 vòng thi”', 'Ở trang Danh sách & Chia đội, kéo xuống bước 3.') +
+      step(5, 'Kéo thả file .tex vào ô “Kéo thả hoặc chọn file câu hỏi”', 'Hoặc bấm vào ô đó và chọn file. Trang báo: <i>“Đã đọc … câu trắc nghiệm từ file LaTeX”</i>.') +
+      step(6, 'Kiểm tra số câu từng vòng', 'Các ô <b>Khởi động 7/7, Hàng ngang 4/4, Từ khóa CNV 1/1, Tăng tốc 4/4, Về đích…</b> phải đủ. Ô đỏ = thiếu câu hoặc có câu chưa gắn mã.') +
+      step(7, 'Xem trước', 'Bấm <b>Xem trước giao diện</b> để xem công thức và hình TikZ hiển thị trên máy đội và máy chiếu.') + `</div>` +
+      P('Nạp thẳng file <b>.tex</b> soạn theo gói <b>ex_test</b> vào ô <b>Kéo thả hoặc chọn file câu hỏi</b> ở bước 3. Trang đọc các câu <code>\\begin{ex} … \\end{ex}</code> có <code>\\choice</code> 4 đáp án; đáp án đúng đánh dấu <code>\\True</code>; <code>\\loigiai{…}</code> được bỏ qua.') +
       btn('h_sampleTex()', 'fa-file-code text-purple-600', 'Tải file .tex mẫu') +
       P('<b>Ghi mã vòng ngay sau <code>\\begin{ex}</code></b> theo dạng <code>%[MÃ]</code>. Vòng nào chỉ lấy đúng các câu mang mã của vòng đó; câu không có mã sẽ không được dùng.') +
       tbl(['Vòng', 'Ghi sau \\begin{ex}', 'Số câu cần'], [
