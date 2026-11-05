@@ -143,11 +143,18 @@
                             <span>Vào phòng bằng PIN</span>
                         </button>
 
-                        <button onclick="window.roomManager.openTeamSetupModal(); window.app.setActiveSidebar(this)" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 text-left">
+                        <button onclick="window.roomManager.openClassDivideModal(); window.app.setActiveSidebar(this)" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 text-left">
                             <div class="w-7 h-7 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-sm">
                                 <i class="fa-solid fa-users-gear"></i>
                             </div>
-                            <span>Chia Đội & Mã PIN (4, 6, 8 đội)</span>
+                            <span>Chia Đội (Kéo thả 4, 6, 8 đội)</span>
+                        </button>
+
+                        <button onclick="window.roomManager.openWaitingLobbyModal(); window.app.setActiveSidebar(this)" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 text-left">
+                            <div class="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center text-sm">
+                                <i class="fa-solid fa-door-open"></i>
+                            </div>
+                            <span>Phòng chờ trực tuyến</span>
                         </button>
 
                         <button onclick="window.app.openClassListModal(); window.app.setActiveSidebar(this)" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 text-left">
@@ -534,107 +541,77 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                        
-                        <!-- CARD 1: OLYMPIA -->
-                        <div onclick="window.app.selectGame('olympia')" class="game-card rounded-3xl p-5 border cursor-pointer flex flex-col justify-between group">
-                            <div>
-                                <div class="flex items-center justify-between mb-3">
-                                    <div class="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center text-xl shadow-sm group-hover:scale-110 transition">
-                                        <i class="fa-solid fa-mountain"></i>
-                                    </div>
-                                    <span class="badge-online">Khởi động • Về đích</span>
+                    <!-- HERO FEATURED GAME: ĐƯỜNG LÊN ĐỈNH OLYMPIA -->
+                    <div class="bg-gradient-to-r from-rose-50 via-white to-amber-50 border-3 border-rose-300 rounded-3xl p-6 md:p-8 shadow-xl relative overflow-hidden">
+                        <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
+                            <div class="space-y-3 max-w-2xl">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span class="px-3.5 py-1 rounded-full bg-rose-600 text-white font-black text-xs uppercase tracking-wider shadow">
+                                        <i class="fa-solid fa-fire mr-1"></i> Trò Chơi Trọng Tâm
+                                    </span>
+                                    <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-800 font-bold text-xs border border-amber-300">
+                                        Chuẩn hóa 4 Vòng Thi Đấu Học Tập
+                                    </span>
                                 </div>
-                                <h4 class="text-lg font-black text-slate-900 group-hover:text-rose-600 transition">Đường Lên Đỉnh Olympia</h4>
-                                <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
-                                    Đầy đủ 4 phần thi kinh điển: Khởi động 60s, Vượt chướng ngại vật, Tăng tốc, Về đích với Ngôi sao hy vọng.
+                                <h3 class="text-2xl sm:text-3xl font-black text-slate-900 font-heading">
+                                    Đường Lên Đỉnh Olympia
+                                </h3>
+                                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                                    Hệ thống thi đấu chia theo <strong>4 Đội (4 Tổ), 6 Đội hoặc 8 Đội</strong> với mã PIN riêng biệt cho từng đội. Gồm 4 vòng thi đầy kịch tính:
                                 </p>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-semibold text-slate-700 pt-1">
+                                    <div class="flex items-center gap-2 bg-white/80 p-2 rounded-xl border border-rose-100">
+                                        <i class="fa-solid fa-circle-check text-emerald-600"></i>
+                                        <span><strong>Vòng 1 (Khởi động):</strong> Đúng +10đ/câu</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 bg-white/80 p-2 rounded-xl border border-amber-100">
+                                        <i class="fa-solid fa-bolt text-amber-600"></i>
+                                        <span><strong>Vòng 2 (Tăng tốc 1):</strong> Điểm tốc độ 20-15-10-5đ</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 bg-white/80 p-2 rounded-xl border border-indigo-100">
+                                        <i class="fa-solid fa-gauge-high text-indigo-600"></i>
+                                        <span><strong>Vòng 3 (Tăng tốc 2):</strong> Sát nút từng mili-giây</span>
+                                    </div>
+                                    <div class="flex items-center gap-2 bg-white/80 p-2 rounded-xl border border-purple-100">
+                                        <i class="fa-solid fa-star text-purple-600"></i>
+                                        <span><strong>Vòng 4 (Về đích):</strong> Gói 60đ - 80đ - 100đ</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-rose-600">
-                                <span>Chơi ngay</span>
-                                <i class="fa-solid fa-arrow-right transform group-hover:translate-x-1 transition"></i>
-                            </div>
-                        </div>
 
-                        <!-- CARD 2: AI LÀ TRIỆU PHÚ -->
-                        <div onclick="window.app.selectGame('millionaire')" class="game-card rounded-3xl p-5 border cursor-pointer flex flex-col justify-between group">
-                            <div>
-                                <div class="flex items-center justify-between mb-3">
-                                    <div class="w-12 h-12 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl shadow-sm group-hover:scale-110 transition">
-                                        <i class="fa-solid fa-circle-question"></i>
-                                    </div>
-                                    <span class="badge-online">15 Câu hỏi • 4 Trợ giúp</span>
-                                </div>
-                                <h4 class="text-lg font-black text-slate-900 group-hover:text-blue-600 transition">Ai Là Triệu Phú</h4>
-                                <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
-                                    Trắc nghiệm 4 đáp án A, B, C, D kịch tính với 4 quyền trợ giúp (50:50, hỏi cả lớp, gọi cố vấn, đổi câu).
-                                </p>
-                            </div>
-                            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-blue-600">
-                                <span>Chơi ngay</span>
-                                <i class="fa-solid fa-arrow-right transform group-hover:translate-x-1 transition"></i>
-                            </div>
-                        </div>
+                            <!-- Hero Action Buttons -->
+                            <div class="flex flex-col sm:flex-row lg:flex-col gap-3 w-full lg:w-auto flex-shrink-0">
+                                <button onclick="window.app.selectGame('olympia')"
+                                    class="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-black text-sm shadow-xl flex items-center justify-center gap-2 transform active:scale-95 transition">
+                                    <i class="fa-solid fa-play"></i>
+                                    <span>Vào Thi Đấu Ngay</span>
+                                </button>
 
-                        <!-- CARD 3: ĐÀO VÀNG TRI THỨC -->
-                        <div onclick="window.app.selectGame('goldminer')" class="game-card rounded-3xl p-5 border cursor-pointer flex flex-col justify-between group">
-                            <div>
-                                <div class="flex items-center justify-between mb-3">
-                                    <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center text-xl shadow-sm group-hover:scale-110 transition">
-                                        <i class="fa-solid fa-person-digging"></i>
-                                    </div>
-                                    <span class="badge-online">Bốc quặng • Tính điểm</span>
-                                </div>
-                                <h4 class="text-lg font-black text-slate-900 group-hover:text-amber-600 transition">Đào Vàng Tri Thức</h4>
-                                <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
-                                    Bốc trúng quặng vàng, kim cương -> giải câu hỏi để kéo quặng lên và tích lũy vàng cho đội thi đấu.
-                                </p>
-                            </div>
-                            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-amber-600">
-                                <span>Chơi ngay</span>
-                                <i class="fa-solid fa-arrow-right transform group-hover:translate-x-1 transition"></i>
-                            </div>
-                        </div>
+                                <button onclick="window.roomManager.openClassDivideModal()"
+                                    class="px-6 py-2.5 rounded-2xl bg-white hover:bg-slate-50 text-purple-700 font-bold text-xs border-2 border-purple-300 shadow-sm flex items-center justify-center gap-2 transition">
+                                    <i class="fa-solid fa-users-gear text-purple-600"></i>
+                                    <span>Chia Đội (Kéo Thả 4, 6, 8 Đội)</span>
+                                </button>
 
-                        <!-- CARD 4: VÒNG QUAY MAY MẮN -->
-                        <div onclick="window.app.selectGame('wheel')" class="game-card rounded-3xl p-5 border cursor-pointer flex flex-col justify-between group">
-                            <div>
-                                <div class="flex items-center justify-between mb-3">
-                                    <div class="w-12 h-12 rounded-2xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl shadow-sm group-hover:scale-110 transition">
-                                        <i class="fa-solid fa-dharmachakra"></i>
-                                    </div>
-                                    <span class="badge-online">Quay gọi tên • Quay điểm</span>
-                                </div>
-                                <h4 class="text-lg font-black text-slate-900 group-hover:text-purple-600 transition">Vòng Quay May Mắn</h4>
-                                <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
-                                    Bánh xe quay sinh động gọi tên học sinh ngẫu nhiên từ danh sách lớp hoặc quay điểm thưởng may mắn.
-                                </p>
-                            </div>
-                            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-purple-600">
-                                <span>Chơi ngay</span>
-                                <i class="fa-solid fa-arrow-right transform group-hover:translate-x-1 transition"></i>
+                                <button onclick="window.roomManager.openWaitingLobbyModal()"
+                                    class="px-6 py-2.5 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs border border-slate-300 shadow-sm flex items-center justify-center gap-2 transition">
+                                    <i class="fa-solid fa-door-open text-emerald-600"></i>
+                                    <span>Mở Phòng Chờ Trực Tuyến</span>
+                                </button>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- CARD 5: HỘP QUÀ BÍ MẬT -->
-                        <div onclick="window.app.selectGame('mystery')" class="game-card rounded-3xl p-5 border cursor-pointer flex flex-col justify-between group">
-                            <div>
-                                <div class="flex items-center justify-between mb-3">
-                                    <div class="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl shadow-sm group-hover:scale-110 transition">
-                                        <i class="fa-solid fa-gift"></i>
-                                    </div>
-                                    <span class="badge-online">12 Hộp quà • Quà bất ngờ</span>
-                                </div>
-                                <h4 class="text-lg font-black text-slate-900 group-hover:text-emerald-600 transition">Hộp Quà Bí Mật</h4>
-                                <p class="text-xs text-slate-500 mt-1.5 leading-relaxed">
-                                    Chọn hộp quà, giải đố nhận điểm 10 miệng, tràng pháo tay, quyền miễn bài tập hoặc x2 điểm lượt sau.
-                                </p>
-                            </div>
-                            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-emerald-600">
-                                <span>Chơi ngay</span>
-                                <i class="fa-solid fa-arrow-right transform group-hover:translate-x-1 transition"></i>
-                            </div>
+                    <!-- Temporarily Hidden Games Note (As requested by user) -->
+                    <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-slate-500 text-xs flex items-center justify-between shadow-xs">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-lock text-purple-600"></i>
+                            <span>Các trò chơi khác (<strong>Ai Là Triệu Phú, Đào Vàng Tri Thức, Vòng Quay May Mắn, Hộp Quà Bí Mật</strong>) đang tạm ẩn để tập trung tối đa cho Đường Lên Đỉnh Olympia.</span>
                         </div>
+                        <span class="text-[11px] font-bold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full border border-purple-200">
+                            Sẽ mở lại khi có yêu cầu
+                        </span>
+                    </div>
 
                     </div>
                 </div>
