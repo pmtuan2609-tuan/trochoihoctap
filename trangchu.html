@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="vi" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EDU GAME - Học Tập & Trò Chơi</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='1' x2='1' y2='0'%3E%3Cstop offset='0' stop-color='%239333ea'/%3E%3Cstop offset='.55' stop-color='%23ec4899'/%3E%3Cstop offset='1' stop-color='%23f59e0b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='url%28%23g%29'/%3E%3Cpath d='M19 20h26c5 0 9.2 3.5 10.2 8.4l2.9 13.5c.9 4.4-4.6 7.3-7.7 4L44 39H20l-6.4 6.9c-3.1 3.3-8.6.4-7.7-4l2.9-13.5C9.8 23.5 14 20 19 20z' fill='%23fff'/%3E%3Crect x='14.5' y='28' width='12' height='3.6' rx='1.8' fill='%239333ea'/%3E%3Crect x='18.7' y='23.8' width='3.6' height='12' rx='1.8' fill='%239333ea'/%3E%3Ccircle cx='42' cy='26.5' r='2.6' fill='%23ec4899'/%3E%3Ccircle cx='47.5' cy='32' r='2.6' fill='%23f59e0b'/%3E%3Ccircle cx='36.5' cy='32' r='2.6' fill='%23f59e0b'/%3E%3Ccircle cx='42' cy='37.2' r='2.6' fill='%23ec4899'/%3E%3C/svg%3E">
+    <meta name="description" content="EDU GAME - Nền tảng trò chơi học tập tương tác cho giáo viên: Olympia, Ai là triệu phú, Đào vàng, Vòng quay may mắn">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Font Awesome Icons 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@800;900&display=swap" rel="stylesheet">
+
+    <!-- KaTeX for Math Formulas (LaTeX) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+    <!-- SheetJS for Excel Reading/Writing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <!-- Mammoth.js for Word (.docx) Parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+
+    <!-- Canvas Confetti for Celebrations -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="w-full min-h-screen flex flex-col lg:flex-row bg-[#f8fafc] text-slate-800 antialiased selection:bg-purple-200 selection:text-purple-900 overflow-x-hidden">
+
+    <!-- ==================== LEFT SIDEBAR (GIAO DIỆN CỘT DỌC) ==================== -->
+    <aside id="sidebar" class="w-60 xl:w-64 flex-shrink-0 bg-white border-r border-slate-200/90 flex flex-col justify-between h-screen sticky top-0 z-40 transition-all duration-300 shadow-sm -translate-x-full lg:translate-x-0 fixed lg:static">
+        
+        <div class="flex flex-col h-full overflow-hidden">
+            <!-- Brand Logo Top Header -->
+            <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+                <div class="flex items-center gap-3 cursor-pointer" onclick="window.app.showGameSelection()">
+                    <span class="inline-flex items-center gap-3 select-none">
+                        <span id="app-logo-badge" class="relative w-12 h-12 rounded-2xl grid place-items-center text-white text-2xl -rotate-6 flex-shrink-0" style="background:linear-gradient(135deg,#6d28d9 0%,#db2777 60%,#f59e0b 100%);box-shadow:0 8px 18px -6px rgba(219,39,119,.55),inset 0 1px 0 rgba(255,255,255,.35)">
+                            <i class="fa-solid fa-gamepad"></i>
+                            <span class="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-amber-300 border-2 border-white"></span>
+                        </span>
+                        <span class="flex flex-col items-start">
+                            <span class="whitespace-nowrap" style="font-family:'Be Vietnam Pro',system-ui,sans-serif;font-weight:900;font-size:27px;letter-spacing:-.035em;line-height:.9"><span class="text-slate-900">EDU</span> <span style="background:linear-gradient(90deg,#7c3aed 0%,#db2777 55%,#f59e0b 100%);-webkit-background-clip:text;background-clip:text;color:transparent">GAME</span></span>
+                            <span class="flex items-center gap-1.5 mt-1.5"><span class="h-1 w-5 rounded-full" style="background:linear-gradient(90deg,#7c3aed,#db2777,#f59e0b)"></span><span class="text-[9px] font-extrabold uppercase tracking-[.12em] text-slate-400 whitespace-nowrap">Học tập &amp; Trò chơi</span></span>
+                        </span>
+                    </span>
+                </div>
+                <!-- Mobile Close Button -->
+                <button onclick="window.app.toggleSidebar()" class="lg:hidden text-slate-400 hover:text-slate-700 p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Search Bar in Sidebar -->
+            <div class="px-3 pt-3 pb-2">
+                <div class="relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                    <input type="text" id="game-search-input" oninput="window.app.filterSidebarGames(this.value)" placeholder="Tìm trò chơi, hoạt động..." 
+                        class="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:bg-white transition">
+                </div>
+            </div>
+
+            <!-- Sidebar Navigation Links (Scrollable) -->
+            <div class="flex-1 overflow-y-auto sidebar-scroll px-3 py-2 space-y-5">
+                
+                <!-- Section 1: KHÁM PHÁ -->
+                <div>
+                    <div class="text-[10px] font-black uppercase text-slate-400 tracking-wider px-3 mb-1.5">Khám Phá</div>
+                    <div class="space-y-1">
+                        <button onclick="window.app.showGameSelection(); window.app.setActiveSidebar(this)" id="side-home-btn" class="sidebar-link active w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-bold text-left">
+                            <div class="w-7 h-7 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-sm">
+                                <i class="fa-solid fa-house"></i>
+                            </div>
+                            <span>Trang chủ</span>
+                        </button>
+
+                        <button onclick="location.href='olympia.html'" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 text-left">
+                            <div class="w-7 h-7 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm">
+                                <i class="fa-solid fa-keyboard"></i>
+                            </div>
+                            <span>Vào phòng bằng PIN</span>
+                        </button>
+
+                        <button onclick="window.roomManager.openClassDivideModal(); window.app.setActiveSidebar(this)" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 text-left">
+                            <div class="w-7 h-7 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-sm">
+                                <i class="fa-solid fa-users-gear"></i>
+                            </div>
+                            <span>Chia Đội (Kéo thả 4, 6, 8 đội)</span>
+                        </button>
+
+                        <button onclick="window.roomManager.openWaitingLobbyModal(); window.app.setActiveSidebar(this)" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 text-left">
+                            <div class="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center text-sm">
+                                <i class="fa-solid fa-door-open"></i>
+                            </div>
+                            <span>Phòng chờ trực tuyến</span>
+                        </button>
+
+                        <button onclick="window.roomManager.openJudgeSpectatorMode(); window.app.setActiveSidebar(this)" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 text-left">
+                            <div class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm">
+                                <i class="fa-solid fa-users-viewfinder"></i>
+                            </div>
+                            <span>Màn hình các đội (Chiếu BGK)</span>
+                        </button>
+
+                        <button onclick="window.app.openClassListModal(); window.app.setActiveSidebar(this)" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 text-left">
+                            <div class="w-7 h-7 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center text-sm">
+                                <i class="fa-solid fa-trophy"></i>
+                            </div>
+                            <span>Bảng vàng lớp học</span>
+                        </button>
+
+                        <button onclick="window.app.toggleTeacherDrawer(); window.app.setActiveSidebar(this)" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 text-left">
+                            <div class="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center text-sm">
+                                <i class="fa-solid fa-folder-open"></i>
+                            </div>
+                            <span>Nạp file Word & Excel</span>
+                        </button>
+
+                        <button onclick="window.app.openGuideModal(); window.app.setActiveSidebar(this)" class="sidebar-link w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold text-slate-600 text-left">
+                            <div class="w-7 h-7 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center text-sm">
+                                <i class="fa-solid fa-book-open"></i>
+                            </div>
+                            <span>Hướng dẫn & Mẫu đề</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Section 2: ĐẤU TRƯỜNG CHÍNH -->
+                <div>
+                    <div class="text-[10px] font-black uppercase text-slate-400 tracking-wider px-3 mb-1.5 flex items-center justify-between">
+                        <span>Đấu Trường Học Tập</span>
+                        <span class="text-[9px] bg-rose-50 text-rose-600 px-1.5 py-0.5 rounded font-bold">Trọng tâm</span>
+                    </div>
+                    
+                    <div class="space-y-1">
+                        <!-- Game Duy Nhất: Đường Lên Đỉnh Olympia -->
+                        <button onclick="location.href='olympia.html?gv'" class="sidebar-link active w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold text-slate-900 bg-rose-50/70 border border-rose-200 text-left group">
+                            <div class="flex items-center gap-2.5 truncate">
+                                <div class="w-8 h-8 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-sm flex-shrink-0 shadow-xs">
+                                    <i class="fa-solid fa-mountain"></i>
+                                </div>
+                                <div>
+                                    <div class="truncate font-black text-rose-700">Đường Lên Đỉnh Olympia</div>
+                                    <div class="text-[10px] text-slate-500 font-normal">4 Vòng thi đấu kịch tính</div>
+                                </div>
+                            </div>
+                            <span class="badge-online flex-shrink-0">Trực tiếp</span>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Sidebar Bottom Footer -->
+            <div class="p-3 border-t border-slate-100 bg-slate-50/60 flex items-center justify-between">
+                <button onclick="window.app.openLogoModal()" class="flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-purple-600">
+                    <i class="fa-solid fa-palette text-purple-500"></i>
+                    <span>Bộ Logo</span>
+                </button>
+
+                <div class="flex items-center gap-2">
+                    <button onclick="window.app.toggleSound()" class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-purple-600 flex items-center justify-center text-xs shadow-sm" title="Bật/Tắt âm">
+                        <i id="sound-icon" class="fa-solid fa-volume-high"></i>
+                    </button>
+                    <button onclick="window.app.toggleFullscreen()" class="w-8 h-8 rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-purple-600 flex items-center justify-center text-xs shadow-sm" title="Toàn màn hình">
+                        <i id="fullscreen-icon" class="fa-solid fa-expand"></i>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </aside>
+
+    <!-- Sidebar Backdrop for Mobile -->
+    <div id="sidebar-backdrop" onclick="window.app.toggleSidebar()" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-30 hidden lg:hidden"></div>
+
+    <!-- ==================== RIGHT MAIN CONTENT AREA ==================== -->
+    <div class="flex-1 flex flex-col min-w-0">
+        
+        <!-- Top Header Bar -->
+        <header class="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-slate-200/90 px-4 md:px-6 py-2.5 flex items-center justify-between shadow-sm">
+            <!-- Left: Breadcrumb with Hamburger Menu -->
+            <div class="flex items-center gap-3">
+                <button onclick="window.app.toggleSidebar()" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition">
+                    <i class="fa-solid fa-bars text-sm"></i>
+                </button>
+                <div class="flex items-center gap-2 text-xs font-semibold text-slate-500">
+                    <span class="text-slate-900 font-bold flex items-center gap-1.5 cursor-pointer" onclick="window.app.showGameSelection()">
+                        <i class="fa-solid fa-gamepad text-purple-600"></i> EDU GAME
+                    </span>
+                    <span>/</span>
+                    <span class="text-slate-400" id="top-breadcrumb">Trang chủ</span>
+                </div>
+            </div>
+
+            <!-- Right Actions -->
+            <div class="flex items-center gap-2 md:gap-2.5">
+                <!-- Admin Auth Badge / Login Button Slot -->
+                <div id="admin-auth-header-slot"></div>
+
+                <!-- Enter Room Button (Purple gradient) -->
+                <button onclick="location.href='olympia.html'" class="px-3 md:px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition active:scale-95">
+                    <i class="fa-solid fa-arrow-right-to-bracket text-xs"></i>
+                    <span>Vào phòng</span>
+                </button>
+
+                <!-- Team Setup & PIN Button -->
+                <button onclick="window.roomManager.openClassDivideModal()" class="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-xs border border-purple-200 flex items-center gap-1.5 transition shadow-sm">
+                    <i class="fa-solid fa-users-gear text-purple-600"></i>
+                    <span class="hidden sm:inline">Chia Đội & PIN</span>
+                </button>
+
+                <!-- Guide Button -->
+                <button onclick="window.app.openGuideModal()" class="px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs border border-amber-200 flex items-center gap-1.5 transition shadow-sm" title="Hướng dẫn soạn câu hỏi & định dạng">
+                    <i class="fa-solid fa-book-open text-amber-600"></i>
+                    <span class="hidden sm:inline">Hướng Dẫn & Mẫu Đề</span>
+                </button>
+
+                <!-- Fullscreen button -->
+                <button onclick="window.app.toggleFullscreen()" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center text-xs transition hidden sm:flex" title="Chiếu máy chiếu">
+                    <i class="fa-solid fa-expand"></i>
+                </button>
+
+                <!-- Teacher Login / Manage Button -->
+                <button onclick="window.app.toggleTeacherDrawer()" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-200 flex items-center gap-1.5 transition">
+                    <i class="fa-solid fa-folder-open text-purple-600"></i>
+                    <span class="hidden sm:inline">Quản lý File</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Body Content -->
+        <main class="flex-1 px-4 sm:px-6 lg:px-8 py-5 space-y-6 w-full max-w-[1550px] mx-auto">
+            
+            <!-- Notice Banner (Matching reference image) -->
+            <div class="bg-amber-50/90 border border-amber-200 rounded-2xl px-4 py-2.5 flex flex-wrap items-center justify-between text-xs text-amber-900 font-medium shadow-sm gap-2">
+                <div class="flex items-center gap-2 truncate">
+                    <i class="fa-solid fa-bullhorn text-amber-600 flex-shrink-0"></i>
+                    <span class="truncate">
+                        <strong>Hỗ trợ giáo viên:</strong> Tải file Word (<code>.docx</code>) & danh sách lớp Excel (<code>.xlsx</code>) để tự động phân dạng bài tập và chia đội thi đấu!
+                    </span>
+                </div>
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <button onclick="window.app.openGuideModal()" class="px-2.5 py-1 rounded-lg bg-amber-200/90 hover:bg-amber-300 text-amber-950 font-bold transition flex items-center gap-1 shadow-xs">
+                        <i class="fa-solid fa-book-open"></i> Hướng dẫn soạn đề
+                    </button>
+                    <button onclick="window.app.toggleTeacherDrawer()" class="text-amber-800 hover:text-amber-950 font-bold underline">
+                        Nạp ngay
+                    </button>
+                </div>
+            </div>
+
+            <!-- Ô NHẬP MÃ PIN CHO HỌC SINH -->
+            <form onsubmit="event.preventDefault(); var v=this.pin.value.replace(/\D/g,''); if(v.length===6){location.href='olympia.html?pin='+v}else{this.pin.focus(); this.querySelector('.pin-err').classList.remove('hidden')}"
+                class="relative overflow-hidden rounded-3xl bg-white border-2 border-purple-200 shadow-sm p-5 sm:p-6 flex flex-col lg:flex-row lg:items-center gap-4">
+                <div class="flex items-center gap-4 flex-1 min-w-0">
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center text-2xl shadow-md flex-shrink-0">
+                        <i class="fa-solid fa-key"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="text-lg sm:text-xl font-black text-slate-900 leading-tight">Học sinh vào thi – Nhập mã PIN của đội</div>
+                        <div class="text-xs text-slate-500 font-medium mt-0.5">Mỗi đội có 1 mã PIN riêng gồm 6 chữ số do giáo viên cấp • mỗi mã chỉ vào được 1 thiết bị</div>
+                    </div>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-2 lg:w-[460px]">
+                    <div class="flex-1">
+                        <input name="pin" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="• • • • • •"
+                            class="w-full text-center text-3xl font-black tracking-[.3em] rounded-2xl border-2 border-slate-200 focus:border-purple-500 focus:outline-none py-3 bg-slate-50 focus:bg-white">
+                        <div class="pin-err hidden text-[11px] font-bold text-rose-600 mt-1 text-center">Mã PIN gồm 6 chữ số</div>
+                    </div>
+                    <button class="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-black text-base shadow-md flex items-center justify-center gap-2 h-[62px] whitespace-nowrap transition active:scale-95">
+                        <i class="fa-solid fa-right-to-bracket"></i> Vào phòng thi
+                    </button>
+                </div>
+            </form>
+
+            <!-- TEACHER DASHBOARD CONTAINER -->
+            <div id="teacher-dashboard" class="space-y-6">
+                
+                <!-- MASTER OLYMPIA HERO ARENA (Expansive Full-Width Banner) -->
+                <div class="relative overflow-hidden rounded-3xl hero-gradient p-6 sm:p-8 lg:p-10 shadow-xl text-white">
+                    <div class="relative z-10 space-y-6">
+                        
+                        <!-- Top Pill & Class Tag -->
+                        <div class="flex flex-wrap items-center justify-between gap-3">
+                            <div class="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-bold text-white border border-white/30 shadow-sm">
+                                <span class="bg-white text-rose-700 px-2 py-0.5 rounded-full font-black text-[10px]">CHUYÊN DỤNG</span>
+                                <span>Tối ưu cho Máy chiếu, Smart TV & Bảng tương tác lớp học</span>
+                            </div>
+                            <div class="flex items-center gap-2 text-xs">
+                                <span class="text-white/80">Lớp hiện tại:</span>
+                                <span class="font-bold text-slate-900 bg-white/90 px-3 py-1 rounded-xl shadow-xs" id="class-current-name">Lớp 10A1 (Mẫu)</span>
+                            </div>
+                        </div>
+
+                        <!-- Grand Title -->
+                        <div class="space-y-2">
+                            <h1 class="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black font-heading tracking-tight drop-shadow-sm leading-tight">
+                                ĐẤU TRƯỜNG TRI THỨC • ĐƯỜNG LÊN ĐỈNH OLYMPIA
+                            </h1>
+                            <p class="text-white/95 text-xs sm:text-sm md:text-base leading-relaxed max-w-4xl font-medium">
+                                Biến tiết học ôn tập thành trận thi đấu sôi nổi cho toàn bộ học sinh với <strong>4 Vòng thi chính quy</strong>: Khởi Động (+10đ/câu • đề và đáp án đảo ngẫu nhiên chống nhìn bài), Tăng Tốc 1 & 2 (đua tốc độ sát nút mili-giây), Về Đích (gói 60đ - 80đ - 100đ, Ngôi sao hy vọng & Chuông cướp điểm).
+                            </p>
+                        </div>
+
+                        <!-- Hero Action Buttons Bar -->
+                        <div class="flex flex-wrap items-center gap-3 pt-1">
+                            <button onclick="location.href='olympia.html?gv'" 
+                                class="px-8 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white font-black text-sm shadow-xl flex items-center gap-2.5 transform active:scale-95 transition">
+                                <i class="fa-solid fa-play text-amber-400 text-base"></i>
+                                <span>Bắt Đầu Chiếu Olympia Ngay (Chia Đội & PIN)</span>
+                            </button>
+
+                            <button onclick="window.roomManager.openClassDivideModal()" 
+                                class="px-5 py-3.5 rounded-2xl bg-white/25 hover:bg-white/35 backdrop-blur-md text-white font-bold text-sm border border-white/40 shadow-sm flex items-center gap-2 transition">
+                                <i class="fa-solid fa-users-gear"></i>
+                                <span>Chia 4/6/8 Đội (Kéo Thả)</span>
+                            </button>
+
+                            <button onclick="window.roomManager.openJudgeSpectatorMode()" 
+                                class="px-5 py-3.5 rounded-2xl bg-indigo-600/90 hover:bg-indigo-600 text-white font-black text-sm border border-indigo-400/60 shadow-md flex items-center gap-2 transition"
+                                title="Chiếu góc nhìn của từng đội học sinh cho Ban Giám Khảo xem (Phím V)">
+                                <i class="fa-solid fa-users-viewfinder"></i>
+                                <span>Chiếu Màn Hình Đội (BGK)</span>
+                            </button>
+
+                            <button onclick="window.roomManager.openWaitingLobbyModal()" 
+                                class="px-5 py-3.5 rounded-2xl bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-bold text-sm border border-white/30 shadow-sm flex items-center gap-2 transition">
+                                <i class="fa-solid fa-door-open"></i>
+                                <span>Phòng Chờ Trực Tuyến</span>
+                            </button>
+
+                            <button onclick="window.app.openGuideModal()" 
+                                class="px-4 py-3.5 rounded-2xl bg-amber-400/90 hover:bg-amber-400 text-slate-950 font-black text-sm shadow-md flex items-center gap-2 transition">
+                                <i class="fa-solid fa-book-open"></i>
+                                <span>Hướng Dẫn & Mẫu Đề</span>
+                            </button>
+
+                            <button onclick="window.app.toggleTeacherDrawer()" 
+                                class="px-4 py-3.5 rounded-2xl bg-white/20 hover:bg-white/30 backdrop-blur-md text-white font-bold text-sm border border-white/30 shadow-sm flex items-center gap-2 transition">
+                                <i class="fa-solid fa-folder-open"></i>
+                                <span>Quản Lý File</span>
+                            </button>
+                        </div>
+
+                        <!-- 4 ROUNDS STRATEGY CARDS (Spacious Responsive 4-Column Grid) -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-3">
+                            <div class="bg-white/15 backdrop-blur-md p-3.5 rounded-2xl border border-white/25 shadow-sm text-left">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-xs font-black uppercase tracking-wider text-amber-300">1. Khởi Động</span>
+                                    <i class="fa-solid fa-bolt text-amber-300 text-xs"></i>
+                                </div>
+                                <div class="text-sm font-black text-white">+10 Điểm / Câu • 45s</div>
+                                <div class="text-[11px] text-white/85 mt-0.5 leading-snug">
+                                    7 câu hỏi. Đảo đề & đảo đáp án A, B, C, D độc lập từng đội chống nhìn bài.
+                                </div>
+                            </div>
+
+                            <div class="bg-white/15 backdrop-blur-md p-3.5 rounded-2xl border border-white/25 shadow-sm text-left">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-xs font-black uppercase tracking-wider text-emerald-300">2. Vượt Chướng Ngại Vật</span>
+                                    <i class="fa-solid fa-puzzle-piece text-emerald-300 text-xs"></i>
+                                </div>
+                                <div class="text-sm font-black text-white">4 Hàng Ngang + Đoán CNV</div>
+                                <div class="text-[11px] text-white/85 mt-0.5 leading-snug">
+                                    Mở hàng ngang +10đ. Chuông đoán CNV nhận 80đ - 60đ - 40đ - 20đ.
+                                </div>
+                            </div>
+
+                            <div class="bg-white/15 backdrop-blur-md p-3.5 rounded-2xl border border-white/25 shadow-sm text-left">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-xs font-black uppercase tracking-wider text-sky-300">3. Tăng Tốc</span>
+                                    <i class="fa-solid fa-gauge-high text-sky-300 text-xs"></i>
+                                </div>
+                                <div class="text-sm font-black text-white">40đ - 30đ - 20đ - 10đ</div>
+                                <div class="text-[11px] text-white/85 mt-0.5 leading-snug">
+                                    4 câu 30s. Xếp hạng tốc độ mili-giây trả lời đúng chuẩn VTV3.
+                                </div>
+                            </div>
+
+                            <div class="bg-white/15 backdrop-blur-md p-3.5 rounded-2xl border border-white/25 shadow-sm text-left">
+                                <div class="flex items-center justify-between mb-1">
+                                    <span class="text-xs font-black uppercase tracking-wider text-pink-300">4. Về Đích</span>
+                                    <i class="fa-solid fa-star text-pink-300 text-xs"></i>
+                                </div>
+                                <div class="text-sm font-black text-white">Gói 60 - 80 - 100đ</div>
+                                <div class="text-[11px] text-white/85 mt-0.5 leading-snug">
+                                    Chọn gói điểm, Ngôi sao hy vọng (×2) & Chuông cướp điểm 5 giây.
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- TEACHER DRAWER / CONTROLS (Word & Excel Uploaders) -->
+                <div id="teacher-files-drawer" class="bg-white border-2 border-slate-200 rounded-3xl p-6 shadow-sm space-y-6">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center text-lg font-bold">
+                                <i class="fa-solid fa-sliders"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-black text-slate-900">Khu Vực Quản Lý Của Giáo Viên</h3>
+                                <p class="text-xs text-slate-500">Nạp đề thi Word & danh sách lớp Excel - Tự động lưu vĩnh viễn trên trình duyệt</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="window.app.openGuideModal()" class="px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-black border border-amber-300 flex items-center gap-1.5 shadow-sm transition">
+                                <i class="fa-solid fa-book-open text-amber-600"></i>
+                                <span>Hướng dẫn soạn đề & Tải mẫu</span>
+                            </button>
+                            <button onclick="window.app.openQuestionsBankModal()" class="px-3 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-800 text-xs font-bold border border-blue-200 flex items-center gap-1.5 transition">
+                                <i class="fa-solid fa-list-check text-blue-600"></i>
+                                <span>Quản lý JSON Đề Thi (<span id="q-total-count">15</span>)</span>
+                            </button>
+                            <button onclick="window.app.openClassJsonModal()" class="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-800 text-xs font-bold border border-purple-200 flex items-center gap-1.5 transition">
+                                <i class="fa-solid fa-code text-purple-600"></i>
+                                <span>Quản lý JSON Lớp & Chia Đội</span>
+                            </button>
+                            <button onclick="window.app.openClassListModal()" class="px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 text-xs font-bold border border-amber-200">
+                                <i class="fa-solid fa-trophy text-amber-600 mr-1"></i> Điểm lớp (<span id="class-student-count">20 HS</span>)
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Word Docx Box -->
+                        <div class="p-4 rounded-2xl bg-blue-50/50 border border-blue-200">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-xs font-bold text-blue-900 flex items-center gap-2">
+                                    <i class="fa-solid fa-file-word text-blue-600 text-lg"></i>
+                                    1. File Câu Hỏi Word (.docx)
+                                </span>
+                                <span class="text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded">Tự nhận dạng</span>
+                            </div>
+                            <div class="relative border-2 border-dashed border-blue-300 hover:border-blue-500 rounded-xl p-4 text-center bg-white cursor-pointer transition">
+                                <input type="file" id="docx-file-input" accept=".docx" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                                <i class="fa-solid fa-cloud-arrow-up text-blue-500 text-2xl mb-1"></i>
+                                <div class="text-xs font-bold text-slate-800">Kéo thả file .docx hoặc <span class="text-blue-600 underline">chọn từ máy tính</span></div>
+                                <div class="text-[10px] text-slate-500 mt-1">
+                                    Trắc nghiệm 4 đáp án (A,B,C,D) hoặc Đúng/Sai • Khuyến nghị 15 - 30 câu
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between text-[11px] mt-2 text-slate-500">
+                                <span>Ví dụ: <code>Câu 1: ... A. ... Đáp án: A</code></span>
+                                <button onclick="window.app.downloadSampleDocx()" class="text-blue-600 hover:underline font-bold flex items-center gap-1">
+                                    <i class="fa-solid fa-download"></i> Tải file Word mẫu
+                                </button>
+                            </div>
+                            <div id="docx-status" class="hidden mt-2 text-xs p-2 rounded-lg bg-blue-100 text-blue-900 font-medium"></div>
+                        </div>
+
+                        <!-- Excel Roster Box -->
+                        <div class="p-4 rounded-2xl bg-emerald-50/50 border border-emerald-200">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-xs font-bold text-emerald-900 flex items-center gap-2">
+                                    <i class="fa-solid fa-file-excel text-emerald-600 text-lg"></i>
+                                    2. Danh Sách Lớp Excel (.xlsx / .csv)
+                                </span>
+                                <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">Chia 4, 6, 8 đội</span>
+                            </div>
+                            <div class="relative border-2 border-dashed border-emerald-300 hover:border-emerald-500 rounded-xl p-4 text-center bg-white cursor-pointer transition">
+                                <input type="file" id="excel-file-input" accept=".xlsx, .xls, .csv" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                                <i class="fa-solid fa-cloud-arrow-up text-emerald-500 text-2xl mb-1"></i>
+                                <div class="text-xs font-bold text-slate-800">Kéo thả file Excel hoặc <span class="text-emerald-600 underline">chọn từ máy tính</span></div>
+                                <div class="text-[10px] text-slate-500 mt-1">Cột: STT, Họ và tên, Lớp • Tự động chia đội và cấp PIN</div>
+                            </div>
+                            <div class="flex items-center justify-between text-[11px] mt-2 text-slate-500">
+                                <span>Mẫu: <code>STT | Họ và tên | Lớp</code></span>
+                                <button onclick="window.app.downloadSampleExcel()" class="text-emerald-600 hover:underline font-bold flex items-center gap-1">
+                                    <i class="fa-solid fa-download"></i> Tải file Excel mẫu
+                                </button>
+                            </div>
+                            <div id="excel-status" class="hidden mt-2 text-xs p-2 rounded-lg bg-emerald-100 text-emerald-900 font-medium"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LIVE TEAMS OVERVIEW (Bảng Đấu Các Đội Olympia) -->
+                <div class="bg-white border-2 border-slate-200 rounded-3xl p-6 shadow-sm space-y-4">
+                    <div class="flex flex-wrap items-center justify-between border-b border-slate-100 pb-3 gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-lg font-black">
+                                <i class="fa-solid fa-trophy"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-black text-slate-900">Bảng Thi Đấu Các Đội Olympia</h3>
+                                <p class="text-xs text-slate-500">Mã PIN kết nối độc lập, điểm số trực tiếp và danh sách thành viên</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="window.roomManager.openClassDivideModal()" class="px-3.5 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 font-bold text-xs border border-purple-200 flex items-center gap-1.5 transition">
+                                <i class="fa-solid fa-users-gear text-purple-600"></i>
+                                <span>Chia lại đội</span>
+                            </button>
+                            <button onclick="window.roomManager.openJudgeSpectatorMode()" class="px-3.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold text-xs border border-indigo-200 flex items-center gap-1.5 transition">
+                                <i class="fa-solid fa-users-viewfinder text-indigo-600"></i>
+                                <span>Màn hình các đội (BGK)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Teams List Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="dashboard-teams-grid">
+                        <div class="p-4 rounded-2xl border-2 border-purple-200 bg-purple-50/40 text-left space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2.5 py-0.5 rounded-full bg-purple-600 text-white font-black text-xs">Đội 1 (Tổ 1)</span>
+                                <span class="text-xs font-mono font-bold text-slate-500">PIN: 1024</span>
+                            </div>
+                            <div class="text-2xl font-black text-slate-900 font-mono">0 <span class="text-xs font-sans text-slate-400 font-bold">điểm</span></div>
+                            <div class="text-[11px] text-slate-500">5 học sinh • Sẵn sàng</div>
+                        </div>
+                        <div class="p-4 rounded-2xl border-2 border-amber-200 bg-amber-50/40 text-left space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2.5 py-0.5 rounded-full bg-amber-600 text-white font-black text-xs">Đội 2 (Tổ 2)</span>
+                                <span class="text-xs font-mono font-bold text-slate-500">PIN: 2048</span>
+                            </div>
+                            <div class="text-2xl font-black text-slate-900 font-mono">0 <span class="text-xs font-sans text-slate-400 font-bold">điểm</span></div>
+                            <div class="text-[11px] text-slate-500">5 học sinh • Sẵn sàng</div>
+                        </div>
+                        <div class="p-4 rounded-2xl border-2 border-emerald-200 bg-emerald-50/40 text-left space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2.5 py-0.5 rounded-full bg-emerald-600 text-white font-black text-xs">Đội 3 (Tổ 3)</span>
+                                <span class="text-xs font-mono font-bold text-slate-500">PIN: 3072</span>
+                            </div>
+                            <div class="text-2xl font-black text-slate-900 font-mono">0 <span class="text-xs font-sans text-slate-400 font-bold">điểm</span></div>
+                            <div class="text-[11px] text-slate-500">5 học sinh • Sẵn sàng</div>
+                        </div>
+                        <div class="p-4 rounded-2xl border-2 border-rose-200 bg-rose-50/40 text-left space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="px-2.5 py-0.5 rounded-full bg-rose-600 text-white font-black text-xs">Đội 4 (Tổ 4)</span>
+                                <span class="text-xs font-mono font-bold text-slate-500">PIN: 4096</span>
+                            </div>
+                            <div class="text-2xl font-black text-slate-900 font-mono">0 <span class="text-xs font-sans text-slate-400 font-bold">điểm</span></div>
+                            <div class="text-[11px] text-slate-500">5 học sinh • Sẵn sàng</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Main dashboard content end -->
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-auto border-t border-slate-200 bg-white py-4 px-6 text-xs text-slate-400 flex flex-col sm:flex-row items-center justify-between gap-2">
+            <div>© 2026 <strong>EDU GAME</strong> - Tương thích máy chiếu & TV thông minh</div>
+            <div class="flex items-center gap-3">
+                <span>Hỗ trợ file Word .docx & Excel .xlsx</span>
+                <span>•</span>
+                <span>Công thức toán KaTeX</span>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- ==================== IMMERSIVE FULLSCREEN GAME ARENA (CHIẾU TOÀN MÀN HÌNH) ==================== -->
+    <div id="game-arena" class="fixed inset-0 z-50 bg-[#f8fafc] hidden flex-col overflow-y-auto">
+        <!-- Top HUD Bar for Projector / TV -->
+        <header class="bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 md:px-8 py-3 flex items-center justify-between shadow-sm sticky top-0 z-30">
+            <div class="flex items-center gap-3">
+                <div id="arena-game-icon" class="w-10 h-10 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center text-lg font-black shadow-sm">
+                    <i class="fa-solid fa-gamepad"></i>
+                </div>
+                <div>
+                    <h2 id="arena-game-title" class="text-base sm:text-lg font-black text-slate-900 leading-tight font-heading">
+                        Tên Trò Chơi
+                    </h2>
+                    <span id="arena-game-subtitle" class="text-[11px] text-slate-500 font-bold uppercase tracking-wider">
+                        Chế độ toàn màn hình máy chiếu
+                    </span>
+                </div>
+            </div>
+
+            <!-- Arena Controls -->
+            <div class="flex items-center gap-2 md:gap-3">
+                <button onclick="window.roomManager.openJudgeSpectatorMode(null, window.olympiaGame ? window.olympiaGame.currentRound : 1)" class="px-3.5 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 font-black text-xs flex items-center gap-2 transition shadow-sm" title="Chiếu màn hình của các đội học sinh cho Ban Giám Khảo xem">
+                    <i class="fa-solid fa-users-viewfinder text-indigo-600"></i>
+                    <span class="hidden md:inline">Màn Hình Các Đội (Chiếu BGK)</span>
+                    <span class="md:hidden">Chiếu BGK</span>
+                </button>
+
+                <button onclick="window.app.quickPickStudent()" class="px-3.5 py-1.5 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold text-xs flex items-center gap-2 transition shadow-sm" title="Gọi ngẫu nhiên học sinh">
+                    <i class="fa-solid fa-shuffle"></i>
+                    <span class="hidden sm:inline">Gọi Học Sinh</span>
+                </button>
+
+                <button onclick="window.app.toggleFullscreen()" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center text-sm transition border border-slate-200 shadow-sm" title="Phóng to toàn màn hình máy chiếu (F11)">
+                    <i class="fa-solid fa-expand"></i>
+                </button>
+
+                <button onclick="window.app.toggleSound()" class="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center text-sm transition border border-slate-200 shadow-sm" title="Bật/Tắt âm thanh">
+                    <i id="arena-sound-icon" class="fa-solid fa-volume-high text-blue-600"></i>
+                </button>
+
+                <button onclick="window.app.exitGameArena()" class="px-4 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 font-bold text-xs flex items-center gap-2 transition shadow-sm">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Thoát Trò Chơi</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Arena Main Stage (100% viewport width) -->
+        <div id="game-stage" class="flex-1 w-full max-w-7xl 2xl:max-w-[1600px] mx-auto p-4 sm:p-6 lg:p-8 flex flex-col justify-center">
+            <!-- Game Canvas & UI rendered here -->
+        </div>
+    </div>
+
+    <!-- GLOBAL MODAL (Used for Pin Room, Question Bank, Class Roster, Logo Picker, Admin Login, Guides) -->
+    <div id="global-modal" onclick="if(event.target === this) window.app.closeAllModals()" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[80] hidden overflow-y-auto p-3 sm:p-6 flex items-start sm:items-center justify-center">
+        <div class="bg-white border border-slate-200 rounded-3xl max-w-3xl w-full my-auto shadow-2xl relative animate-scale-up text-slate-900 max-h-[92vh] flex flex-col overflow-hidden" id="global-modal-body">
+            <!-- Dynamic modal content -->
+        </div>
+    </div>
+
+    <!-- DEDICATED JUDGE SPECTATOR THEATER (MÀN HÌNH HỌC SINH CHIẾU CHO BAN GIÁM KHẢO) -->
+    <div id="judge-spectator-modal" onclick="if(event.target === this) window.roomManager.closeJudgeSpectatorMode()" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-[90] hidden overflow-y-auto p-2 sm:p-4 md:p-6 flex items-center justify-center">
+        <div class="bg-white border border-slate-200 rounded-3xl w-full max-w-7xl max-h-[96vh] shadow-2xl relative flex flex-col overflow-hidden text-slate-900 animate-scale-up" id="judge-spectator-body">
+            <!-- Dynamic content rendered by roomManager.openJudgeSpectatorMode() -->
+        </div>
+    </div>
+
+    <!-- Core App Scripts (Exclusively Olympia) -->
+    <script src="js/audio.js"></script>
+    <script src="js/docx-parser.js"></script>
+    <script src="js/excel-parser.js"></script>
+    <script src="js/room-manager.js"></script>
+    <script src="js/games/olympia.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
