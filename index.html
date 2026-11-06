@@ -950,15 +950,11 @@ function parseQuestions(raw) {
   }
   flush(); return out;
 }
-/* Vòng 2: chế độ Điền đáp số dùng câu có đáp số (Đáp số: 12,5 / \shortans) trước, rồi mới đến câu trắc nghiệm có số đáp án đúng */
-function pickR2(p) {
-  const mc = p.r2.filter(q => !q.sa), sa = p.r2.filter(q => q.sa);
-  return (H && H.r2mode === 'fill') ? [...sa, ...mc] : mc;
-}
+/* Vòng 2: hệ thống tự nhận dạng từng câu – có 4 đáp án (\choice / A-D) là trắc nghiệm, có \shortans hoặc "Đáp số:" là câu điền số */
+function pickR2(p) { return p.r2; }
 const expectedOf = q => q.sa !== undefined ? q.sa : q.opts[q.ans];
 function buildBank(text) {
   const p = parseQuestions(text), warn = [];
-  if (!(H && H.r2mode === 'fill') && p.r2.some(q => q.sa)) warn.push(`Vượt chướng ngại vật: có ${p.r2.filter(q => q.sa).length} câu điền đáp số nhưng đang chọn Trắc nghiệm – các câu này không được dùng`);
   // Nhận diện nghiêm ngặt: mỗi vòng CHỈ dùng câu có đúng mã vòng đó; câu không có mã thì không dùng.
   const take = (arr, n, label) => {
     if (arr.length < n) warn.push(`${label}: cần ${n} câu, mới có ${arr.length}`);
@@ -1116,12 +1112,12 @@ function r2Team(p, t, ctx) {
     const r = v.rows[v.row], a = v.ans[v.row][t], pend = ctx.pend && ctx.pend.type === 'r2' && ctx.pend.row === v.row;
     main = `<div class="card qcard p-5 sm:p-7 pop">${timerHTML(v.deadline, RULES.R2_ROW_TIME)}
       <div class="text-xs font-black text-violet-600 uppercase mt-4 mb-2">Hàng ngang ${v.row + 1}</div><div class="text-xl sm:text-2xl font-black mb-5">${rich(r.text)}</div>
-      ${v.fill ? fillBox('r2', v.row, ctx.ro || !!a || pend, a ? a.txt : pend ? ctx.pend.txt : '') : optsHTML(r.opts, { act: 'r2', extra: `data-row="${v.row}"`, disabled: ctx.ro || !!a || pend, chosen: a ? a.c : pend ? ctx.pend.c : -1 })}
+      ${r.fill ? fillBox('r2', v.row, ctx.ro || !!a || pend, a ? a.txt : pend ? ctx.pend.txt : '') : optsHTML(r.opts, { act: 'r2', extra: `data-row="${v.row}"`, disabled: ctx.ro || !!a || pend, chosen: a ? a.c : pend ? ctx.pend.c : -1 })}
       ${a ? `<div class="mt-4 text-sm font-bold text-slate-500"><i class="fa-solid fa-lock"></i> ${a.c >= 0 ? 'Đã chốt đáp án ' + L[a.c] : 'Đã gửi đáp án'} sau ${fmtT(a.t)} – chờ hết giờ</div>` : ''}</div>`;
   } else {
     const last = v.row >= 0 ? v.rows[v.row] : null, a = last ? v.ans[v.row][t] : null;
     main = last ? `<div class="card p-6 pop"><div class="text-xs font-black text-emerald-600 uppercase mb-2">Đáp án hàng ngang ${v.row + 1}</div><div class="text-lg font-black mb-4">${rich(last.text)}</div>
-      ${v.fill ? `${fillShow(last.key, '')}<div class="mt-3 text-sm font-bold text-slate-600">Đội bạn gõ: <span class="text-slate-900">${a && a.txt ? esc(a.txt) : '—'}</span></div>` : optsHTML(last.opts, { disabled: true, chosen: a ? a.c : -1, correct: last.ans })}
+      ${last.fill ? `${fillShow(last.key, '')}<div class="mt-3 text-sm font-bold text-slate-600">Đội bạn gõ: <span class="text-slate-900">${a && a.txt ? esc(a.txt) : '—'}</span></div>` : optsHTML(last.opts, { disabled: true, chosen: a ? a.c : -1, correct: last.ans })}
       <div class="mt-4 font-black ${a && a.ok ? 'text-emerald-600' : 'text-rose-600'}">${a ? (a.ok ? `Đội bạn trả lời đúng (+${RULES.R2_POINT}đ) • ${fmtT(a.t)}` : 'Đội bạn trả lời chưa đúng') : 'Đội bạn chưa trả lời'}</div>
       <div class="text-slate-500 text-sm mt-1">Chờ giáo viên mở hàng ngang tiếp theo…</div></div>` : waitBox('Chờ giáo viên mở hàng ngang đầu tiên');
   }
@@ -1281,7 +1277,7 @@ function hostDefault() {
   return {
     roomId: rid(), students: [],
     teams: Array.from({ length: RULES.TEAM_COUNT }, (_, i) => ({ name: `Đội ${i + 1}`, color: COLORS[i], members: [], pin: '', dev: null, score: 0 })),
-    bankText: SAMPLE_BANK, bankName: 'Bộ câu hỏi mẫu – KHTN 8 (Chương I–II)', phase: 'setup', g: null, rejects: {}, r2mode: 'mc'
+    bankText: SAMPLE_BANK, bankName: 'Bộ câu hỏi mẫu – KHTN 8 (Chương I–II)', phase: 'setup', g: null, rejects: {}
   };
 }
 function save() { try { localStorage.setItem('olp_host', JSON.stringify(H)); } catch (e) { } }
@@ -1313,8 +1309,8 @@ function pubRound(g) {
   }
   if (g.round === 2 && g.r2) {
     const r = g.r2, rev = g.status === 'review';
-    return { row: r.row, rs: r.rs, start: r.start, deadline: r.deadline, finalDl: r.finalDl, solved: r.solved, fill: !!r.fill,
-      rows: b.r2.map((q, i) => { const show = i === r.row || r.opened[i] || rev, open = r.opened[i] || rev; return { text: show ? q.text : null, opts: show ? q.opts : null, ans: open ? q.ans : -1, key: open ? expectedOf(q) : null, open }; }),
+    return { row: r.row, rs: r.rs, start: r.start, deadline: r.deadline, finalDl: r.finalDl, solved: r.solved,
+      rows: b.r2.map((q, i) => { const show = i === r.row || r.opened[i] || rev, open = r.opened[i] || rev; return { text: show ? q.text : null, opts: show ? q.opts : null, ans: open ? q.ans : -1, key: open ? expectedOf(q) : null, fill: q.sa !== undefined, open }; }),
       ans: r.ans.map((row, i) => row.map(a => a ? { c: a.c, t: a.t, ok: (r.opened[i] || rev) ? a.ok : null, txt: (r.opened[i] || rev) ? a.txt : null } : null)),
       cnv: b.cnv && (r.opened.some(Boolean) || g.status !== 'play') ? { text: b.cnv.text, opts: b.cnv.opts, ans: rev ? b.cnv.ans : -1 } : null,
       hasCnv: !!b.cnv, cnvTry: r.cnv, opened: r.opened.filter(Boolean).length };
@@ -1393,7 +1389,7 @@ function onR1(a) {
 /* ---------- Vòng 2: Vượt chướng ngại vật ---------- */
 function startR2() {
   const g = H.g; g.status = 'play';
-  g.r2 = { row: -1, rs: 'idle', start: 0, deadline: 0, finalDl: 0, solved: -1, fill: H.r2mode === 'fill',
+  g.r2 = { row: -1, rs: 'idle', start: 0, deadline: 0, finalDl: 0, solved: -1,
     ans: g.bank.r2.map(() => H.teams.map(() => null)), opened: g.bank.r2.map(() => false), cnv: H.teams.map(() => null) };
 }
 function h_openRow(i) { const r = H.g.r2; r.row = i; r.rs = 'play'; setDl(r, RULES.R2_ROW_TIME); commit(); }
@@ -1407,7 +1403,7 @@ function numOf(s) { const m = String(s || '').replace(/\$/g, '').replace(/,/g, '
 function sameNum(x, y) { if (!isNumIn(x)) return false; const a = numOf(x), b = numOf(y); return isFinite(a) && isFinite(b) && Math.abs(a - b) < 1e-9; }
 function onR2(a) {
   const g = H.g, r = g.r2; if (g.status !== 'play' || r.rs !== 'play' || a.row !== r.row || r.ans[r.row][a.team] || a.ts > r.deadline + 300) return;
-  const q = g.bank.r2[r.row], fill = !!r.fill, txt = fill ? String(a.txt || '').slice(0, 200) : null;
+  const q = g.bank.r2[r.row], fill = q.sa !== undefined, txt = fill ? String(a.txt || '').slice(0, 200) : null;
   if (fill && !isNumIn(txt)) return;
   const ok = fill ? sameNum(txt, expectedOf(q)) : a.c === q.ans;
   r.ans[r.row][a.team] = { c: fill ? -1 : a.c, txt, ok, t: a.ts - r.start }; if (ok) H.teams[a.team].score += RULES.R2_POINT;
@@ -1653,7 +1649,6 @@ async function h_bankFile(file) {
     toast(note || `Đã nạp ${b.total} câu hỏi từ “${file.name}”`, b.warn.length ? 'warn' : 'success', 4500);
   } catch (e) { say({ title: 'Không đọc được file', msg: e.message, tone: 'danger', icon: 'fa-file-circle-xmark' }); }
 }
-function h_r2mode(m) { H.r2mode = m === 'fill' ? 'fill' : 'mc'; commit(); }
 function h_sampleBank() { H.bankText = SAMPLE_BANK; H.bankName = 'Bộ câu hỏi mẫu – KHTN 8 (Chương I–II)'; commit(); }
 function h_downloadTemplate() {
   const a = document.createElement('a');
@@ -1838,14 +1833,6 @@ function setupHTML() {
     <div class="grid grid-cols-2 sm:grid-cols-4 ${cnt.pool ? 'lg:grid-cols-9' : 'lg:grid-cols-8'} gap-2 text-center">${[['Khởi động', cnt.r1, RULES.R1_COUNT], ['Hàng ngang', cnt.r2, 4], ['Từ khóa CNV', cnt.cnv, 1], ['Tăng tốc', cnt.r3, 4], ['Về đích 20đ', cnt.v20, 3 * RULES.TEAM_COUNT], ['Về đích 30đ', cnt.v30, 2 * RULES.TEAM_COUNT], ['Về đích 40đ', cnt.v40, 2 * RULES.TEAM_COUNT], ['Câu hỏi phụ', cnt.tb, 3]].concat(cnt.pool ? [['Chưa có mã (bỏ)', cnt.pool, -1]] : []).map(([n, c, need]) =>
       `<div class="rounded-xl p-2 border ${need < 0 || (need && c < need) ? 'border-rose-200 bg-rose-50' : 'border-slate-200 bg-slate-50'}"><div class="text-[11px] font-bold text-slate-500">${n}</div><div class="text-xl font-black ${need < 0 ? 'text-rose-600' : ''}">${c}${need > 0 ? `<span class="text-xs text-slate-400">/${need}</span>` : ''}</div></div>`).join('')}</div>
     ${b.warn.length ? `<div class="mt-3 text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3">${b.warn.map(esc).join('<br>')}</div>` : ''}
-    <div class="mt-3 rounded-2xl border border-violet-200 bg-violet-50/50 p-4">
-      <div class="font-black text-sm mb-2"><i class="fa-solid fa-puzzle-piece text-violet-600"></i> Dạng câu hỏi Vượt chướng ngại vật</div>
-      <div class="grid sm:grid-cols-2 gap-2">
-        ${[['mc', 'fa-list-check', 'Trắc nghiệm', 'Học sinh chọn đáp án A, B, C, D'], ['fill', 'fa-keyboard', 'Điền đáp số', 'Học sinh gõ số, ví dụ 12,5 hoặc 12.5 (không ghi đơn vị)']].map(([m, ic, t, d]) => `
-        <button onclick="h_r2mode('${m}')" class="text-left rounded-xl p-3 border-2 transition ${(H.r2mode || 'mc') === m ? 'border-violet-500 bg-white shadow-sm' : 'border-slate-200 bg-white/60 hover:border-violet-300'}">
-          <div class="font-black text-sm"><i class="fa-solid ${ic} text-violet-600"></i> ${t}</div><div class="text-[11px] text-slate-500 mt-0.5">${d}</div></button>`).join('')}
-      </div>
-      ${(H.r2mode === 'fill') && b.r2.some(q => !isFinite(numOf(expectedOf(q)))) ? `<div class="mt-2 text-xs font-bold text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-2.5">Có ${b.r2.filter(q => !isFinite(numOf(expectedOf(q)))).length} hàng ngang có đáp án không phải số. Ở chế độ này cần đáp án đúng là số (ví dụ 12 hoặc 12,5).</div>` : ''}</div>
     <details class="mt-3 text-xs text-slate-600"><summary class="cursor-pointer font-bold">Cấu trúc file câu hỏi</summary><pre class="mt-2 bg-slate-50 rounded-xl p-3 whitespace-pre-wrap">[KHỞI ĐỘNG]  (7 câu)
 Câu 1: Nội dung câu hỏi
 A. ...
@@ -1994,7 +1981,7 @@ function hostMain(p) {
   if (g.round === 2) {
     const cur = v.rs !== 'idle' && v.row >= 0 ? v.rows[v.row] : null;
     return `<div class="grid lg:grid-cols-[1fr_320px] gap-5 mb-5">
-      <div class="card qcard p-6 big">${cur ? `<div class="text-xs font-black text-violet-600 uppercase mb-2">Hàng ngang ${v.row + 1}</div><div class="text-2xl sm:text-3xl font-black mb-5">${rich(cur.text)}</div>${v.fill ? fillShow(v.rs === 'reveal' ? cur.key : null, 'Học sinh đang gõ đáp án…') : optsHTML(cur.opts, { disabled: true, correct: v.rs === 'reveal' ? cur.ans : -1 })}`
+      <div class="card qcard p-6 big">${cur ? `<div class="text-xs font-black text-violet-600 uppercase mb-2">Hàng ngang ${v.row + 1}</div><div class="text-2xl sm:text-3xl font-black mb-5">${rich(cur.text)}</div>${cur.fill ? fillShow(v.rs === 'reveal' ? cur.key : null, 'Học sinh đang gõ đáp án…') : optsHTML(cur.opts, { disabled: true, correct: v.rs === 'reveal' ? cur.ans : -1 })}`
         : g.status === 'final' || g.status === 'review' ? `<div class="text-xs font-black text-amber-600 uppercase mb-2">Chướng ngại vật</div><div class="text-2xl font-black mb-5">${rich(v.cnv ? v.cnv.text : '')}</div>${v.cnv ? (v.fill ? fillShow(g.status === 'review' ? v.cnv.opts[v.cnv.ans] : null, 'Học sinh đang gõ đáp án chướng ngại vật…') : optsHTML(v.cnv.opts, { disabled: true, correct: v.cnv.ans })) : ''}` : '<div class="text-center text-slate-400 font-bold py-10">Bấm “Mở hàng ngang 1” để bắt đầu</div>'}</div>
       <div class="card p-4 space-y-3 h-fit">${rowsBoard(v)}<div class="rounded-xl bg-slate-900 text-white p-3 text-center"><div class="text-[10px] uppercase font-bold text-slate-400">Chướng ngại vật</div><div class="text-lg font-black">${g.status === 'review' && v.cnv ? rich(v.cnv.opts[v.cnv.ans]) : '? ? ?'}</div><div class="text-[11px] text-amber-300 font-bold">${v.opened && g.status === 'play' ? `Đoán ngay: +${RULES.CNV_POINTS[Math.min(v.opened, 4) - 1]}đ` : ''}</div></div></div></div>` +
       scoreCards(p, i => { const a = v.row >= 0 ? v.ans[v.row][i] : null, c = v.cnvTry[i];
@@ -2359,7 +2346,7 @@ function helpContent(k) {
         ['<code>$…$</code>, <code>\\(…\\)</code>, <code>$$…$$</code>, <code>\\ce{…}</code>', 'Công thức toán, hóa học.'],
         ['<code>\\textbf</code>, <code>\\textit</code>, <code>\\emph</code>, <code>\\underline</code>, <code>\\\\</code>, <code>itemize</code>, <code>center</code>', 'Định dạng chữ, xuống dòng, gạch đầu dòng.'],
         ['<code>\\choiceTF</code>, câu tự luận', 'Bỏ qua (trò chơi chỉ dùng trắc nghiệm 4 đáp án) – trang báo số câu bị bỏ qua.'],
-        ['<code>\\shortans[oly]{12,5}</code> hoặc dòng <code>Đáp số: 12,5</code> (Word)', 'Chỉ dùng ở vòng Vượt chướng ngại vật khi chọn <b>Điền đáp số</b>. Đặt trong mục [VCNV] như các câu hàng ngang.']]) +
+        ['<code>\\shortans[oly]{12,5}</code> hoặc dòng <code>Đáp số: 12,5</code> (Word)', 'Hệ thống tự nhận là <b>câu điền số</b> (học sinh gõ số, 12,5 hoặc 12.5 đều đúng). Đặt trong mục [VCNV]; có thể trộn với câu trắc nghiệm trong cùng vòng.']]) +
       tip('<b>Lưu ý về hình TikZ:</b> hình được vẽ qua dịch vụ trực tuyến miễn phí <b>Upmath</b> nên <b>cần Internet</b> trên mọi máy. Nên dùng nhãn <b>không dấu / ký hiệu</b> trong hình (chữ tiếng Việt có dấu trong hình có thể không hiển thị). Các gói vẽ riêng như <code>tkz-euclide</code>, <code>tkz-tab</code> có thể không được hỗ trợ – nếu hình không vẽ được, ô hình sẽ hiện cảnh báo màu vàng. Lệnh <code>\\includegraphics</code> (ảnh từ file) chưa hỗ trợ.') +
       tip('Mẹo: soạn và biên dịch thử file .tex như bình thường để chắc mã đúng, rồi mới nạp vào trò chơi.', 'emerald');
     case 'excel': return H2('Cấu trúc file Excel danh sách lớp') + P('File <b>.xlsx</b>, <b>.xls</b> hoặc <b>.csv</b>, lấy <b>trang tính đầu tiên</b>. Hàng đầu là tiêu đề cột.') +
