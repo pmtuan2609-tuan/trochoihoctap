@@ -1261,7 +1261,7 @@ function hostInit() {
   setInterval(hostTick, 250);
   setInterval(() => { if (H.phase !== 'setup') Net.heartbeat(); }, 2000);
   Net.onStatus = () => { if (H.phase === 'lobby') renderHost(); };
-  commit();
+  commit(); applyGameParam();
 }
 
 function buildPub() {
@@ -2607,6 +2607,17 @@ function mgTeamHTML(p, t) {
   <div class="card p-4 flex justify-between items-center"><b>${esc(me.name)}</b><span class="text-3xl font-black">${me.score}</span></div></div>`;
 }
 
+/* Mở đúng trò theo ?game=... (chạy ngay sau khi đăng nhập/khởi tạo, nên không bị quay về trò cũ) */
+async function applyGameParam() {
+  const gid = QS.get('game'); if (!gid || window._gp) return; window._gp = 1;
+  try { history.replaceState(null, '', location.pathname + '?gv'); } catch (e) { }
+  if (gid === 'champions') {
+    if (!H.game) return;
+    if (H.phase !== 'setup') { if (!(await ask({ title: 'Chuyển sang EDU Champions?', msg: 'Phòng chờ, mã PIN và điểm của trò đang chạy sẽ bị đóng.', ok: 'Chuyển trò chơi', tone: 'warn', icon: 'fa-right-left' }))) return; closeRoom(); }
+    H.game = null; H.mg = null; H.phase = 'setup'; H.g = null; H.teams.forEach(t => { t.dev = null; t.score = 0; t.pin = ''; }); commit(); return;
+  }
+  if (MORE_GAMES.some(g => g.id === gid)) mg_play(gid);
+}
 /* ============================ ĐĂNG NHẬP GV ============================ */
 const AUTH_HASH = '531ddb6aebcb5c05ed6a18e7ff3c66272aebb9cc9834e68e3af1cf1d59731b09'; // tài khoản quản trị (đã mã hóa)
 function authUser() { try { return localStorage.getItem('olp_auth') || sessionStorage.getItem('olp_auth') || ''; } catch (e) { return ''; } }
@@ -2680,7 +2691,6 @@ document.addEventListener('click', e => {
 Net.init();
 setInterval(updateTimers, 200);
 IS_TEAM ? teamInit() : (authUser() ? hostInit() : renderLogin());
-if (!IS_TEAM) setTimeout(() => { if (typeof H === 'undefined' || !H) return; const gid = QS.get('game'); if (gid && MORE_GAMES.some(g => g.id === gid)) mg_play(gid); else if (QS.has('gv') && H.game && H.phase === 'setup') { H.game = null; commit(); } }, 500);
 </script>
 </body>
 </html>

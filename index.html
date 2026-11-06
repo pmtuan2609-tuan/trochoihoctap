@@ -75,7 +75,7 @@ function liveRow(logo, name, sub, g) {
   return `<div class="rounded-3xl p-5 sm:p-6 flex flex-wrap items-center gap-5 text-white" style="background:${g ? g.color : 'linear-gradient(120deg,#0f172a,#4c1d95)'}">
     <div class="w-[84px] h-[84px] grid place-items-center flex-shrink-0">${logo}</div>
     <div class="flex-1 min-w-[220px]"><div class="text-2xl sm:text-3xl font-black">${name}</div><div class="text-sm text-white/80 mt-1">${sub}</div></div>
-    <a href="${g ? href(g) : GAME_FILE + '?gv'}" class="px-7 py-3.5 rounded-2xl bg-amber-300 text-slate-900 font-black">Mở phòng thi</a></div>`;
+    <a href="${g ? href(g) : GAME_FILE + '?gv&game=champions'}" class="px-7 py-3.5 rounded-2xl bg-amber-300 text-slate-900 font-black">Mở phòng thi</a></div>`;
 }
 function render() {
   const out = MORE.filter(g => promoted[g.id]), rest = MORE.filter(g => !promoted[g.id]);
