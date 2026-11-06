@@ -2100,10 +2100,22 @@ function renderTeam() {
   const p = T.p, me = p.teams[T.t];
   if (p.phase === 'end' && !T.confetti && window.confetti) { T.confetti = true; setTimeout(() => confetti({ particleCount: 140, spread: 90, origin: { y: .55 } }), 1300); }
   if (p.phase !== 'end') T.confetti = false;
-  root.innerHTML = teamHeaderHTML(p, me) + `
-    ${T.lost ? '<div class="max-w-4xl mx-auto px-3 pt-3"><div class="rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-bold px-4 py-2.5"><i class="fa-solid fa-wifi fa-fade"></i> Mất kết nối với máy giáo viên – đang tự kết nối lại…</div></div>' : ''}
+  root.innerHTML = teamHeaderHTML(p, me) + teamTimerStrip(p) + `
+    ${T.lost ?'<div class="max-w-4xl mx-auto px-3 pt-3"><div class="rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-bold px-4 py-2.5"><i class="fa-solid fa-wifi fa-fade"></i> Mất kết nối với máy giáo viên – đang tự kết nối lại…</div></div>' : ''}
     <main class="max-w-4xl mx-auto p-3 sm:p-6 pb-10">${teamScreen(p, T.t, { ro: false, pend: T.pend, cnvOpen: T.cnvOpen, pick: T.pick })}</main>`;
   renderMath($('#app')); updateTimers();
+}
+/* Thanh đếm ngược cho học sinh: hiện khi đang có giờ đếm ngược, ẩn khi không có */
+function teamTimerStrip(p) {
+  const v = p.view; if (!v || p.phase !== 'game' || p.status === 'review') return '';
+  const dl = v.deadline || v.finalDl;
+  if (!dl || dl <= Net.now()) return '';
+  let total = v.total;
+  if (!total) total = p.round === 1 ? RULES.R1_TIME
+    : p.round === 2 ? (p.status === 'final' ? RULES.CNV_FINAL_TIME : RULES.R2_ROW_TIME)
+    : p.round === 3 ? RULES.R3_TIME : RULES.BUZZ_TIME;
+  return `<div class="max-w-4xl mx-auto px-3 pt-3"><div class="card p-3 sm:p-4 flex items-center gap-3">
+    <span class="text-[11px] font-black text-slate-500 uppercase tracking-wider whitespace-nowrap"><i class="fa-solid fa-hourglass-half"></i> Thời gian</span>${timerHTML(dl, total)}</div></div>`;
 }
 function teamHeaderHTML(p, me, sticky = true) {
   return `
