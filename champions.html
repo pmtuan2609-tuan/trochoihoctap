@@ -1016,6 +1016,7 @@ function scoreStrip(p, me = -1) {
    ctx = { ro: chỉ xem, pend: thao tác đang gửi, cnvOpen, pick }
    ===================================================================== */
 function teamScreen(p, t, ctx) {
+  if (p.game && p.game !== 'champions' && p.phase === 'game' && p.mg) return mgTeamHTML(p, t);
   if (p.phase === 'lobby') {
     const n = p.teams.filter(x => x.dev).length;
     return waitBox('Đã vào phòng – chờ giáo viên bắt đầu', `${n}/${p.teams.length} đội đã sẵn sàng`,
@@ -1265,7 +1266,9 @@ function hostInit() {
 
 function buildPub() {
   const p = { roomId: H.roomId, phase: H.phase, teams: H.teams.map(t => ({ name: t.name, color: t.color, members: t.members, dev: t.dev, score: t.score, tb: t.tb || 0 })), rejects: H.rejects };
-  if (H.phase === 'game') { p.round = H.g.round; p.status = H.g.status; p.view = pubRound(H.g); }
+  p.game = H.game || 'champions';
+  if (H.game && H.phase === 'game') { const g = mgGame(), rd = g.rounds[H.mg.r]; p.mg = { r: H.mg.r, n: rd.n, rule: rd.rule, card: rd.items[H.mg.ci[g.id + H.mg.r] || 0], team: H.mg.team, gn: g.name, c: g.color }; }
+  else if (H.phase === 'game') { p.round = H.g.round; p.status = H.g.status; p.view = pubRound(H.g); }
   return p;
 }
 function pubRound(g) {
@@ -1616,8 +1619,8 @@ function h_downloadTemplate() {
 /* ---------- Vẽ màn hình GV ---------- */
 function renderHost() {
   RR = 0;
-  const body = H.phase === 'setup' ? setupHTML() : H.phase === 'lobby' ? lobbyHTML() : H.phase === 'game' ? gameHTML() : endHTML();
-  const crumb = { setup: 'Danh sách & Chia đội', lobby: 'Phòng chờ & Mã PIN', game: H.g ? `Vòng ${H.g.round}: ${ROUND_NAMES[H.g.round]}` : 'Thi đấu', end: 'Kết quả chung cuộc' }[H.phase];
+  const body = H.phase === 'setup' ? setupHTML() : H.phase === 'lobby' ? lobbyHTML() : H.phase === 'game' ? (H.game ? mgHostHTML() : gameHTML()) : endHTML();
+  const crumb = { setup: 'Danh sách & Chia đội', lobby: 'Phòng chờ & Mã PIN', game: H.game ? mgGame().rounds[H.mg.r].n : H.g ? `Vòng ${H.g.round}: ${ROUND_NAMES[H.g.round]}` : 'Thi đấu', end: 'Kết quả chung cuộc' }[H.phase];
   $('#app').innerHTML = `
   <div class="w-full min-h-screen flex">
     ${sidebarHTML()}
@@ -2546,6 +2549,64 @@ function mgDraw() {
   r.innerHTML = `<div class="fixed inset-0 z-[95] bg-slate-950/75 backdrop-blur-sm p-3 sm:p-6 overflow-y-auto" onclick="if(event.target===this)mg_close()"><div class="max-w-[1200px] mx-auto bg-slate-50 rounded-3xl shadow-2xl overflow-hidden pop">${head}${body}</div></div>`;
 }
 
+/* ===== v2: MỖI GAME CÓ LUỒNG RIÊNG: Cách chơi -> Danh sách & Chia đội -> Phòng chờ (PIN riêng) -> Thi đấu =====
+   PIN 6 số, số đầu cho biết trò: 1 = EDU Champions, 2 = Đại Chiến Từ Khóa, 3 = Vòng Quay Tri Thức, 4 = Tiếp Sức Đồng Đội.
+   Phòng còn gửi kèm trường "game" nên máy học sinh tự nhận ra trò chơi sau khi nhập PIN. */
+const GAME_PRE = { champions: '1', tukhoa: '2', quay: '3', tiepsuc: '4' };
+makePins = function (n, pre) { pre = pre || GAME_PRE[(H && H.game) || 'champions'] || '1'; const s = new Set(); while (s.size < n) s.add(pre + String(10000 + Math.floor(Math.random() * 90000))); return [...s]; };
+mgGame = () => MORE_GAMES.find(g => g.id === (H && H.game));
+const _hs = h_start;
+h_start = function () { if (!H.game) return _hs(); H.mg = H.mg || { r: 0, ci: {}, team: 0 }; H.teams.forEach(t => { t.score = 0; }); H.phase = 'game'; H.g = { round: H.mg.r + 1, status: 'play', bank: null }; UI.tab = 'main'; mg_stop(); commit(); };
+mg_play = async function (id) {
+  if (H.game === id && H.phase !== 'setup') return;
+  if (H.phase !== 'setup' && !(await ask({ title: 'Chuyển sang trò chơi khác?', msg: 'Phòng chờ, mã PIN và điểm của trò đang chạy sẽ bị đóng.', ok: 'Chuyển trò chơi', tone: 'warn', icon: 'fa-right-left' }))) return;
+  if (H.phase !== 'setup') closeRoom();
+  H.game = id; H.phase = 'setup'; H.g = null; H.mg = { r: 0, ci: {}, team: 0 }; H.teams.forEach(t => { t.dev = null; t.score = 0; t.pin = ''; });
+  MG.open = false; mgDraw(); UI.intro = id; commit(); mgIntro();
+};
+function mg_help() { UI.intro = H.game; mgIntro(); }
+function mg_introOk() { UI.intro = null; mgIntro(); }
+function mgIntro() {
+  let r = $('#mg-intro'); if (!r) { r = document.createElement('div'); r.id = 'mg-intro'; document.body.appendChild(r); }
+  const g = MORE_GAMES.find(x => x.id === UI.intro); if (!g) { r.innerHTML = ''; return; }
+  r.innerHTML = `<div class="fixed inset-0 z-[96] bg-slate-950/75 backdrop-blur-sm p-4 overflow-y-auto grid place-items-center"><div class="w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden pop">
+    <div class="px-6 py-5 text-white flex items-center gap-3" style="background:${g.color}"><i class="fa-solid ${g.icon} text-3xl"></i><div><div class="text-2xl font-black">${g.name}</div><div class="text-sm text-white/85">${g.desc}</div></div></div>
+    <div class="p-6 space-y-3"><div class="font-black text-slate-800">Cách chơi</div>
+      ${g.rounds.map((q, i) => `<div class="flex gap-3 p-3 rounded-2xl bg-slate-50 border border-slate-200"><div class="w-9 h-9 rounded-xl text-white grid place-items-center font-black flex-shrink-0" style="background:${g.color}">${i + 1}</div><div><div class="font-black">${q.n} <span class="text-xs font-bold text-slate-500">• ${q.t}s • ±${q.pts} điểm</span></div><div class="text-sm text-slate-600">${q.rule}</div></div></div>`).join('')}
+      <div class="text-sm font-bold text-slate-600 bg-amber-50 border border-amber-200 rounded-xl p-3">Mã PIN của trò này bắt đầu bằng số <b>${GAME_PRE[g.id]}</b>. Học sinh chỉ cần nhập mã PIN, hệ thống tự vào đúng trò.</div>
+      <button class="btn btn-pri w-full py-3" onclick="mg_introOk()">Đã hiểu – nạp danh sách & chia đội</button></div></div></div>`;
+}
+const _hero = heroHTML;
+heroHTML = function (title, desc, pill) {
+  const g = mgGame(); if (!g) return _hero(title, desc, pill);
+  return `<div class="rounded-3xl p-6 sm:p-8 text-white mb-6 shadow-xl" style="background:linear-gradient(120deg,${g.color},#0f172a)"><div class="flex flex-wrap items-center justify-between gap-3"><span class="bg-white text-slate-900 px-2.5 py-1 rounded-full text-[11px] font-black">${pill} • THỬ NGHIỆM</span><button class="btn bg-white/15 text-white" onclick="mg_help()"><i class="fa-solid fa-book-open"></i> Xem cách chơi</button></div>
+    <h1 class="text-3xl sm:text-4xl font-black mt-3">${g.name}</h1><p class="text-white/90 text-sm mt-1 max-w-3xl">${g.desc}</p>
+    <div class="grid sm:grid-cols-3 gap-3 mt-5">${g.rounds.map((q, i) => `<div class="p-4 rounded-2xl bg-white/15 border border-white/25"><div class="text-xs font-black uppercase">Vòng ${i + 1}: ${q.n}</div><div class="text-lg font-black">±${q.pts} điểm • ${q.t}s</div></div>`).join('')}</div></div>`;
+};
+mg_stop = function () { clearInterval(MG.tm); MG.tm = null; const g = mgGame(); MG.left = g && H.mg ? g.rounds[H.mg.r].t : 0; };
+mg_timer = function () { if (MG.tm) { clearInterval(MG.tm); MG.tm = null; return renderHost(); } if (MG.left <= 0) mg_stop(); MG.tm = setInterval(() => { MG.left--; const e = $('#mg-t'); if (e) e.textContent = MG.left; if (MG.left <= 0) { clearInterval(MG.tm); MG.tm = null; toast('Hết giờ!', 'warn', 2500); renderHost(); } }, 1000); renderHost(); };
+mg_round = function (r) { H.mg.r = r; H.g = { round: r + 1, status: 'play', bank: null }; mg_stop(); commit(); };
+mg_card = function (d) { const g = mgGame(), it = g.rounds[H.mg.r].items, k = g.id + H.mg.r; H.mg.ci[k] = d === 0 ? Math.floor(Math.random() * it.length) : ((H.mg.ci[k] || 0) + d + it.length) % it.length; commit(); };
+mg_pts = function (ti, s) { H.teams[ti].score += s * mgGame().rounds[H.mg.r].pts; commit(); };
+function mg_team(i) { H.mg.team = i; commit(); }
+mg_resetScore = function () { H.teams.forEach(t => { t.score = 0; }); commit(); };
+function mgHostHTML() {
+  const g = mgGame(); H.mg = H.mg || { r: 0, ci: {}, team: 0 }; const rd = g.rounds[H.mg.r], it = rd.items[H.mg.ci[g.id + H.mg.r] || 0];
+  return `<div class="space-y-4"><div class="flex flex-wrap gap-2">${g.rounds.map((q, i) => `<button onclick="mg_round(${i})" class="px-4 py-2 rounded-xl text-sm font-black border-2 ${i === H.mg.r ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-600 border-slate-200'}">Vòng ${i + 1}: ${q.n}</button>`).join('')}</div>
+  <div class="grid lg:grid-cols-[1fr_340px] gap-4"><div class="rounded-3xl p-6 text-white text-center" style="background:linear-gradient(135deg,${g.color},#0f172a)"><div class="text-sm font-bold text-white/85">${rd.rule}</div><div class="text-4xl font-black my-8 min-h-[90px] grid place-items-center">${esc(it)}</div>
+    <div class="flex flex-wrap justify-center items-center gap-2"><button class="btn bg-white/15 text-white" onclick="mg_card(-1)"><i class="fa-solid fa-chevron-left"></i></button><button class="btn bg-white text-slate-900" onclick="mg_card(0)"><i class="fa-solid fa-shuffle"></i> Thẻ ngẫu nhiên</button><button class="btn bg-white/15 text-white" onclick="mg_card(1)"><i class="fa-solid fa-chevron-right"></i></button>
+    <span class="mx-2 text-5xl font-black tabular-nums" id="mg-t">${MG.left || rd.t}</span><button class="btn btn-ok" onclick="mg_timer()"><i class="fa-solid ${MG.tm ? 'fa-pause' : 'fa-play'}"></i> ${MG.tm ? 'Dừng' : 'Bấm giờ'}</button></div></div>
+  <div class="card p-4 space-y-2"><div class="flex justify-between"><b>Bảng điểm</b><span class="text-[11px] font-bold text-slate-400">±${rd.pts}/lần • bấm tên đội để giao lượt</span></div>
+    ${H.teams.map((t, i) => `<div class="flex items-center gap-2 p-2 rounded-xl border-2 ${H.mg.team === i ? 'border-amber-400 bg-amber-50' : 'border-slate-200 bg-slate-50'}"><button class="flex-1 text-left font-black truncate" onclick="mg_team(${i})">${esc(t.name)}</button><button class="w-8 h-8 rounded-lg bg-rose-100 text-rose-700 font-black" onclick="mg_pts(${i},-1)">−</button><div class="w-12 text-center text-xl font-black tabular-nums">${t.score}</div><button class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 font-black" onclick="mg_pts(${i},1)">+</button></div>`).join('')}
+    <button class="btn btn-soft w-full" onclick="mg_resetScore()"><i class="fa-solid fa-rotate"></i> Đặt lại điểm</button></div></div></div>`;
+}
+function mgTeamHTML(p, t) {
+  const m = p.mg, me = p.teams[t], mine = m.team === t;
+  return `<div class="space-y-3"><div class="rounded-3xl p-5 text-white text-center" style="background:${m.c}"><div class="text-xs font-black uppercase opacity-90">${esc(m.gn)} • Vòng ${m.r + 1}: ${esc(m.n)}</div><div class="text-sm mt-1 opacity-95">${esc(m.rule)}</div></div>
+  <div class="card p-5 text-center">${mine ? `<div class="text-xs font-black text-emerald-700">ĐẾN LƯỢT ĐỘI BẠN</div><div class="text-2xl font-black mt-2">${esc(m.card)}</div>` : `<div class="text-sm font-bold text-slate-500">Đội <b>${esc(p.teams[m.team].name)}</b> đang chơi. Chuẩn bị đến lượt!</div>`}</div>
+  <div class="card p-4 flex justify-between items-center"><b>${esc(me.name)}</b><span class="text-3xl font-black">${me.score}</span></div></div>`;
+}
+
 /* ============================ ĐĂNG NHẬP GV ============================ */
 const AUTH_HASH = '531ddb6aebcb5c05ed6a18e7ff3c66272aebb9cc9834e68e3af1cf1d59731b09'; // tài khoản quản trị (đã mã hóa)
 function authUser() { try { return localStorage.getItem('olp_auth') || sessionStorage.getItem('olp_auth') || ''; } catch (e) { return ''; } }
@@ -2619,7 +2680,7 @@ document.addEventListener('click', e => {
 Net.init();
 setInterval(updateTimers, 200);
 IS_TEAM ? teamInit() : (authUser() ? hostInit() : renderLogin());
-if (!IS_TEAM && QS.get('game')) setTimeout(() => { if (typeof H !== 'undefined' && H && MORE_GAMES.some(g => g.id === QS.get('game'))) mg_play(QS.get('game')); }, 500);
+if (!IS_TEAM) setTimeout(() => { if (typeof H === 'undefined' || !H) return; const gid = QS.get('game'); if (gid && MORE_GAMES.some(g => g.id === gid)) mg_play(gid); else if (QS.has('gv') && H.game && H.phase === 'setup') { H.game = null; commit(); } }, 500);
 </script>
 </body>
 </html>
