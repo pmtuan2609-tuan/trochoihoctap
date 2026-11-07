@@ -1727,6 +1727,14 @@ async function h_bankFile(file) {
     toast(note || `Đã nạp ${b.total} câu hỏi từ “${file.name}”`, b.warn.length ? 'warn' : 'success', 4500);
   } catch (e) { say({ title: 'Không đọc được file', msg: e.message, tone: 'danger', icon: 'fa-file-circle-xmark' }); }
 }
+async function h_clearRoster() {
+  if (!await ask({ title: 'Xóa danh sách lớp?', msg: 'Danh sách học sinh và cách chia đội hiện tại sẽ bị xóa. Bạn có thể nạp danh sách mới ngay sau đó.', ok: 'Xóa danh sách', tone: 'danger', icon: 'fa-trash' })) return;
+  H.students = []; H.teams.forEach(t => t.members = []); UI.msg = ''; commit(); toast('Đã xóa danh sách lớp – hãy nạp danh sách mới');
+}
+async function h_clearBank() {
+  if (!await ask({ title: 'Xóa file câu hỏi đã nạp?', msg: 'Bộ câu hỏi đang dùng sẽ bị xóa và quay về bộ câu hỏi mẫu. Bạn có thể nạp file mới ngay sau đó.', ok: 'Xóa file', tone: 'danger', icon: 'fa-trash' })) return;
+  H.bankText = SAMPLE_BANK; H.bankName = 'Bộ câu hỏi mẫu – KHTN 8 (Chương I–II)'; commit(); toast('Đã xóa file đã nạp – hãy nạp file câu hỏi mới');
+}
 function h_sampleBank() { H.bankText = SAMPLE_BANK; H.bankName = 'Bộ câu hỏi mẫu – KHTN 8 (Chương I–II)'; commit(); }
 function h_downloadTemplate() {
   const a = document.createElement('a');
@@ -1875,7 +1883,8 @@ function setupHTML() {
         <i class="fa-solid fa-file-excel text-emerald-600 text-2xl"></i><div class="font-bold text-sm mt-1">Chọn file Excel danh sách lớp</div><div class="text-[11px] text-slate-500">Cột: STT | Họ và tên | Lớp</div></label>
       <div><textarea id="paste-names" rows="3" class="w-full rounded-xl border border-slate-200 p-3 text-sm" placeholder="Hoặc dán danh sách tên, mỗi dòng 1 học sinh"></textarea><div class="flex flex-wrap gap-2 mt-1"><button class="btn btn-soft" onclick="h_rosterPaste()"><i class="fa-solid fa-paste"></i> Nạp từ danh sách dán</button>
         <button class="btn btn-soft" onclick="h_sampleExcel()"><i class="fa-solid fa-file-excel text-emerald-600"></i> Tải Excel mẫu</button>
-        <button class="btn btn-soft" onclick="h_help('excel')"><i class="fa-solid fa-circle-question text-amber-600"></i> Cấu trúc Excel</button></div></div>
+        <button class="btn btn-soft" onclick="h_help('excel')"><i class="fa-solid fa-circle-question text-amber-600"></i> Cấu trúc Excel</button>
+        ${H.students.length ? '<button class="btn btn-soft !text-rose-600" onclick="h_clearRoster()"><i class="fa-solid fa-trash"></i> Xóa danh sách đã nạp</button>' : ''}</div></div>
     </div>
     <div class="mt-3 text-sm font-bold ${H.students.length ? 'text-emerald-700' : 'text-slate-400'}">${UI.msg || (H.students.length ? `Đã có ${H.students.length} học sinh` : 'Chưa có danh sách lớp')}</div>`;
   const teams = `
@@ -1903,6 +1912,7 @@ function setupHTML() {
       <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 flex flex-col justify-between gap-2">
         <div class="font-bold text-sm"><i class="fa-solid fa-file-lines text-blue-600"></i> Đang dùng: ${esc(H.bankName)} <span class="text-slate-400">(${b.total} câu)</span></div>
         <div class="flex flex-wrap gap-2">
+          ${H.bankText !== SAMPLE_BANK ? '<button class="btn btn-soft !py-1.5 !text-xs !text-rose-600" onclick="h_clearBank()"><i class="fa-solid fa-trash"></i> Xóa file đã nạp</button>' : ''}
           <button class="btn btn-soft !py-1.5 !text-xs" onclick="h_sampleBank()"><i class="fa-solid fa-flask"></i> Bộ mẫu KHTN 8</button>
           <button class="btn btn-soft !py-1.5 !text-xs" onclick="h_sampleDocx()"><i class="fa-solid fa-file-word text-blue-600"></i> Word mẫu</button>
           <button class="btn btn-soft !py-1.5 !text-xs" onclick="h_sampleTex()"><i class="fa-solid fa-file-code text-purple-600"></i> .tex mẫu</button>
