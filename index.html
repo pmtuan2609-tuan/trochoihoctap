@@ -2516,6 +2516,7 @@ function previewMock(k) {
   const b = buildBank(H.bankText), now = Net.now(), D = s => now + s * 1000;
   const fb = { text: 'Câu hỏi mẫu', opts: ['Đáp án A', 'Đáp án B', 'Đáp án C', 'Đáp án D'], ans: 0 };
   const q = (arr, i) => (arr && arr[i]) || fb;
+  const mockAns = (x, bad) => KIND(x) === 'sa' ? { c: -1, txt: bad ? '0' : x.sa } : KIND(x) === 'tf' ? { c: -1, tf: tfStr(bad ? x.tf.map((v, i) => i ? v : !v) : x.tf) } : { c: bad ? (x.ans + 1) % 4 : x.ans };
   const teams = H.teams.map((t, i) => ({ name: t.name, color: t.color, members: t.members.length ? t.members : ['Học sinh A', 'Học sinh B'], dev: 'demo' + i, score: [60, 40, 30, 10][i] ?? 0 }));
   const p = { roomId: 'demo', teams, rejects: {}, phase: 'game', round: 1, status: 'play' };
   let t = 0, ctx = { ro: true };
@@ -2527,15 +2528,15 @@ function previewMock(k) {
   if (k === 'r2') {
     p.round = 2; const r0 = q(b.r2, 0), r1 = q(b.r2, 1), c = b.cnv || fb;
     p.view = { row: 1, rs: 'play', start: now, deadline: D(12), finalDl: 0, solved: -1,
-      rows: [0, 1, 2, 3].map(i => i === 0 ? { text: r0.text, opts: r0.opts, ans: r0.ans, key: r0.opts[r0.ans], open: true } : i === 1 ? { text: r1.text, opts: r1.opts, ans: -1, key: null, open: false } : { text: null, opts: null, ans: -1, key: null, open: false }),
-      ans: [0, 1, 2, 3].map(i => teams.map((_, ti) => i === 0 ? (ti === 3 ? null : { c: ti === 2 ? (r0.ans + 1) % 4 : r0.ans, t: 2300 + ti * 1700, ok: ti !== 2 }) : i === 1 && ti === 2 ? { c: 0, t: 3400, ok: null } : null)), cnv: { text: c.text, opts: c.opts, ans: -1 }, hasCnv: true, cnvTry: teams.map(() => null), opened: 1 };
+      rows: [0, 1, 2, 3].map(i => i === 0 ? { text: r0.text, opts: r0.opts, ans: r0.ans, key: expectedOf(r0), fill: r0.sa !== undefined, open: true } : i === 1 ? { text: r1.text, opts: r1.opts, ans: -1, key: null, fill: r1.sa !== undefined, open: false } : { text: null, opts: null, ans: -1, key: null, open: false }),
+      ans: [0, 1, 2, 3].map(i => teams.map((_, ti) => i === 0 ? (ti === 3 ? null : { ...mockAns(r0, ti === 2), t: 2300 + ti * 1700, ok: ti !== 2 }) : i === 1 && ti === 2 ? { c: 0, t: 3400, ok: null } : null)), cnv: { text: c.text, opts: c.opts, ans: -1, kind: KIND(c), key: null }, hasCnv: true, cnvTry: teams.map(() => null), opened: 1 };
   }
-  if (k === 'r3') { p.round = 3; const x = q(b.r3, 0); p.view = { q: 0, n: 4, qs: 'play', start: now, deadline: D(24), text: x.text, opts: x.opts, ans: -1, answers: teams.map((_, ti) => ti === 1 ? { c: x.ans, t: 4120, ok: null } : ti === 3 ? { c: (x.ans + 2) % 4, t: 6800, ok: null } : null), award: teams.map(() => 0) }; }
+  if (k === 'r3') { p.round = 3; const x = q(b.r3, 0); p.view = { q: 0, n: 4, qs: 'play', start: now, deadline: D(24), text: x.text, opts: x.opts, ans: -1, kind: KIND(x), key: null, tfk: null, answers: teams.map((_, ti) => ti === 1 ? { ...mockAns(x, false), t: 4120, ok: null } : ti === 3 ? { ...mockAns(x, true), t: 6800, ok: null } : null), award: teams.map(() => 0) }; }
   if (k.startsWith('r4')) {
     p.round = 4; const x = q(b.v[20], 0);
     p.view = { order: teams.map((_, i) => i), turn: 0, active: 0, st: 'pick', pkg: 0, star: -1, qi: 0, pts: [], hist: [], text: null, opts: null, ans: -1, deadline: D(15), total: 15, main: null, buzzer: -1, steal: null };
     if (k === 'r4pick') ctx.pick = { pkg: 80, star: 1 };
-    if (k !== 'r4pick') Object.assign(p.view, { st: k === 'r4q' ? 'answer' : 'buzz', pkg: 80, star: 1, pts: [20, 30, 30], text: x.text, opts: x.opts, deadline: D(k === 'r4q' ? 11 : 4), total: k === 'r4q' ? 15 : RULES.BUZZ_TIME, main: k === 'r4buzz' ? { c: (x.ans + 1) % 4, ok: false } : null });
+    if (k !== 'r4pick') Object.assign(p.view, { st: k === 'r4q' ? 'answer' : 'buzz', pkg: 80, star: 1, pts: [20, 30, 30], text: x.text, opts: x.opts, kind: KIND(x), deadline: D(k === 'r4q' ? 11 : 4), total: k === 'r4q' ? 15 : RULES.BUZZ_TIME, main: k === 'r4buzz' ? { ...mockAns(x, true), ok: false, to: false } : null });
     if (k === 'r4buzz') t = 1;
   }
   if (k === 'review') {
@@ -2544,7 +2545,7 @@ function previewMock(k) {
   }
   if (k === 'r5') {
     p.round = 5; teams[0].score = teams[1].score = 60; const x = q(b.tb, 0);
-    p.view = { group: [0, 1], alive: [0, 1], st: 'buzz', qi: 0, text: x.text, opts: x.opts, ans: -1, deadline: D(11), total: RULES.TB_BUZZ_TIME, buzzer: -1, res: null, msg: '' };
+    p.view = { group: [0, 1], alive: [0, 1], st: 'buzz', qi: 0, text: x.text, opts: x.opts, ans: -1, kind: KIND(x), key: null, deadline: D(11), total: RULES.TB_BUZZ_TIME, buzzer: -1, res: null, msg: '' };
   }
   if (k === 'end') p.phase = 'end';
   return { p, t, ctx };
