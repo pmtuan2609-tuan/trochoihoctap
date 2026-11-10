@@ -533,7 +533,7 @@ const PEER_PREFIX = 'edugame-olympia-v1-';
 // Máy chủ trung chuyển (STUN/TURN) để kết nối được giữa các trình duyệt/mạng khác nhau (Chrome ↔ Safari, wifi ↔ 4G)
 window.PEER_OPTIONS = window.PEER_OPTIONS || { config: { iceServers: [
   { urls: 'stun:stun.l.google.com:19302' }, { urls: 'stun:stun1.l.google.com:19302' }, { urls: 'stun:global.stun.twilio.com:3478' },
-  { urls: ['turn:openrelay.metered.ca:80', 'turn:openrelay.metered.ca:443', 'turn:openrelay.metered.ca:443?transport=tcp'], username: 'openrelayproject', credential: 'openrelayproject' }
+  { urls: ['turn:openrelay.metered.ca:80', 'turn:openrelay.metered.ca:443', 'turn:openrelay.metered.ca:443?transport=tcp', 'turns:openrelay.metered.ca:443?transport=tcp'], username: 'openrelayproject', credential: 'openrelayproject' }
 ] } };
 const Net = {
   mode: 'local', offset: 0, db: null, bc: null,
@@ -618,10 +618,14 @@ const Net = {
       let done = false;
       const fin = v => { if (!done) { done = true; clearTimeout(to); this._fin = null; res(v); } };
       this._fin = fin;
-      const to = setTimeout(() => { this.err = this.err || 'timeout'; fin(null); }, 20000);
+      let stage = 'signal', retry = null;
+      const to = setTimeout(() => { this.err = this.err || (stage === 'signal' ? 'timeout-signal' : stage === 'dial' ? 'timeout-ice' : 'timeout-nopub'); clearTimeout(retry); fin(null); }, 25000);
       const start = () => {
         if (this.conn) { try { this.conn.close(); } catch (e) { } this.conn = null; }
+        stage = 'dial'; clearTimeout(retry);
         const c = this.peer.connect(PEER_PREFIX + pin, { reliable: true });
+        c.on('open', () => { stage = 'open'; clearTimeout(retry); });
+        retry = setTimeout(() => { if (!done && stage === 'dial') { try { c.close(); } catch (e) { } start(); } }, 9000);   // thử quay số lại 1 lần nếu kênh chưa mở
         c.on('error', e => { this.err = this.err || (e && e.type) || 'conn'; });
         c.on('data', d => {
           if (!d || d.k !== 'pub') return;
@@ -2205,6 +2209,9 @@ function pinError() {
   if (['network', 'server-error', 'socket-error', 'socket-closed'].includes(e)) return 'Không kết nối được máy chủ. Kiểm tra Internet (wifi/4G) rồi thử lại.';
   if (e === 'browser-incompatible') return 'Trình duyệt này không hỗ trợ. Hãy mở bằng Chrome, Edge, Safari hoặc Cốc Cốc bản mới.';
   if (e === 'peer-unavailable') return 'Không tìm thấy phòng thi với mã PIN này. Kiểm tra lại mã, và giáo viên phải đang mở trang Phòng chờ (thẻ đội có dòng xanh “Cổng kết nối đã mở”).';
+  if (e === 'timeout-signal') return 'Máy này không nối được máy chủ trung gian (có thể mạng wifi trường chặn). Thử bật 4G/hotspot hoặc đổi mạng rồi tải lại trang.';
+  if (e === 'timeout-ice') return 'Đã tìm thấy phòng nhưng không mở được kênh truyền dữ liệu trực tiếp (mạng wifi trường/nhà mạng chặn kết nối ngang hàng). Thử đổi sang 4G hoặc cho giáo viên dùng chung 1 mạng với học sinh; nếu vẫn lỗi hãy báo giáo viên bật chế độ Firebase.';
+  if (e === 'timeout-nopub') return 'Đã nối được máy giáo viên nhưng chưa nhận được dữ liệu phòng. Giáo viên hãy mở lại trang Phòng chờ (không ở màn hình chuẩn bị) rồi học sinh thử lại.';
   return 'Chưa kết nối được tới máy giáo viên' + (e ? ` (mã lỗi: ${e})` : '') + '. Kiểm tra mã PIN, Internet, giáo viên phải đang mở Phòng chờ; thử lại sau vài giây hoặc tải lại trang (Ctrl+Shift+R).';
 }
 Net.onLost = () => { if (IS_TEAM && T.t >= 0 && T.pin) { T.lost = true; renderTeam(); teamReconnect(0); } };
