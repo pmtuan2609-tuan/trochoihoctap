@@ -495,7 +495,7 @@ function ask(o) {   // trả về Promise<true/false>
     const wrap = document.createElement('div');
     wrap.className = 'ui-dlg fixed inset-0 z-[300] grid place-items-center p-4';
     wrap.innerHTML = `<div class="ui-dlg-bg absolute inset-0 bg-slate-950/60 backdrop-blur-sm"></div>
-      <div role="alertdialog" aria-modal="true" class="ui-dlg-card relative w-full max-w-[420px] bg-white rounded-[1.75rem] shadow-2xl overflow-hidden">
+      <div role="alertdialog" aria-modal="true" class="ui-dlg-card relative w-full ${o.wide ? "max-w-[560px]" : "max-w-[420px]"} bg-white rounded-[1.75rem] shadow-2xl overflow-hidden">
         <div class="h-1.5" style="background:${t.grad}"></div>
         <div class="px-6 sm:px-7 pt-6 pb-5 text-center">
           <div class="mx-auto w-16 h-16 rounded-2xl grid place-items-center text-2xl" style="background:${t.bg};color:${t.c}"><i class="fa-solid ${o.icon || t.icon}"></i></div>
@@ -755,11 +755,11 @@ function texToBank(tex) {
   s = s.replace(/\\begin\{ex\}[ \t]*%([^\n]*)/g, (all, c) => { const t = (c.match(/\[[^\]]+\]/g) || []).map(x => x.slice(1, -1)).find(x => secKey(x) !== 'pool'); return t ? `\\begin{ex}⟦SEC:${t}⟧` : '\\begin{ex}'; })
        .replace(/^[ \t]*%[ \t]*\[([^\]\n]+)\][^\n]*$/gm, (_, t) => `[${t}]`);
   s = texNoComments(s);
-  const lines = []; let n = 0, skipped = 0, sec = 'pool';
+  const lines = [], bad = []; let n = 0, skipped = 0, sec = 'pool', exN = 0;
   const re = /\\begin\{ex\}|\\(?:sub)*section\*?\{([^}]*)\}|^[ \t]*%?[ \t]*\[([^\]\n]+)\][ \t]*$/gm; let m;
   while ((m = re.exec(s))) {
     if (m[0].startsWith('\\begin{ex}')) {
-      const end = s.indexOf('\\end{ex}', re.lastIndex); if (end < 0) break;
+      exN++; const end = s.indexOf('\\end{ex}', re.lastIndex); if (end < 0) { bad.push({ sec: sec, ref: `Bài \\begin{ex} thứ ${exN}`, snip: s.slice(re.lastIndex, re.lastIndex + 70).replace(/\s+/g, ' ').trim(), why: 'thiếu \\end{ex} đóng câu' }); break; }
       let body = s.slice(re.lastIndex, end); re.lastIndex = end + 8;
       const tag = (body.match(/^⟦SEC:([^⟧]*)⟧/) || [])[1];
       let own = tag && secKey(tag) !== 'pool' ? secKey(tag) : null;
@@ -773,7 +773,7 @@ function texToBank(tex) {
         let ti = tm.index + tm[0].length; ti = texOpt(body, ti)[1];
         const st = [], tv = [];
         for (let k = 0; k < 4; k++) { const tg = texGroup(body, ti); if (!tg) break; let o = tg[0]; tv.push(/\\True(?![A-Za-z])/.test(o)); o = o.replace(/\\True(?![A-Za-z])/g, ''); st.push(texInline(o, libs) || '—'); ti = tg[1]; }
-        if (st.length < 4) { skipped++; continue; }
+        if (st.length < 4) { skipped++; bad.push({ sec: own || sec, ref: `\\begin{ex} thứ ${exN}`, snip: texInline(body.slice(0, tm.index), libs).slice(0, 70), why: `\\choiceTF cần đủ 4 ý {a}{b}{c}{d}, chỉ đọc được ${st.length}` }); continue; }
         const tq = texInline(body.slice(0, tm.index), libs);
         if (own) lines.push(SEC_LABEL[own]);
         lines.push(`Câu ${++n}: ${tq || '(không có nội dung)'}`); st.forEach((o, k) => lines.push(`${L[k]}. ${o}`)); lines.push(`Đúng sai: ${tv.map(x => x ? 'Đ' : 'S').join(' ')}`);
@@ -784,7 +784,7 @@ function texToBank(tex) {
       if (!cm) {
         // câu điền số: \shortans[oly]{đáp số} trong gói ex_test (dùng cho vòng Vượt chướng ngại vật, chế độ Điền đáp số)
         const sm = /\\shortans(?![A-Za-z])/.exec(body), g = sm ? texGroup(body, texOpt(body, sm.index + sm[0].length)[1]) : null, val = g ? texInline(g[0], libs).trim() : '';
-        if (!sm || !val) { skipped++; continue; }
+        if (!sm || !val) { skipped++; bad.push({ sec: own || sec, ref: `\\begin{ex} thứ ${exN}`, snip: texInline(body, libs).slice(0, 70), why: !sm ? 'không có \\choice, \\choiceTF hay \\shortans' : '\\shortans để trống hoặc không đọc được' }); continue; }
         const sq = texInline(body.slice(0, sm.index), libs);
         if (own) lines.push(SEC_LABEL[own]);
         lines.push(`Câu ${++n}: ${sq || '(không có nội dung)'}`); lines.push(`Đáp số: ${val}`);
@@ -794,7 +794,7 @@ function texToBank(tex) {
       let i = cm.index + cm[0].length; i = texOpt(body, i)[1];
       const opts = []; let ans = -1;
       for (let k = 0; k < 4; k++) { const g = texGroup(body, i); if (!g) break; let o = g[0]; if (/\\True(?![A-Za-z])/.test(o)) { ans = k; o = o.replace(/\\True(?![A-Za-z])/g, ''); } opts.push(texInline(o, libs) || '—'); i = g[1]; }
-      if (opts.length < 2 || ans < 0) { skipped++; continue; }
+      if (opts.length < 2 || ans < 0) { skipped++; bad.push({ sec: own || sec, ref: `\\begin{ex} thứ ${exN}`, snip: texInline(body.slice(0, cm.index), libs).slice(0, 70), why: opts.length < 2 ? `\\choice cần 4 phương án {A}{B}{C}{D}, chỉ đọc được ${opts.length}` : 'chưa đánh dấu \\True cho đáp án đúng' }); continue; }
       const q = texInline(body.slice(0, cm.index), libs);
       if (own) lines.push(SEC_LABEL[own]);
       lines.push(`Câu ${++n}: ${q || '(không có nội dung)'}`); opts.forEach((o, k) => lines.push(`${L[k]}. ${o}`)); lines.push(`Đáp án: ${L[ans]}`);
@@ -804,7 +804,7 @@ function texToBank(tex) {
       if (k !== 'pool' || m[1]) { sec = k; lines.push(SEC_LABEL[sec]); }
     }
   }
-  return { text: lines.join('\n'), n, skipped };
+  return { text: lines.join('\n'), n, skipped, bad };
 }
 const SAMPLE_TEX = String.raw`\documentclass[12pt,a4paper]{article}
 \usepackage[utf8]{vietnam}
@@ -946,28 +946,40 @@ function secKey(s) {
   if (n.includes('VE DICH')) { if (n.includes('40')) return 'v40'; if (n.includes('30')) return 'v30'; return 'v20'; }
   return 'pool';
 }
+const SEC_VN = { r1: 'Khởi động', r2: 'Vượt CNV (hàng ngang)', cnv: 'CNV', r3: 'Tăng tốc', v20: 'Về đích 20đ', v30: 'Về đích 30đ', v40: 'Về đích 40đ', tb: 'Câu phụ', pool: 'chưa có mã vòng' };
+let BANK_BAD = [];
 function parseQuestions(raw) {
+  BANK_BAD = []; let ln = 0;
   const out = { r1: [], r2: [], cnv: [], r3: [], v20: [], v30: [], v40: [], tb: [], pool: [] };
   let sec = 'pool', cur = null;
   const flush = () => {
     if (cur) {
-      const n = cur.opts.filter(o => o !== undefined).length;
+      const n = cur.opts.filter(o => o !== undefined).length, hint = cur.hints.length ? ' – ' + cur.hints.join('; ') : '';
+      const bad = why => BANK_BAD.push({ sec, ref: `Dòng ${cur.line} (${cur.head})`, snip: cur.text.trim().slice(0, 70), why: why + hint });
       if (n >= 2 && cur.ans >= 0 && cur.opts[cur.ans] !== undefined)
         out[sec].push({ text: cur.text.trim(), opts: Array.from(cur.opts, o => o ?? ''), ans: cur.ans });
       else if (cur.sa && ['r2', 'cnv', 'v20', 'v30', 'v40', 'tb'].includes(sec)) out[sec].push({ text: cur.text.trim(), opts: [], ans: -1, sa: cur.sa });
       else if (cur.tf && sec === 'r3' && n >= 4) out.r3.push({ text: cur.text.trim(), opts: Array.from(cur.opts, o => o ?? ''), ans: -1, tf: cur.tf });
+      else if (cur.sa && n < 2) bad('câu điền số (Đáp số) chỉ dùng ở mục VCNV, CNV, VD20/30/40, PHU – không dùng cho ' + SEC_VN[sec]);
+      else if (cur.tf) bad(sec === 'r3' ? 'câu Đúng/Sai cần đủ 4 ý A–D' : 'câu Đúng/Sai chỉ dùng ở mục Tăng tốc [TT]');
+      else if (n < 2) bad(`chỉ đọc được ${n} phương án (cần A, B, C, D, mỗi phương án bắt đầu bằng "A." hoặc "A)")`);
+      else if (cur.ans < 0) bad('thiếu dòng "Đáp án: A/B/C/D"');
+      else bad(`đáp án ${L[cur.ans]} trỏ tới phương án không tồn tại`);
     }
     cur = null;
   };
   for (let line of String(raw).replace(/\r/g, '').split('\n')) {
-    line = line.trim(); if (!line) continue;
+    ln++; line = line.trim(); if (!line) continue;
     const sm = line.match(/^\[(.+?)\]\s*$/) || line.match(/^#{1,3}\s*(.+)$/);
     if (sm) { flush(); sec = secKey(sm[1]); continue; }
     const qm = line.match(/^(?:C.u|Question)\s*\d+\s*[:.)]\s*(.*)$/i);
-    if (qm) { flush(); cur = { text: qm[1], opts: [], ans: -1 }; continue; }
+    if (qm) { flush(); cur = { text: qm[1], opts: [], ans: -1, line: ln, head: line.slice(0, 12), hints: [] }; continue; }
+    if (/^(?:C.u|B.i|Question)\s*\d+/i.test(line)) { flush(); BANK_BAD.push({ sec, ref: `Dòng ${ln}`, snip: line.slice(0, 70), why: 'không nhận ra đầu câu – cần dạng "Câu 1:" hoặc "Câu 1."' }); continue; }
     if (!cur) continue;
     const am = norm(line).match(/^(?:DAP AN|DA)(?:\s*DUNG)?\s*[:\-]?\s*([A-D])\b/);
     if (am) { cur.ans = L.indexOf(am[1]); continue; }
+    if (/^(?:dap an|dap so|da)\b/i.test(norm(line)) && !/[:\-]\s*\S/.test(line)) cur.hints.push('dòng "' + line.slice(0, 30) + '" thiếu dấu ":" hoặc nội dung');
+    if (/^[a-d]\s*[.)]\s/.test(line) && !cur.hints.some(h => h.includes('chữ thường'))) cur.hints.push('có phương án viết chữ thường (a. b.) – hãy viết hoa A. B. C. D.');
     const tfm = norm(line).match(/^(?:DUNG SAI|DS|TF)\s*[:\-]\s*([DSTF][\sDSTF,;]*)$/);
     if (tfm) { const tk = tfm[1].replace(/[^DSTF]/g, '').split(''); if (tk.length === 4) { cur.tf = tk.map(c => c === 'D' || c === 'T'); continue; } }
     const sa = norm(line).match(/^(?:DAP SO|DAP AN|DA)\s*[:\-]\s*(.+)$/);
@@ -1006,6 +1018,7 @@ function buildBank(text) {
     else if (arr.length > n) warn.push(`${label}: có ${arr.length} câu, chỉ dùng ${n} câu đầu`);
     return arr.slice(0, n);
   };
+  BANK_BAD.push(...p.pool.map(q => ({ sec: 'pool', ref: 'Câu không có mục', snip: q.text.slice(0, 70), why: 'nằm ngoài mục vòng thi – đặt dưới [KD], [VCNV], [CNV], [TT], [VD20/30/40] hoặc [PHU]' })));
   if (p.pool.length) warn.push(`${p.pool.length} câu chưa có mã vòng thi nên KHÔNG được dùng – hãy đặt dưới mục [KD], [VCNV], [CNV], [TT], [VD20], [VD30], [VD40] hoặc [PHU]`);
   if (!p.cnv.length && p.r2.length >= 5) { p.cnv = [p.r2[4]]; p.r2 = p.r2.slice(0, 4); warn.push('Không có câu [CNV] – dùng câu Vượt CNV thứ 5 làm câu chướng ngại vật'); }
   const b = { r1: take(p.r1, RULES.R1_COUNT, 'Khởi động'), r2: take(pickR2(p), 4, 'Vượt CNV (hàng ngang)'), cnv: take(p.cnv, 1, 'Câu từ khóa CNV')[0] || null, r3: take(p.r3, 4, 'Tăng tốc') };
@@ -1017,6 +1030,7 @@ function buildBank(text) {
   if (b.v[20].length < need20 || b.v[30].length < need30) warn.push(`Về đích (khuyến nghị, không lặp câu với mọi cách chọn gói): ${need20} câu 20đ, ${need30} câu 30đ, ${need40} câu 40đ – đang có ${b.v[20].length}/${b.v[30].length}/${b.v[40].length}`);
   if (!b.tb.length) warn.push('Câu hỏi phụ: chưa có câu [PHU] – nếu cuối trận có đội bằng điểm sẽ không phân định được (khuyến nghị 3 câu)');
   b.total = Object.values(p).reduce((s, a) => s + a.length, 0); b.warn = warn;
+  b.bad = [...(text === H?.bankText && H?.texBad ? H.texBad : []), ...BANK_BAD];
   b.count = { r1: b.r1.length, r2: b.r2.length, cnv: b.cnv ? 1 : 0, r3: b.r3.length, v20: b.v[20].length, v30: b.v[30].length, v40: b.v[40].length, tb: b.tb.length, pool: p.pool.length };
   return b;
 }
@@ -1726,14 +1740,15 @@ function h_useSaved() { const r = findSavedRoster(); if (r) setStudents(r.names,
 async function h_bankFile(file) {
   if (!file) return;
   try {
-    let text, note = '';
+    let text, note = '', texBad = [];
     if (/\.tex$/i.test(file.name)) {
-      const r = texToBank(await file.text()); text = r.text;
+      const r = texToBank(await file.text()); text = r.text; texBad = r.bad;
       note = `Đã đọc ${r.n} câu trắc nghiệm từ file LaTeX` + (r.skipped ? ` (bỏ qua ${r.skipped} câu không phải \\choice 4 đáp án hoặc thiếu \\True)` : '') + '.';
     } else text = /\.docx$/i.test(file.name) ? (await mammoth.extractRawText({ arrayBuffer: await file.arrayBuffer() })).value : await file.text();
     const b = buildBank(text);
     if (!b.total) return say({ title: 'Không nhận được câu hỏi nào', html: true, msg: 'Kiểm tra định dạng: mỗi câu có <b>“Câu 1: …”</b>, các dòng <b>“A. …”</b> và <b>“Đáp án: A”</b>. Với file .tex: mỗi câu cần <b>\\choice</b> 4 đáp án và <b>\\True</b>.', tone: 'danger', icon: 'fa-file-circle-question' });
-    H.bankText = text; H.bankName = file.name; commit();
+    H.bankText = text; H.bankName = file.name; H.texBad = texBad; commit();
+    if (b.bad.length) setTimeout(() => h_checkBank(), 400);
     toast(note || `Đã nạp ${b.total} câu hỏi từ “${file.name}”`, b.warn.length ? 'warn' : 'success', 4500);
   } catch (e) { say({ title: 'Không đọc được file', msg: e.message, tone: 'danger', icon: 'fa-file-circle-xmark' }); }
 }
@@ -1745,9 +1760,18 @@ async function h_clearRoster() {
 }
 async function h_clearBank() {
   if (!await ask({ title: 'Xóa file câu hỏi đã nạp?', msg: 'Bộ câu hỏi đang dùng sẽ bị xóa và quay về bộ câu hỏi mẫu. Bạn có thể nạp file mới ngay sau đó.', ok: 'Xóa file', tone: 'danger', icon: 'fa-trash' })) return;
-  H.bankText = SAMPLE_BANK; H.bankName = 'Bộ câu hỏi mẫu – KHTN 8 (Chương I–II)'; commit(); toast('Đã xóa file đã nạp – hãy nạp file câu hỏi mới');
+  H.bankText = SAMPLE_BANK; H.bankName = 'Bộ câu hỏi mẫu – KHTN 8 (Chương I–II)'; H.texBad = []; commit(); toast('Đã xóa file đã nạp – hãy nạp file câu hỏi mới');
 }
-function h_sampleBank() { H.bankText = SAMPLE_BANK; H.bankName = 'Bộ câu hỏi mẫu – KHTN 8 (Chương I–II)'; commit(); }
+function h_sampleBank() { H.bankText = SAMPLE_BANK; H.bankName = 'Bộ câu hỏi mẫu – KHTN 8 (Chương I–II)'; H.texBad = []; commit(); }
+function h_checkBank() {
+  const b = buildBank(H.bankText), bad = b.bad;
+  const grp = {}; bad.forEach(x => (grp[x.sec] = grp[x.sec] || []).push(x));
+  const items = Object.entries(grp).map(([k, a]) => `<div class="mt-3"><div class="text-[11px] font-black uppercase text-rose-600">${esc(SEC_VN[k] || k)} – ${a.length} câu lỗi</div>${a.map(x => `<div class="mt-1 rounded-xl bg-rose-50 border border-rose-200 p-2"><div class="text-[11px] font-bold text-slate-500">${esc(x.ref)}</div><div class="text-xs text-slate-800 font-semibold">${esc(x.snip || '(không có nội dung)')}</div><div class="text-xs font-bold text-rose-700">→ ${esc(x.why)}</div></div>`).join('')}</div>`).join('');
+  const warn = b.warn.length ? `<div class="text-xs font-bold text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-2">${b.warn.map(esc).join('<br>')}</div>` : '';
+  const sum = `<div class="text-xs text-slate-500">Đã nhận <b>${b.total}</b> câu hợp lệ trong “${esc(H.bankName)}”.</div>`;
+  say({ wide: true, title: bad.length ? `Có ${bad.length} câu không nhận diện được` : 'Không phát hiện câu lỗi', html: true, tone: bad.length ? 'danger' : 'success', icon: bad.length ? 'fa-bug' : 'fa-circle-check',
+    msg: `<div class="text-left max-h-[55vh] overflow-y-auto pr-1">${sum}${warn ? '<div class="mt-2">' + warn + '</div>' : ''}${items || '<div class="mt-3 text-sm">Mọi câu trong file đều đọc được. Nếu vẫn báo thiếu thì file chưa đủ số câu cho mục đó (xem thông báo màu vàng).</div>'}</div>` });
+}
 function h_downloadTemplate() {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(new Blob(['\ufeff' + SAMPLE_BANK], { type: 'text/plain;charset=utf-8' }));
@@ -1924,6 +1948,7 @@ function setupHTML() {
       <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4 flex flex-col justify-between gap-2">
         <div class="font-bold text-sm"><i class="fa-solid fa-file-lines text-blue-600"></i> Đang dùng: ${esc(H.bankName)} <span class="text-slate-400">(${b.total} câu)</span></div>
         <div class="flex flex-wrap gap-2">
+          <button class="btn btn-soft !py-1.5 !text-xs ${b.bad.length ? '!text-rose-600' : ''}" onclick="h_checkBank()"><i class="fa-solid fa-bug"></i> Kiểm tra lỗi câu hỏi${b.bad.length ? ` (${b.bad.length})` : ''}</button>
           ${H.bankText !== SAMPLE_BANK ? '<button class="btn btn-soft !py-1.5 !text-xs !text-rose-600" onclick="h_clearBank()"><i class="fa-solid fa-trash"></i> Xóa file đã nạp</button>' : ''}
           <button class="btn btn-soft !py-1.5 !text-xs" onclick="h_sampleBank()"><i class="fa-solid fa-flask"></i> Bộ mẫu KHTN 8</button>
           <button class="btn btn-soft !py-1.5 !text-xs" onclick="h_sampleDocx()"><i class="fa-solid fa-file-word text-blue-600"></i> Word mẫu</button>
