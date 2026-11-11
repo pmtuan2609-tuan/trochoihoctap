@@ -553,11 +553,18 @@ const Net = {
   publish(roomId, pub) {
     const s = JSON.stringify(pub);
     if (this.db) return this.db.ref(`olp/rooms/${roomId}/pub`).set(s);
+    this.lastPub = s;                       // luôn giữ bản mới nhất (máy đội vào sau sẽ nhận bản này)
+    if (this._cool) { this._dirty = true; return; }   // gộp nhiều thay đổi dồn dập thành 1 lần gửi (tránh nghẽn mạng/đơ máy)
+    this._flush();
+    this._cool = setTimeout(() => { this._cool = null; if (this._dirty) { this._dirty = false; this._flush(); this._cool = setTimeout(() => { this._cool = null; if (this._dirty) { this._dirty = false; this._flush(); } }, 90); } }, 90);
+  },
+  _flush() {
+    const s = this.lastPub; if (!s) return;
     try { localStorage.setItem('olp_pub', s); localStorage.setItem('olp_alive', Date.now()); } catch (e) { }
     this.bc && this.bc.postMessage({ k: 'pub', s });
-    this.lastPub = s;
     this.conns.forEach(c => { if (c.open) try { c.send({ k: 'pub', s, now: Date.now() }); } catch (e) { } });
   },
+  rebroadcast() { if (!this.lastPub || this._cool) return; this.conns.forEach(c => { if (c.open) try { c.send({ k: 'pub', s: this.lastPub, now: Date.now() }); } catch (e) { } }); },   // nhịp tim: gửi lại bản mới nhất để máy đội luôn đồng bộ
   heartbeat() { try { localStorage.setItem('olp_alive', Date.now()); } catch (e) { } },
   registerPins(roomId, pins, oldPins = []) {
     if (this.db) {
@@ -629,7 +636,8 @@ const Net = {
         c.on('error', e => { this.err = this.err || (e && e.type) || 'conn'; });
         c.on('data', d => {
           if (!d || d.k !== 'pub') return;
-          this.offset = d.now - Date.now();
+          this.lastRx = Date.now(); const est = d.now - Date.now();
+          if (!this._offAt || est > this.offset || Date.now() - this._offAt > 30000) { this.offset = est; this._offAt = Date.now(); }   // giữ ước lượng độ lệch đồng hồ có độ trễ thấp nhất
           const p = JSON.parse(d.s); this.conn = c; this.via = 'p2p'; this.p2pPub = p;
           if (!done) fin(p.roomId); else this.pubCb && this.pubCb(p);
         });
@@ -1041,7 +1049,7 @@ function buildBank(text) {
 
 /* ===================== KHUNG GIAO DIỆN DÙNG CHUNG ===================== */
 let RR = 0; // thời điểm cần vẽ lại
-function rerenderAt(t) { if (!RR || t < RR) RR = t; }
+function rerenderAt(t) { if (t > Net.now() + 30 && (!RR || t < RR)) RR = t; }   // chỉ hẹn vẽ lại khi mốc còn ở tương lai (mốc đã qua mà hẹn lại sẽ gây vòng lặp vẽ vô hạn → treo máy)
 function timerHTML(dl, total, big) {
   return `<div class="flex items-center gap-3">
     <div class="flex-1 ${big ? 'h-4' : 'h-3'} bg-slate-200 rounded-full overflow-hidden"><div class="h-full bg-gradient-to-r from-emerald-500 via-amber-400 to-rose-500 tbar" data-dl="${dl}" data-total="${total}" style="width:100%"></div></div>
@@ -1059,7 +1067,7 @@ function updateTimers() {
   document.querySelectorAll('.tnum').forEach(e => { const s = Math.max(0, Math.ceil((+e.dataset.dl - now) / 1000)); e.textContent = s; e.classList.toggle('text-rose-600', s <= 5); });
   document.querySelectorAll('.tbar').forEach(e => { const r = Math.max(0, (+e.dataset.dl - now) / (+e.dataset.total * 1000)); e.style.width = (Math.min(1, r) * 100) + '%'; });
   document.querySelectorAll('[data-until]').forEach(e => { const s = Math.ceil((+e.dataset.until - now) / 1000); e.textContent = s > 0 ? s : 'Bắt đầu!'; });
-  if (RR && now >= RR) { RR = 0; IS_TEAM ? renderTeam() : renderHost(); }
+  if (RR && now >= RR) { RR = 0; setTimeout(() => IS_TEAM ? renderTeam() : renderHost(), 0); }
 }
 function optsHTML(opts, o = {}) {
   const { act = '', extra = '', disabled = false, chosen = -1, correct = -1, wrong = -1 } = o;
@@ -1387,12 +1395,14 @@ function hostInit() {
   if (H.phase !== 'setup') { Net.registerPins(H.roomId, H.teams.map(t => t.pin)); listen(); }
   setInterval(hostTick, 250);
   setInterval(() => { if (H.phase !== 'setup') Net.heartbeat(); }, 2000);
+  setInterval(() => { if (H.phase !== 'setup') Net.rebroadcast(); }, 3000);
   Net.onStatus = () => { if (H.phase === 'lobby') renderHost(); };
   commit();
 }
 
+let PUBSEQ = 0;
 function buildPub() {
-  const p = { roomId: H.roomId, phase: H.phase, teams: H.teams.map(t => ({ name: t.name, color: t.color, members: t.members, dev: t.dev, score: t.score, tb: t.tb || 0 })), rejects: H.rejects, times: H.times };
+  const p = { seq: (PUBSEQ = Math.max(PUBSEQ + 1, Date.now())), roomId: H.roomId, phase: H.phase, teams: H.teams.map(t => ({ name: t.name, color: t.color, members: t.members, dev: t.dev, score: t.score, tb: t.tb || 0 })), rejects: H.rejects, times: H.times };
   if (H.phase === 'game') { p.round = H.g.round; p.status = H.g.status; p.view = pubRound(H.g); }
   return p;
 }
@@ -2225,6 +2235,11 @@ async function teamReconnect(n) {
 function teamLeave(msg) { T.room = null; T.t = -1; T.wasIn = false; T.connecting = false; T.err = msg; sessionStorage.removeItem('olp_pin'); renderTeam(); }
 function teamOnPub(p) {
   if (!T.room || p.roomId !== T.room) return;
+  if (p.seq) {
+    if (T.seq && p.seq < T.seq) return;                          // bản cũ đến muộn → bỏ
+    if (p.seq === T.seq && T.t >= 0 && !T.lost) return;          // bản gửi lại giống hệt → không vẽ lại
+    T.seq = p.seq;
+  }
   T.p = p; if (p.times) applyTimes(p.times);
   const t = (p.teams || []).findIndex(x => x.dev === T.dev);
   if (t < 0) {
@@ -2260,6 +2275,7 @@ function renderTeam() {
   RR = 0;
   const root = $('#app');
   if (T.t < 0 || !T.p) {
+    T.lastHtml = null;
     root.innerHTML = `<div class="min-h-screen grid place-items-center p-4 bg-gradient-to-br from-rose-50 via-violet-50 to-amber-50">
       <div class="card p-7 sm:p-9 w-full max-w-md text-center pop">
         <div class="flex justify-center">${champStackHTML()}</div>
@@ -2279,10 +2295,12 @@ function renderTeam() {
   const p = T.p, me = p.teams[T.t];
   if (p.phase === 'end' && !T.confetti && window.confetti) { T.confetti = true; setTimeout(() => confetti({ particleCount: 140, spread: 90, origin: { y: .55 } }), 1300); }
   if (p.phase !== 'end') T.confetti = false;
-  root.innerHTML = teamHeaderHTML(p, me) + teamTimerStrip(p) + `
+  const html = teamHeaderHTML(p, me) + teamTimerStrip(p) + `
     ${T.lost ?'<div class="max-w-4xl mx-auto px-3 pt-3"><div class="rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-sm font-bold px-4 py-2.5"><i class="fa-solid fa-wifi fa-fade"></i> Mất kết nối với máy giáo viên – đang tự kết nối lại…</div></div>' : ''}
     <main class="max-w-4xl mx-auto p-3 sm:p-6 pb-10">${teamScreen(p, T.t, { ro: false, pend: T.pend, cnvOpen: T.cnvOpen, pick: T.pick })}</main>`;
-  renderMath($('#app')); updateTimers();
+  if (html === T.lastHtml && root.firstChild) { updateTimers(); return; }   // nội dung không đổi → giữ nguyên giao diện, không nhấp nháy/tải lại hình
+  T.lastHtml = html; root.innerHTML = html;
+  renderMath(root); updateTimers();
 }
 /* Thanh đếm ngược cho học sinh: hiện khi đang có giờ đếm ngược, ẩn khi không có */
 function teamTimerStrip(p) {
@@ -2747,6 +2765,7 @@ document.addEventListener('click', e => {
 });
 Net.init();
 setInterval(updateTimers, 200);
+setInterval(() => { if (IS_TEAM && Net.via === 'p2p' && Net.conn && T.t >= 0 && !T.lost && Date.now() - (Net.lastRx || 0) > 9000) { try { Net.conn.close(); } catch (e) { } Net.conn = null; Net.onLost && Net.onLost(); } }, 3000);   // quá 9s không nhận gì → coi như mất kết nối và tự nối lại
 IS_TEAM ? teamInit() : (authUser() ? hostInit() : renderLogin());
 </script>
 </body>
